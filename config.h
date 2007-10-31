@@ -129,25 +129,6 @@ namespace tlib
         } // end _get()
 
         /**
-         * Reads a sequence of up to 3 values and for more that 4 values
-         * it creates a loop
-         */
-        template<typename T>
-        void _fetch( T *result, const int count )
-        {
-            switch(count)
-            {
-            case 1: cfg >> *result; break;
-            case 2: cfg >> *result >> *(result+1); break;
-            case 3: cfg >> *result >> *(result+1) >> *(result+2); break;
-            default:
-                for( int i=0; i<count; ++i ) 
-                    cfg >> *(result+i);
-                break;
-            }
-        }
-
-        /**
          * Returns the file pointer to the beginning of the file
          */
         void _reset()
