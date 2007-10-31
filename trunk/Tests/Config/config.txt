@@ -1,0 +1,12 @@
+spaceship_lives         5
+spaceship_shield_hits   20
+spaceship_model         assets/models/comet_3ds/comet.3ds
+spaceship_init_pos      0 0 0
+spaceship_init_rot      90.03434 5 0 7
+defence_gun_hits        3
+reactor_hits            5
+spacestation_tiles      40
+spacestation_tile_size  30
+spacestation_mapfile    assets/mapfile.txt
+spacestation_texture    assets/techno.jpg
+corridor_texture        
