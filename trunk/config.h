@@ -3,10 +3,10 @@
 
 #include <string>
 #include <fstream>
+#include <map>
+#include <sstream>
 
-using std::string;
-using std::ifstream;
-using std::ios_base;
+using namespace std;
 
 namespace tlib
 {
@@ -24,119 +24,84 @@ namespace tlib
     {
     private:
         // The file stream
-        ifstream cfg;
+        ifstream m_File;
+
+        // The key items
+        map < string, string > m_Items;
 
     public:
         /**
          * Constructors
          */
-        Config() {}
-        Config( const char *cfg_filename )
-        {
-            open( cfg_filename );
-        }
+        Config();
+        Config( const char *cfg_filename );
 
         /**
          * Opens the stream and returns whether it was successfull
          */
-        bool open( const char *cfg_filename )
-        {
-            cfg.open( cfg_filename );
-            return cfg.is_open();
-        }
+        bool open( const char *cfg_filename );
 
         /**
          * Closes the stream
          */
-        void close() { cfg.close(); }
+        void close();
 
         /**
-         * Maps the search to an int or an array of ints
+         * Loads a block of key-value paired data under the 
+         * given block title
          */
-        int getInt( const string &key, int *result, int count = 1 ) {
-            return _get<int>( key, result, count );
-        }
+        int loadBlock( const string &sTitle );
 
         /**
-         * Maps the search to a float or an array of floats
+         * An simple method if we want a string value
          */
-        int getFloat( const string &key, float *result, int count = 1 ) {
-            return _get<float>( key, result, count );
-        }
+        void getString( const string &sKey, string &sOut );
 
         /**
-         * Maps the search to a double or an array of doubles
+         * Reads integers
          */
-        int getDouble( const string &key, double *result, int count = 1 ) {
-            return _get<double>( key, result, count );
-        }
+        void getInt( const string &sKey, 
+                     int *out, 
+                     const int nCount = 1 );
 
         /**
-         * Maps the search to a string
+         * Reads floats
          */
-        int getString( const string &key, char result[] ) {
-            return _get<char*>( key, &result, 1 );
-        }
-
-        /**
-         * Maps the search to a string
-         */
-        int getString( const string &key, string *result ) {
-            return _get<string>( key, result, 1 );
-        }
+        void getFloat( const string &sKey, 
+                       float *out, 
+                       const int nCount = 1 );
 
     private:
         /**
-         * Searches the configuration file to find the desired key-value pair
-         * we want.
-         * Returns -1 if file is not open, 0 if key was not found and 1 if
-         * key was found and value was saved successfully
+         * Saves any number of values of any kind from a key-value
+         * pair
          */
         template<typename T>
-        int _get( const string &key, T *result, const int count )
-        {
-            if( !cfg.is_open() ) return -1;
-
-            // For every line in the file, read the first word
-            // (aka. stop at the first space character)
-            char line[50];
-            int sz = sizeof(line);
-            while( cfg.getline( line, sz, ' ' ) )
-            {
-                // Compare word with given key
-                if( 0 == key.compare( line ) )
-                {
-                    // If they match then fetch the value associated 
-                    // with that key
-                    for( int i=0; i<count; ++i ) 
-                        cfg >> *(result+i);
-
-                    // And since we don't want anything we can 
-                    // reset the file
-                    _reset();
-
-                    // and safely return
-                    return 1;
-                }
-
-                // Do another getline() to clear the line remains
-                cfg.getline( line, 50 );
-
-            } // end while( )
-
-            return 0;
-
-        } // end _get()
+        void _get( const string &sKey, T *out, const int nCount );
 
         /**
          * Returns the file pointer to the beginning of the file
          */
-        void _reset()
-        {
-            cfg.clear();
-            cfg.seekg( 0, ios_base::beg );
-        }
+        void _reset();
 
     }; // end of class Config
+
+    // ------------------------------------------------------------------------
+    template<typename T>
+    void Config::_get( const string &sKey, 
+                       T *out, 
+                       const int nCount )
+    {
+        // Create a string stream to easily read the values
+        // from out data string
+        istringstream instream;
+        instream.clear();
+        instream.str( m_Items[sKey] );
+        
+        // dummy character to read delimiter
+        char d;
+        for( int i=0; i<nCount; ++i )
+            instream >> *(out+i) >> d;
+    } // end of _get
 
 } // end of namespace tlib
