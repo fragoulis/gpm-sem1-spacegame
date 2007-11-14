@@ -4,13 +4,15 @@
 #include <fstream>
 #include <assert.h>
 #include "SpacestationCorridorsDisplayList.h"
+#include "Outlet.h"
 #include "Logger.h"
 #include "Config.h"
 
 using std::ifstream;
 using tlib::Logger;
 
-SpacestationCorridorsDisplayList::SpacestationCorridorsDisplayList()
+SpacestationCorridorsDisplayList::SpacestationCorridorsDisplayList():
+    m_TileList(0)
 {
     _LOG("Setting up spacestation corridors display list...");
     
@@ -31,18 +33,23 @@ SpacestationCorridorsDisplayList::SpacestationCorridorsDisplayList()
     }
 }
 
+// ----------------------------------------------------------------------------
 SpacestationCorridorsDisplayList::~SpacestationCorridorsDisplayList()
 {
     // Iterate and delete all tiles
-    _Tilemap::iterator iter;
+    /*_Tilemap::iterator iter;
     for( iter = m_Tilemap.begin(); iter != m_Tilemap.end(); iter++ )
     {
         delete iter->second;
         iter->second = 0;
-    }
+    }*/
+    if( m_TileList )
+        delete [] m_TileList;
+    m_TileList = 0;
     m_Tilemap.clear();
 }
 
+// ----------------------------------------------------------------------------
 bool SpacestationCorridorsDisplayList::readMap( const char *filename )
 {
     ifstream fin( filename );
@@ -51,10 +58,10 @@ bool SpacestationCorridorsDisplayList::readMap( const char *filename )
     
     _LOG("Reading filemap " + string(filename) );
 
-    // Read info for every tile in the mapfile
-    // We are kind of forced to use a new for every tile
-    int i, j, k, corr_type, obj_type;
-    while( fin >> i >> j >> k >> corr_type >> obj_type )
+    // Read every line to get a hold of the number of tiles
+    int iNumOfLines = 0;
+    int i, j, k, corr_type, obj_type, friend_id;
+    while( fin >> i >> j >> k >> corr_type >> obj_type >> friend_id )
     {
         // Tile's index must be between our boundaries
         if( i<0 || i>=m_iNumOfTiles || 
@@ -64,19 +71,65 @@ bool SpacestationCorridorsDisplayList::readMap( const char *filename )
             _LOG("Invalid tile on line " + toStr<size_t>(m_Tilemap.size()-1) );
             continue;
         }
-            
+
+        iNumOfLines++;
+    }
+
+    _LOG("Counted " + toStr<size_t>(iNumOfLines) + " tiles");
+
+    // Return at the start of the file
+    fin.clear();
+    fin.seekg( 0, ios_base::beg );
+
+    // Allocate continuous memory for all tiles
+    m_TileList = new Tile3d[ iNumOfLines ];
+
+    // Read info for every tile in the mapfile
+    // We prefer to use a start to end for here sine we already have 
+    // the end of the array :|
+    for( int iCurrentTile = 0; iCurrentTile<iNumOfLines; ++iCurrentTile )
+    {
+        // Read tile attibutes
+        fin >> i >> j >> k >> corr_type >> obj_type >> friend_id;
+        
         // Create tile and push it to the list
         int index = i + 
                     j * m_iNumOfTiles + 
                     k * m_iNumOfTiles * m_iNumOfTiles;
-        m_Tilemap[ index ] = new Tile3d( i, j, k, corr_type, obj_type );
+
+        // Setup tile
+        m_TileList[ iCurrentTile ].i = i;
+        m_TileList[ iCurrentTile ].j = j;
+        m_TileList[ iCurrentTile ].k = k;
+        m_TileList[ iCurrentTile ].setType( corr_type );
+        m_TileList[ iCurrentTile ].setFriendId( friend_id );
+        m_TileList[ iCurrentTile ].addObject( obj_type );
+
+        // Save address to associative map
+        m_Tilemap[ index ] = &m_TileList[ iCurrentTile ];
     }
-    _LOG("Counted " + toStr<size_t>(m_Tilemap.size()) + " tiles");
     
+    // Third and final pass... a little quicker this time
+    // We have to link outlets to barriers. To do that we pass the address
+    // of the occupant object of the tile with index the same as the friend id
+    // of to this tile's occupant barrier pointer :)))
+    for( int iCurrentTile = 0; iCurrentTile<iNumOfLines; ++iCurrentTile )
+    {
+        // friend id is zero, then tile is not an outlet
+        if( !m_TileList[iCurrentTile].getFriendId() ) continue;
+        
+        // Associate power outlet with a barrier
+        Outlet *oOL = (Outlet*)m_TileList[iCurrentTile].getOccupant();
+        int index = m_TileList[iCurrentTile].getFriendId();
+
+        oOL->setBarrier( (Barrier*)m_Tilemap[index]->getOccupant() );
+    }
+
     return true;
     
 } // end readMap()
 
+// ----------------------------------------------------------------------------
 void SpacestationCorridorsDisplayList::buildObject() const 
 {
     _LOG("Building spacestation corridors object");
@@ -104,7 +157,7 @@ void SpacestationCorridorsDisplayList::buildObject() const
             endY = startY + m_iTileSize;
             endZ = startZ - m_iTileSize;
 
-            if( oTile->corrType & TW_FRONT )
+            if( oTile->getType() & TW_FRONT )
             {
                 // front face
                 glNormal3f( 0.0f, 0.0f, 1.0f );
@@ -118,7 +171,7 @@ void SpacestationCorridorsDisplayList::buildObject() const
                 glVertex3f( startX,   endY, endZ );
             } // end of front face
 
-            if( oTile->corrType & TW_BACK )
+            if( oTile->getType() & TW_BACK )
             {
                 // back face
                 glNormal3f( 0.0f, 0.0f, -1.0f );
@@ -132,7 +185,7 @@ void SpacestationCorridorsDisplayList::buildObject() const
                 glVertex3f( startX, startY, startZ );
             } // end of back face
 
-            if( oTile->corrType & TW_LEFT )
+            if( oTile->getType() & TW_LEFT )
             {
                 // left face
                 glNormal3f( 1.0f, 0.0f, 0.0f );
@@ -146,7 +199,7 @@ void SpacestationCorridorsDisplayList::buildObject() const
                 glVertex3f( startX,   endY, startZ );
             }
 
-            if( oTile->corrType & TW_RIGHT )
+            if( oTile->getType() & TW_RIGHT )
             {
                 // right face
                 glNormal3f( -1.0f, 0.0f, 0.0f );
@@ -160,7 +213,7 @@ void SpacestationCorridorsDisplayList::buildObject() const
                 glVertex3f( endX,   endY, endZ );
             }
 
-            if( oTile->corrType & TW_TOP )
+            if( oTile->getType() & TW_TOP )
             {   
                 // top face
                 glNormal3f( 0.0f, -1.0f, 0.0f );
@@ -174,7 +227,7 @@ void SpacestationCorridorsDisplayList::buildObject() const
                 glVertex3f( startX, endY, startZ );
             }
 
-            if( oTile->corrType & TW_BOTTOM )
+            if( oTile->getType() & TW_BOTTOM )
             {    
                 // bottom face
                 glNormal3f( 0.0f, 1.0f, 0.0f );

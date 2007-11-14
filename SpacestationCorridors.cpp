@@ -1,6 +1,7 @@
 #include "SpacestationCorridors.h"
 #include "SpacestationCorridorsDisplayList.h"
-#include "Texture.h"
+#include "SingleTexture.h"
+#include "SimpleMaterial.h"
 #include "Logger.h"
 #include "Config.h"
 
@@ -10,12 +11,16 @@ void SpacestationCorridors::setup()
 {
     _LOG("Setting up spacestation corridors...");
 
+    // Read texture filename from configuration file
+    string sTexture;
     Config cfg("config.txt");
     cfg.loadBlock("corridor");
-
-    string sTexture;
     cfg.getString("texture" ,sTexture);
 
-    setComponent( new SpacestationCorridorsDisplayList );      
-    setComponent( new OCTexture( sTexture.c_str() ) );
+    // Initialize display list component
+    setComponent( new SpacestationCorridorsDisplayList );     
+    // Initialize material component
+    setComponent( new OCSimpleMaterial );
+    // Initialize texture component
+    setComponent( new OCSingleTexture( sTexture.c_str() ) );
 }

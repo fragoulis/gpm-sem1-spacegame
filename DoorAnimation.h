@@ -1,8 +1,6 @@
 #pragma once
 #include "Animation.h"
-#include "Movement.h"
 using tlib::IOCAnimation;
-using tlib::IOCMovement;
 
 class DoorAnimation : public IOCAnimation
 {
@@ -15,14 +13,21 @@ public:
     }
 
 private:
-    void onStart() {}
-    void onStop() {}
-    void onUpdate() {
-        IOCMovement *cMov = (IOCMovement*)getOwner()->getComponent("movement");
-        cMov->update();
-    }
-    bool condition() const { 
-        return 1; 
-    }
+    /**
+     * Disable the collision box
+     */
+    void onStart();
+    // empty
+    void onStop();
+
+    /**
+     * Update the door's panels
+     */
+    void onUpdate();
+
+    /**
+     * Check for reason to stop animation
+     */
+    bool condition();
 
 }; // end of DoorAnimation class

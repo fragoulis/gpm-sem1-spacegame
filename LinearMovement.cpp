@@ -21,9 +21,6 @@ namespace tlib
         // Retrieve object's position
         const Vector3f& vPos = getOwner()->getPos();
 
-        // Rotate the direction vector
-        //m_vDir.selfRotate( qRot );
-
         // Calculate new position
         Vector3f vNewPos = vPos + 
                            m_vDir * m_fVelocity * IOCMovement::DeltaTime();

@@ -43,7 +43,7 @@ void DoorPanel::init( PanelId pid )
             m_vPos.xyz( 0.0f, -fvDim[0], -fvDim[2] );
             m_qDir.toRotation( (float)M_PI_2, Vector3f::Front() );
             break;
-    }
+    } // end switch( )
 
     // Get panel's direction according to its type
     float fvDir[3];

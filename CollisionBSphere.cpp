@@ -7,6 +7,7 @@ namespace tlib
     }
     OCCollisionBSphere::OCCollisionBSphere( int iRadius ) {
         setRadius( iRadius );
+        m_iType = BSphere;
     }
 
 } // end of namespace tlib

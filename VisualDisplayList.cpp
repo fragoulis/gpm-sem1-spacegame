@@ -1,9 +1,9 @@
-
 #include <windows.h>
 #include <gl/gl.h>
 #include "VisualDisplayList.h"
 #include "Object.h"
-#include "Presentation.h"
+#include "Material.h"
+#include "Texture.h"
 #include "Logger.h"
 
 namespace tlib
@@ -18,11 +18,15 @@ namespace tlib
         // get the object's position
         const Vector3f& pos = getOwner()->getPos();
 
-        // apply color/material/texture
-        IComponent *comp = m_oOwner->getComponent("presentation");
-        IOCPresentation *pres = static_cast<IOCPresentation*>(comp);
-        if( pres )
-            pres->apply();
+        // Apply material if component exists
+        IOCMaterial *cMaterial = (IOCMaterial*)m_oOwner->getComponent("material");
+        if( cMaterial )
+            cMaterial->apply();
+
+        // Apply texture if component exists
+        IOCTexture *cTexture = (IOCTexture*)m_oOwner->getComponent("texture");
+        if( cTexture )
+            cTexture->apply();
 
         glPushMatrix();
             glTranslatef( pos.x(), pos.y(), pos.z() );

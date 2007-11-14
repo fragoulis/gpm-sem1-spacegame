@@ -23,6 +23,7 @@ Camera::Camera()
     setComponent( cOrientation );
 }
 
+// ----------------------------------------------------------------------------
 void Camera::apply()
 {
     // Get viewing and up vectors
@@ -35,6 +36,7 @@ void Camera::apply()
                vUp.x(),     vUp.y(),     vUp.z() );
 }
 
+// ----------------------------------------------------------------------------
 void Camera::write( std::ostream &cout )
 {
     // Get viewing and up vectors

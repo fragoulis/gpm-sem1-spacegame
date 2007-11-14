@@ -5,7 +5,7 @@
 namespace tlib
 {
     OCVisualBox::OCVisualBox( const Vector3f& vHalfDim ): 
-    m_vHalfDim(vHalfDim)
+      m_vHalfDim(vHalfDim)
     {
         generate();
     }

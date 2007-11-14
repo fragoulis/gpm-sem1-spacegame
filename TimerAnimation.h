@@ -8,21 +8,24 @@ namespace tlib
     {
     private:
         // How long the animation will last in miliseconds
-        unsigned long m_ulDuration;
+        unsigned int m_uiDuration;
 
         // The current time
-        unsigned long m_ulCurrent;
+        unsigned int m_uiCurrent;
 
     public:
         /**
          * Constructor
          */
-        OCTimerAnimation(): m_ulDuration(0L), m_ulCurrent(0L)
+        OCTimerAnimation(): 
+            m_uiDuration(0), 
+            m_uiCurrent(0)
         {}
-        OCTimerAnimation( bool bRepeat ): m_ulDuration(0L), m_ulCurrent(0L)
-        {
-            IOCAnimation::IOCAnimation( bRepeat );
-        }
+        OCTimerAnimation( bool bRepeat ): 
+            m_uiDuration(0), 
+            m_uiCurrent(0),
+            IOCAnimation( bRepeat )
+        {}
 
         /**
          * Destructor
@@ -39,9 +42,9 @@ namespace tlib
         /**
          * Getter/Setter for the animation's duration
          */
-        unsigned long getDuration() const { return m_ulDuration; }
+        unsigned long getDuration() const { return m_uiDuration; }
         void setDuration( unsigned long ulDuration ) { 
-            m_ulDuration = ulDuration; 
+            m_uiDuration = ulDuration; 
         }
 
     protected:
@@ -60,19 +63,20 @@ namespace tlib
          * This function is to be called by the timer every time
          * it advances
          */
-        virtual void OnTimerChange( unsigned long ulCurrentTime ) const = 0;
+        virtual void OnTimerChange( unsigned int uiCurrentTime,
+                                    unsigned int uiDuration ) const = 0;
 
     private:
         void onUpdate() 
         { 
-            m_ulCurrent++; 
-            OnTimeChange( m_ulCurrent );
+            m_uiCurrent++; 
+            OnTimerChange( m_uiCurrent, m_uiDuration );
         }
 
-        bool condition() const
+        bool condition()
         {
-            if( m_ulCurrent >= m_ulDuration ) {
-                m_ulCurrent = 0L;
+            if( m_uiCurrent >= m_uiDuration ) {
+                m_uiCurrent = 0L;
                 return true;
             }
 

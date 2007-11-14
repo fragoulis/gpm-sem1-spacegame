@@ -75,24 +75,21 @@ namespace tlib
         /**
          *  Assigns a value to each component
          */
-        void xyz( const T x, const T y, const T z ) 
-        { 
+        void xyz( const T x, const T y, const T z ) { 
             this->x(x); this->y(y); this->z(z);
         }
 
         /**
          * Copies the values of the given array
          */
-        void xyz( const T xyz[] ) 
-        { 
+        void xyz( const T xyz[] ) { 
             x(xyz[0]); y(xyz[1]); z(xyz[2]);
         }
         
         /**
          * Copies the values of the given vector
          */
-        void xyz( const Vector3<T> &vec ) 
-        { 
+        void xyz( const Vector3<T> &vec ) { 
             x(vec.x()); y(vec.y()); z(vec.z());
         }
 
@@ -111,8 +108,7 @@ namespace tlib
         /**
          * Returns the squared length of the vector
          */
-        float squaredLength() const 
-        { 
+        float squaredLength() const { 
             return ( x()*x() + y()*y() + z()*z() );
         }
 

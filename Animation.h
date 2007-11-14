@@ -76,10 +76,11 @@ namespace tlib
             // comes true
             if( condition() ) 
             {
-                stop();
+                freeze();
 
                 // If the repeat flag is on start over
                 if( m_bRepeat ) start();
+                else stop();
             }
         } // end of update()
 
@@ -100,7 +101,7 @@ namespace tlib
         virtual void onStart()   = 0;
         virtual void onStop()    = 0;
         virtual void onUpdate()  = 0;
-        virtual bool condition() const = 0;
+        virtual bool condition() = 0;
 
     }; // end of IOCAnimation class
 
