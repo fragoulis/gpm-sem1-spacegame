@@ -6,18 +6,16 @@ namespace tlib
 {
     OCAccelMovement::OCAccelMovement():  
       m_fAccel(0.0f)
-    {
-        OCLinearMovement::OCLinearMovement();
-    }
+    {}
 
     OCAccelMovement::OCAccelMovement( float fAcc, 
                                       float fVel, 
                                       const Vector3f& vDir ):
-      m_fAccel(fAcc)
-    {
-        OCLinearMovement::OCLinearMovement( fVel, vDir );
-    }
+      m_fAccel(fAcc),
+      OCLinearMovement( fVel, vDir )
+    {}
 
+    // ----------------------------------------------------------------------------
     void OCAccelMovement::update()
     {
         // Retrieve object's position

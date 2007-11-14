@@ -10,6 +10,9 @@ namespace tlib { class Object; }
 #define TW_BACK   0x08
 #define TW_LEFT   0x10
 #define TW_RIGHT  0x20
+#define TW_X_ALIGNED ( TW_TOP | TW_BOTTOM | TW_FRONT | TW_BACK )
+#define TW_Y_ALIGNED ( TW_LEFT | TW_RIGHT | TW_FRONT | TW_BACK )
+#define TW_Z_ALIGNED ( TW_TOP | TW_BOTTOM | TW_LEFT | TW_RIGHT )
 
 // Object container flags
 // Each tile can have zero or one of the following objects
@@ -28,32 +31,60 @@ namespace tlib { class Object; }
 class Tile3d
 {
 public:
+    // The index of the tile
+    int i, j, k;
+
+private:
+    // Pointer to a special object
+    // The list of special objects consists of lights, barriers, 
+    // triggers and defence guns
+    tlib::Object *m_oOccupant;
+
+    int 
+        // The corridor type
+        m_iCorrType,
+
+        // If tile occupant is an outlet, this will link the outlet
+        // with a barrier
+        m_iFriendId;
+
+public:
     /**
      * Constructor
      */
-    Tile3d( int pi, int pj, int pk, 
-            int pcorrType, int pobjType );
+    Tile3d();
 
     /**
      * Destructor
      */
     ~Tile3d();
 
-    // The corridor type
-    int corrType;
+    /**
+     * Returns the occupier object
+     */
+    tlib::Object* getOccupant() const { return m_oOccupant; }
 
-    // Pointer to a special object
-    // The list of special objects consists of lights, barriers, 
-    // triggers and defence guns
-    tlib::Object *obj;
+    /**
+     * Getter/Setter for the tile type
+     */
+    int getType() const { return m_iCorrType; }
+    void setType( int type ) { m_iCorrType = type; }
 
-    // The index of the tile
-    int i, j, k;
+    /**
+     * Getter/Setter for the friend id
+     */
+    int getFriendId() const { return m_iFriendId; }
+    void setFriendId( int id ) { m_iFriendId = id; }
 
     /**
      * Creates a new object of the wanted type and assigns that
      * to the tile's object handle
      */
     void addObject( int objType );
+
+private:
+    // Helper functions
+    void addDoor();
+    void addOutlet();
 
 }; // end of Tile3d class

@@ -28,8 +28,7 @@ namespace tlib
          */
         virtual ~OCGXModel()
         {
-            //m_Model.FreeGL();
-            m_Model.Free();
+            m_Model.FreeGL();
         }
 
         /**

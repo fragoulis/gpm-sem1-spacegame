@@ -6,6 +6,7 @@
 #include "AccelMovement.h"
 #include "QuatRotation.h"
 #include "SpaceshipKeyboard.h"
+#include "SpaceshipCollisionResponse.h"
 #include "Texture.h"
 #include "CollisionGXModel.h"
 
@@ -70,6 +71,9 @@ void Spaceship::setup()
     OCCollisionGXModel *cCol = new OCCollisionGXModel;
     setComponent( cCol );
     cCol->initBBox();
+
+    // Initialize collision response component
+    setComponent( new SpaceshipCollisionResponse );
 
 } // end setup()
 

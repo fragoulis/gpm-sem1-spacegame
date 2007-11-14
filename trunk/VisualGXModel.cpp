@@ -2,7 +2,6 @@
 #include "Object.h"
 #include "Vector3.h"
 #include "QuatRotation.h"
-#include "Presentation.h"
 #include "Logger.h"
 
 namespace tlib
@@ -15,6 +14,7 @@ namespace tlib
         load( filename, scale );
     }
 
+    // ------------------------------------------------------------------------
     bool OCGXModel::load( const char *filename, float scale )
     {
         if( !m_Model.Load( filename ) ) {
@@ -28,6 +28,7 @@ namespace tlib
         return true;
     }
 
+    // ------------------------------------------------------------------------
     void OCGXModel::render() const
     {
         glPushMatrix();

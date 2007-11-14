@@ -5,6 +5,8 @@
 namespace tlib 
 {
 
+    IOCCollision::IOCCollision(): m_bIsActive(true) {}
+
     // ------------------------------------------------------------------------
     bool IOCCollision::check( Object *oObj, Vector3f& vCollDir ) const
     {
@@ -13,6 +15,9 @@ namespace tlib
         IOCCollision *cObjCol = (IOCCollision*)cCom;
         if( !cObjCol )
             return false;
+
+        // If the component is deactivated, skip detection
+        if( !cObjCol->isActive() ) return false;
 
         // Switch between the differect kinds of collision
         if( m_iType == BBox && cObjCol->getType() == BBox ) {
@@ -45,6 +50,9 @@ namespace tlib
         IOCCollision *cObjCol = (IOCCollision*)cCom;
         if( !cObjCol )
             return false;
+
+        // If the component is deactivated, skip detection
+        if( !cObjCol->isActive() ) return false;
 
         // Switch between the differect kinds of collision
         if( m_iType == BBox && cObjCol->getType() == BBox ) {

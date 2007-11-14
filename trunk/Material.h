@@ -4,19 +4,19 @@
 namespace tlib
 {
 
-    class IOCTexture : public IComponent
+    class IOCMaterial : public IComponent
     {
     public:
         /**
          * Destructor
          */
-        virtual ~IOCTexture(){}
+        virtual ~IOCMaterial(){}
         
         /**
          * Returns the component's family ID
          */
         const string familyID() const { 
-            return string("texture"); 
+            return string("material"); 
         }
 
         /**

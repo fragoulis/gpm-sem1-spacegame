@@ -14,7 +14,16 @@ namespace tlib
         // the object has
         int m_iType;
 
+        // This flag tells us whether the collision is turned on for
+        // the owner object
+        bool m_bIsActive;
+
     public:
+        /**
+         * Constructor
+         */
+        IOCCollision();
+
         /**
          * Destructor
          */
@@ -31,6 +40,13 @@ namespace tlib
          * Returns the type of the bounding box
          */
         int getType() const { return m_iType; }
+
+        /**
+         * Activates/Deactivates the component
+         */
+        void activate() { m_bIsActive = true; }
+        void deactivate() { m_bIsActive = false; }
+        bool isActive() const { return m_bIsActive; }
 
         /**
          * Checks for collision between this object and another

@@ -1,14 +1,9 @@
 #pragma once
-#include "Object.h"
-using tlib::Object;
+#include "TileObject.h"
 using tlib::Vector3f;
 
-class Barrier : public Object
+class Barrier : public TileObject
 {
-private:
-    // This flag tells us whether the barrier is 'harmfull' or not
-    bool bIsActive;
-
 public:
     /**
      * Constructor
@@ -17,8 +12,7 @@ public:
     Barrier( const Vector3f& vBBox );
 
     /**
-     * Takes the index of the tile in which is this barrier 
-     * in an array and positions it once and for all
+     * Destructor
      */
-    void setPosFromIndex( int ijk[] );
+    virtual ~Barrier() {}
 };

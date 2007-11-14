@@ -20,7 +20,12 @@ private:
     // A single tile's size
     int m_iTileSize;
     
-    // An indexed array of tiles that will shape the inside corridors
+    // The list of tiles
+    Tile3d *m_TileList;
+
+    // The list of tiles mapped into an integer, used to quickly find 
+    // a wanted tile
+    // The key is the index of the tile in an imaginary 3d cube
     _Tilemap m_Tilemap;
 
 public:

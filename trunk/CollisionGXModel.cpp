@@ -3,9 +3,7 @@
 
 namespace tlib 
 {
-    OCCollisionGXModel::OCCollisionGXModel() {
-        OCCollisionDynamicBBox::OCCollisionDynamicBBox();
-    }
+    OCCollisionGXModel::OCCollisionGXModel() {}
 
     void OCCollisionGXModel::initBBox()
     {

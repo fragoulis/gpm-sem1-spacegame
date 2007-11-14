@@ -1,5 +1,5 @@
 #pragma once
-#include "CollisionBBox.h"
+#include "CollisionBSphere.h"
 #include "Object.h"
 
 class Tile3d;
@@ -12,7 +12,7 @@ namespace tlib
      * with other bounding boxes but it can also detect collision with 
      * the spacestation corridors
      */
-    class OCCollisionDynamicBBox : public OCCollisionBBox
+    class OCCollisionDynamicBSphere : public OCCollisionBSphere
     {
     private:
         // This pointer holds the address of the tile the spaceship
@@ -29,25 +29,20 @@ namespace tlib
         /**
          * Constructor
          */
-        OCCollisionDynamicBBox();
-        OCCollisionDynamicBBox( const Vector3f& );
+        OCCollisionDynamicBSphere();
+        OCCollisionDynamicBSphere( int iRadius );
 
         /**
          * Destructor
          */
-        virtual ~OCCollisionDynamicBBox(){}
+        virtual ~OCCollisionDynamicBSphere(){}
         
         /**
          * Returns the unique component ID
          */
         const string componentID() const { 
-            return string("collisiondynamicbbox"); 
+            return string("collisiondynamicbsphere"); 
         }
-
-        /**
-         * Returns the tile pointer
-         */
-        const Tile3d& getTile() const { return *m_CurTile; }
 
         /**
          * It checks the owner object with the occupant object
@@ -67,18 +62,12 @@ namespace tlib
          */
         bool readTile( SpacestationCorridors& oCor );
 
-        /**
-         * Calls the check function and calls each object's response
-         * component if collision was detected
-         */
-        void actOnCollision() const;
-
     private:
         /**
          * Initializes member variables from the configuration file
          */
         void _readConfig();
 
-    }; // end of OCCollisionDynamicBBox class
+    }; // end of OCCollisionDynamicBSphere class
 
 } // end of namespace tlib

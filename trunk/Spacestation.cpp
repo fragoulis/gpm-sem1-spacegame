@@ -1,6 +1,7 @@
 #include "Spacestation.h"
 #include "SpacestationDisplayList.h"
-#include "Texture.h"
+#include "SingleTexture.h"
+#include "SimpleMaterial.h"
 #include "CollisionBBox.h"
 #include "Logger.h"
 #include "Config.h"
@@ -23,9 +24,11 @@ void Spacestation::setup()
 
     _LOG("Setting up spacestation...");
     // Initialize visual component
-    setComponent( new SpacestationDisplayList );      
+    setComponent( new SpacestationDisplayList );
+    // Initialize material component
+    setComponent( new OCSimpleMaterial );
     // Initialize presetation component
-    setComponent( new OCTexture( sTexture.c_str() ) );
+    setComponent( new OCSingleTexture( sTexture.c_str() ) );
     // Initialize collision component
     setComponent( new OCCollisionBBox( Vector3f(fBBSide,fBBSide,fBBSide) ) );
 }
