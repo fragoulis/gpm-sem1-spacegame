@@ -96,13 +96,10 @@ namespace tlib
         /**
          * Returns the length of the vector
          */
-        float length() 
+        float length() const
         { 
-            // Update vector's length
-            m_fLength = (float)sqrt( squaredLength() );
-
             // Return updated length
-            return m_fLength;
+            return (float)sqrt( squaredLength() );
         }
 
         /**

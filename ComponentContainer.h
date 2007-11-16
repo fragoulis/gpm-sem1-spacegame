@@ -7,6 +7,7 @@ using std::string;
 
 namespace tlib
 {
+
     template<class T>
     class OCComponentContainer : public IComponent
     {
@@ -49,4 +50,5 @@ namespace tlib
             return m_Container[ key ];
         }
     };
+
 }

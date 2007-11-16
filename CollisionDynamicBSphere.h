@@ -30,7 +30,7 @@ namespace tlib
          * Constructor
          */
         OCCollisionDynamicBSphere();
-        OCCollisionDynamicBSphere( int iRadius );
+        OCCollisionDynamicBSphere( float fRadius );
 
         /**
          * Destructor
@@ -61,6 +61,12 @@ namespace tlib
          * within a tile
          */
         bool readTile( SpacestationCorridors& oCor );
+
+        /**
+         * Calls the check function and calls each object's response
+         * component if collision was detected
+         */
+        void actOnCollision() const;
 
     private:
         /**

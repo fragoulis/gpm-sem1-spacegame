@@ -17,11 +17,6 @@ public:
     Outlet();
 
     /**
-     * Destructor
-     */
-    virtual ~Outlet() {}
-
-    /**
      * Getter/Setter for the barrier pointer
      */
     Barrier* getBarrier() const { return m_pBarrier; }

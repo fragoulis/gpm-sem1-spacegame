@@ -5,7 +5,7 @@
 using tlib::OCCollisionBBox;
 using tlib::Config;
 
-Vector3f Door::PanelDim;
+float Door::PanelDim;
 
 Door::Door()
 {
@@ -34,7 +34,7 @@ Door::Door()
     cfg.loadBlock("door_panel");
     float vfDim[3];
     cfg.getFloat("half_dim", vfDim, 3);
-    PanelDim.xyz( vfDim );
+    PanelDim = vfDim[0];
 
     // Initialize animation component
     setComponent( new DoorAnimation );

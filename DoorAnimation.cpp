@@ -41,16 +41,12 @@ bool DoorAnimation::condition()
     // take for granted that the other panels are on the same state
     float fPanelX = ((Door*)getOwner())->rightPanel()->getPos().x();
 
-    static float fDistTraveled = 0.0f;
-    static float vPrevX = fPanelX;
-
-    if( fDistTraveled > 2.0f * Door::PanelDim.x() ) {
-        fDistTraveled = 0.0f;
+    if( m_fDistMoved > 2.0f * Door::PanelDim ) {
         return true;
     }
 
-    fDistTraveled += fPanelX - vPrevX;
-    vPrevX = fPanelX;
+    m_fDistMoved += fPanelX - m_fPrevX;
+    m_fPrevX = fPanelX;
 
     return false;
 
@@ -63,6 +59,12 @@ void DoorAnimation::onStart()
     // deactivating it
     IOCCollision *cDoorCol = (IOCCollision*)getOwner()->getComponent("collision");
     cDoorCol->deactivate();
+
+    // Initialize the helper variables
+    // Set distance door has moved to zero
+    m_fDistMoved = 0.0f;
+    // Set the previous position to the current one
+    m_fPrevX = ((Door*)getOwner())->rightPanel()->getPos().x();
 }
 
 void DoorAnimation::onStop()

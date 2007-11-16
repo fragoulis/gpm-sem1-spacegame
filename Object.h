@@ -54,13 +54,19 @@ namespace tlib
         /**
          * Pushes a component to the component list
          */
-        void setComponent( IComponent *comp ) 
+        IComponent* setComponent( IComponent *comp ) 
         { 
+            // Get the component that MAY already exists of the
+            // same interface
+            IComponent *oldComp = m_vComponents[ comp->familyID() ];
+
             // set the owner of this component to be this
             comp->setOwner( this );
 
             // push the component to the list
             m_vComponents[ comp->familyID() ] = comp;
+
+            return oldComp;
         }
 
         /**

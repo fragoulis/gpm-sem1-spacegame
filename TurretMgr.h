@@ -4,7 +4,7 @@
 using namespace std;
 using tlib::Object;
 
-class Door;
+class Turret;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -12,41 +12,39 @@ class Door;
  * Object.
  * To get around this we declare the date we care for as static
  */
-class DoorMgr : public Object
+class TurretMgr
 {
 private:
-    static vector<Door*> m_vDoors;
+    // The list of forcefieds
+    static vector<Turret*> m_vTurrets;
 
 public:
     /**
-     * Initializes the object
-     */
-    void init();
-
-    /**
-     * Renders all the doors in the game
+     * Renders all the turrets in the game
      */
     void render();
 
     /**
-     * Updates the animations for all doors
+     * Updates the animations for all turrets
      * Note: this has no overhead [except of course of the function call]
      * unless the animation is actually running
      */
     void update();
 
+    void destroy();
+
     /**
-     * Pushes a door to the list
+     * Pushes a turret to the list
      */
-    static void add( Door *door ) {
-        m_vDoors.push_back( door );
+    static void add( Turret *tr ) {
+        m_vTurrets.push_back( tr );
     }
 
     /**
-     * Returns a door by its index
+     * Returns a turret by its index
      */
-    Door* getDoor( int index ) {
-        return m_vDoors[index];
+    Turret* getTurret( int index ) {
+        return m_vTurrets[index];
     }
 
-}; // end of DoorMgr class
+}; // end of TurretMgr class

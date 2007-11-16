@@ -13,13 +13,24 @@ namespace tlib
         // Whether the animation should repeat or not
         bool m_bRepeat;
 
+        // Whether the animation has ended
+        // If this flag is true, an animation can only restart if
+        // the repeat flag is on
+        bool m_bIsDone;
+
     public:
         /**
          * Constructor
          */
-        IOCAnimation(): m_bIsOn(0), m_bRepeat(0) 
+        IOCAnimation(): 
+            m_bIsOn(0), 
+            m_bRepeat(0), 
+            m_bIsDone(0)
         {}
-        IOCAnimation( bool bRepeat ): m_bIsOn(0), m_bRepeat(bRepeat)
+        IOCAnimation( bool bRepeat ): 
+            m_bIsOn(0), 
+            m_bRepeat(bRepeat), 
+            m_bIsDone(0)
         {}
 
         /**
@@ -35,8 +46,10 @@ namespace tlib
         }
 
         /**
-         * Getter/Setter for the animation's repeat flag
+         * Getter/Setter for the animation's flags
          */
+        bool isOn() const { return m_bIsOn; }
+        bool isDone() const { return m_bIsDone; }
         bool getRepeat() const { return m_bRepeat; }
         void setRepeat( bool bRepeat ) { 
             m_bRepeat = bRepeat; 
@@ -49,9 +62,19 @@ namespace tlib
         {
             // If animation is already running avoid reseting it
             if( m_bIsOn ) return;
+            if( m_bIsDone ) return;
 
             onStart();
             unfreeze();
+        }
+
+        /**
+         * Restarts the animation
+         */
+        void restart()
+        {
+            m_bIsDone = false;
+            start();
         }
 
         /**
@@ -61,6 +84,7 @@ namespace tlib
         {
             freeze();
             onStop();
+            m_bIsDone = true;
         }
 
         /**
@@ -79,7 +103,7 @@ namespace tlib
                 freeze();
 
                 // If the repeat flag is on start over
-                if( m_bRepeat ) start();
+                if( m_bRepeat ) restart();
                 else stop();
             }
         } // end of update()

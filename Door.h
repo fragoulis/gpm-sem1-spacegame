@@ -8,10 +8,10 @@ public:
     // The number of panels
     static const int ciNumOfPanels = 4;
 
-    // A single panel's half dimensions
+    // A single panel's half x dimension
     // We declare it static because it will be the same for
     // all doors and panels
-    static Vector3f PanelDim;
+    static float PanelDim;
 
 private:
     // The four door panels

@@ -2,9 +2,8 @@
 #include <vector>
 #include "Object.h"
 using namespace std;
-using tlib::Object;
 
-class Door;
+class RotatingBlade;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -12,41 +11,37 @@ class Door;
  * Object.
  * To get around this we declare the date we care for as static
  */
-class DoorMgr : public Object
+class BladeMgr
 {
 private:
-    static vector<Door*> m_vDoors;
+    // The list of blades in our scene
+    static vector<RotatingBlade*> m_vBlades;
 
 public:
     /**
-     * Initializes the object
-     */
-    void init();
-
-    /**
-     * Renders all the doors in the game
+     * Renders all blades in the game
      */
     void render();
 
     /**
-     * Updates the animations for all doors
+     * Updates the animations for all blades
      * Note: this has no overhead [except of course of the function call]
      * unless the animation is actually running
      */
     void update();
 
     /**
-     * Pushes a door to the list
+     * Pushes a blade to the list
      */
-    static void add( Door *door ) {
-        m_vDoors.push_back( door );
+    static void add( RotatingBlade *obj ) {
+        m_vBlades.push_back( obj );
     }
 
     /**
-     * Returns a door by its index
+     * Returns a blade by its index
      */
-    Door* getDoor( int index ) {
-        return m_vDoors[index];
+    RotatingBlade* getBlade( int index ) {
+        return m_vBlades[index];
     }
 
-}; // end of DoorMgr class
+}; // end of BladeMgr class
