@@ -2,6 +2,7 @@
 #include "Tile3d.h"
 #include "SpacestationCorridors.h"
 #include "SpacestationCorridorsDisplayList.h"
+#include "CollisionResponse.h"
 #include "Config.h"
 
 namespace tlib 
@@ -12,9 +13,9 @@ namespace tlib
       {
         _readConfig();
     }
-    OCCollisionDynamicBSphere::OCCollisionDynamicBSphere( int iRadius ): 
+    OCCollisionDynamicBSphere::OCCollisionDynamicBSphere( float fRadius ): 
       m_CurTile(0),
-      OCCollisionBSphere( iRadius )
+      OCCollisionBSphere( fRadius )
     {
         _readConfig();
     }
@@ -29,6 +30,35 @@ namespace tlib
         cfg.getInt("tile_size"  ,&m_iTileSize);
         cfg.getInt("tiles"      ,&iNumOfTiles);
         m_iHalfNumOfTiles = (int)(iNumOfTiles * 0.5f);
+    }
+
+    // ------------------------------------------------------------------------
+    void OCCollisionDynamicBSphere::actOnCollision() const
+    {
+        // The resulting collision vector
+        Vector3f vCollDir;
+
+        // Get the owner object's response component
+        IOCCollisionResponse *cOwnerRes = 
+            (IOCCollisionResponse*)m_oOwner->getComponent("collisionresponse");
+
+        // Check collision with the spacestation corridors
+        if( checkWithTile( vCollDir ) ) {
+            cOwnerRes->respond( vCollDir );
+        }
+
+        // Check with tile's occupier object
+        if( checkWithObject( vCollDir ) ) {
+            // Get the other object's response component
+            // Note: that not all object's have response components
+            Object *oOcc = m_CurTile->getOccupant();
+            IOCCollisionResponse *cObjRes = 
+                (IOCCollisionResponse*)oOcc->getComponent("collisionresponse");
+
+            cOwnerRes->respond( vCollDir );
+            if( cObjRes )
+                cObjRes->respond( vCollDir );
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -53,7 +83,7 @@ namespace tlib
         if( m_CurTile->getType() & TW_LEFT ) {
             // Check collision with the left plane
             int x = ( m_CurTile->i - m_iHalfNumOfTiles ) * m_iTileSize;
-            float fOverlapX = m_iRadius + (float)x - vPos.x();
+            float fOverlapX = m_fRadius + (float)x - vPos.x();
             if( fOverlapX > 0.0f ) {
                 vfOverlap[0] = fOverlapX;
                 isCollision = true;
@@ -63,7 +93,7 @@ namespace tlib
         if( m_CurTile->getType() & TW_RIGHT ) {
             // Check collision with the right plane
             int x = ( ( m_CurTile->i + 1 ) - m_iHalfNumOfTiles ) * m_iTileSize;
-            float fOverlapX = m_iRadius + vPos.x() - (float)x;
+            float fOverlapX = m_fRadius + vPos.x() - (float)x;
             if( fOverlapX > 0.0f ) {
                 vfOverlap[0] = -fOverlapX;
                 isCollision = true;
@@ -73,7 +103,7 @@ namespace tlib
         if( m_CurTile->getType() & TW_BOTTOM ) {
             // Check collision with the bottom plane
             int y = ( m_CurTile->j - m_iHalfNumOfTiles ) * m_iTileSize;
-            float fOverlapY = m_iRadius + (float)y - vPos.y();
+            float fOverlapY = m_fRadius + (float)y - vPos.y();
             if( fOverlapY > 0.0f  ) {
                 vfOverlap[1] = fOverlapY;
                 isCollision = true;
@@ -83,7 +113,7 @@ namespace tlib
         if( m_CurTile->getType() & TW_TOP ) {
             // Check collision with the top plane
             int y = ( ( m_CurTile->j + 1 ) - m_iHalfNumOfTiles ) * m_iTileSize;
-            float fOverlapY = m_iRadius + vPos.y() - (float)y;
+            float fOverlapY = m_fRadius + vPos.y() - (float)y;
             if( fOverlapY > 0.0f  ) {
                 vfOverlap[1] = -fOverlapY;
                 isCollision = true;
@@ -93,7 +123,7 @@ namespace tlib
         if( m_CurTile->getType() & TW_BACK ) {
             // Check collision with the front plane
             int z = ( m_iHalfNumOfTiles - m_CurTile->k ) * m_iTileSize;
-            float fOverlapZ = m_iRadius + vPos.z() - (float)z;
+            float fOverlapZ = m_fRadius + vPos.z() - (float)z;
             if( fOverlapZ > 0.0f  ) {
                 vfOverlap[2] = -fOverlapZ;
                 isCollision = true;
@@ -103,7 +133,7 @@ namespace tlib
         if( m_CurTile->getType() & TW_FRONT ) {
             // Check collision with the front plane
             int z = ( m_iHalfNumOfTiles - ( m_CurTile->k + 1 ) ) * m_iTileSize;
-            float fOverlapZ = m_iRadius + (float)z - vPos.z();
+            float fOverlapZ = m_fRadius + (float)z - vPos.z();
             if( fOverlapZ > 0.0f  ) {
                 vfOverlap[2] = fOverlapZ;
                 isCollision = true;

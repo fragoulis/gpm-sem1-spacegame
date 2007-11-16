@@ -16,13 +16,12 @@ namespace tlib { class Object; }
 
 // Object container flags
 // Each tile can have zero or one of the following objects
-#define OBJ_LIGHT   1
+#define OBJ_OUTLET  1
 #define OBJ_DOOR    2
 #define OBJ_BLADE   3
 #define OBJ_FIELD   4
-#define OBJ_TRIGGER 5
-#define OBJ_GUN     6
-#define OBJ_OUTLET  7
+#define OBJ_TURRET  5
+#define OBJ_LIGHT   6
 
 /**
  * Holds information of where and how to draw each piece
@@ -85,6 +84,9 @@ public:
 private:
     // Helper functions
     void addDoor();
+    void addBlade();
+    void addField();
     void addOutlet();
+    void addTurret();
 
 }; // end of Tile3d class

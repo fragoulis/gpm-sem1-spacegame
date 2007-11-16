@@ -80,13 +80,13 @@ namespace tlib
          * Checks the collision of a box with a sphere
          * Returns true if collision is detected
          */
-        virtual bool checkBoxWithSphere( const Vector3f&, int ) const;
+        virtual bool checkBoxWithSphere( const Vector3f&, float ) const;
 
         /**
          * Checks the collision of a sphere with a sphere
          * Returns true if collision is detected
          */
-        virtual bool checkSphereWithSphere( const Vector3f&, int  ) const;
+        virtual bool checkSphereWithSphere( const Vector3f&, float  ) const;
 
         /**
          * Checks the collision of a box with a box
@@ -101,7 +101,7 @@ namespace tlib
          * Returns true if collision is detected and sets a vector
          * with the collision direction
          */
-        virtual bool checkBoxWithSphere( const Vector3f&, int, 
+        virtual bool checkBoxWithSphere( const Vector3f&, float, 
                                          Vector3f&  ) const;
 
         /**
@@ -109,7 +109,7 @@ namespace tlib
          * Returns true if collision is detected and sets a vector
          * with the collision direction
          */
-        virtual bool checkSphereWithSphere( const Vector3f&, int, 
+        virtual bool checkSphereWithSphere( const Vector3f&, float, 
                                             Vector3f&  ) const;
 
     }; // end of IOCCollision class

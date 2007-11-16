@@ -2,18 +2,18 @@
 #include "Animation.h"
 using tlib::IOCAnimation;
 
-class DoorAnimation : public IOCAnimation
+class BladeAnimation : public IOCAnimation
 {
 private:
     // Helper variables
-    float m_fDistMoved, m_fPrevX;
+    float m_fDistMoved, m_fPrevPos;
 
 public:
     /**
      * Returns the unique component ID
      */
     const string componentID() const { 
-        return string("dooranimation"); 
+        return string("bladeanimation"); 
     }
 
 private:
@@ -25,7 +25,7 @@ private:
     void onStop();
 
     /**
-     * Update the door's panels
+     * Update the rotating blade
      */
     void onUpdate();
 
@@ -34,4 +34,4 @@ private:
      */
     bool condition();
 
-}; // end of DoorAnimation class
+}; // end of BladeAnimation class

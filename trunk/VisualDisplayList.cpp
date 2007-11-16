@@ -37,6 +37,9 @@ namespace tlib
 
             glCallList( m_uiListId );
         glPopMatrix();
+
+        // Turn of texturing in case texture component turned it on
+        glDisable( GL_TEXTURE_2D );
     }
 
     void OCVisualDisplayList::generate()

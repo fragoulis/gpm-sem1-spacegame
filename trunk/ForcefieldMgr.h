@@ -4,7 +4,7 @@
 using namespace std;
 using tlib::Object;
 
-class Door;
+class Forcefield;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -12,10 +12,11 @@ class Door;
  * Object.
  * To get around this we declare the date we care for as static
  */
-class DoorMgr : public Object
+class ForcefieldMgr : public Object
 {
 private:
-    static vector<Door*> m_vDoors;
+    // The list of forcefieds
+    static vector<Forcefield*> m_vForcefields;
 
 public:
     /**
@@ -24,29 +25,29 @@ public:
     void init();
 
     /**
-     * Renders all the doors in the game
+     * Renders all the forcefields in the game
      */
     void render();
 
     /**
-     * Updates the animations for all doors
+     * Updates the animations for all forcefields
      * Note: this has no overhead [except of course of the function call]
      * unless the animation is actually running
      */
     void update();
 
     /**
-     * Pushes a door to the list
+     * Pushes a forcefield to the list
      */
-    static void add( Door *door ) {
-        m_vDoors.push_back( door );
+    static void add( Forcefield *ff ) {
+        m_vForcefields.push_back( ff );
     }
 
     /**
-     * Returns a door by its index
+     * Returns a forcefield by its index
      */
-    Door* getDoor( int index ) {
-        return m_vDoors[index];
+    Forcefield* getForcefield( int index ) {
+        return m_vForcefields[index];
     }
 
-}; // end of DoorMgr class
+}; // end of ForcefieldMgr class

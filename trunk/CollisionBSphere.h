@@ -7,14 +7,14 @@ namespace tlib
     class OCCollisionBSphere : public IOCCollision
     {
     protected:
-        int m_iRadius;
+        float m_fRadius;
 
     public:
         /**
          * Constructor
          */
         OCCollisionBSphere();
-        OCCollisionBSphere( int );
+        OCCollisionBSphere( float fRadius );
 
         /**
          * Destructor
@@ -31,15 +31,15 @@ namespace tlib
         /**
          * Returns the bounding sphere's radius
          */
-        int getRadius() const {
-            return m_iRadius;
+        float getRadius() const {
+            return m_fRadius;
         }
 
         /**
          * Sets the radius
          */
-        void setRadius( int iRadius ) {
-            m_iRadius = iRadius;
+        void setRadius( float fRadius ) {
+            m_fRadius = fRadius;
         }
 
     }; // end of OCCollisionGXModel class

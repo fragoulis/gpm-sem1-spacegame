@@ -2,18 +2,14 @@
 #include "Animation.h"
 using tlib::IOCAnimation;
 
-class DoorAnimation : public IOCAnimation
+class ForcefieldAnimation : public IOCAnimation
 {
-private:
-    // Helper variables
-    float m_fDistMoved, m_fPrevX;
-
 public:
     /**
      * Returns the unique component ID
      */
     const string componentID() const { 
-        return string("dooranimation"); 
+        return string("forcefieldanimation"); 
     }
 
 private:
@@ -34,4 +30,4 @@ private:
      */
     bool condition();
 
-}; // end of DoorAnimation class
+}; // end of ForcefieldAnimation class
