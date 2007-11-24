@@ -12,13 +12,18 @@ class Turret;
  * Object.
  * To get around this we declare the date we care for as static
  */
-class TurretMgr
+class TurretMgr : public Object
 {
 private:
     // The list of forcefieds
     static vector<Turret*> m_vTurrets;
 
 public:
+    /**
+     * Initializes the object
+     */
+    void init( Object *obj );
+
     /**
      * Renders all the turrets in the game
      */
@@ -30,8 +35,6 @@ public:
      * unless the animation is actually running
      */
     void update();
-
-    void destroy();
 
     /**
      * Pushes a turret to the list

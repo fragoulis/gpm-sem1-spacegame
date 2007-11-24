@@ -276,4 +276,4 @@ void Spaceship::resetRoll()
         m_fRoll = 0.0f;
         m_bResetRoll = false;
     }
-}
+} // end resetRoll()

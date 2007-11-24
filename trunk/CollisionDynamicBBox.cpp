@@ -49,13 +49,15 @@ namespace tlib
 
         // Check with tile's occupier object
         if( checkWithObject( vCollDir ) ) {
+            // Respond to collision
+            cOwnerRes->respond( vCollDir );
+
             // Get the other object's response component
             // Note: that not all object's have response components
             Object *oOcc = m_CurTile->getOccupant();
             IOCCollisionResponse *cObjRes = 
                 (IOCCollisionResponse*)oOcc->getComponent("collisionresponse");
 
-            cOwnerRes->respond( vCollDir );
             if( cObjRes )
                 cObjRes->respond( vCollDir );
         }
@@ -104,7 +106,7 @@ namespace tlib
             // Check collision with the bottom plane
             int y = ( m_CurTile->j - m_iHalfNumOfTiles ) * m_iTileSize;
             float fOverlapY = m_BBox.y() + (float)y - vPos.y();
-            if( fOverlapY > 0.0f  ) {
+            if( fOverlapY > 0.0f ) {
                 vfOverlap[1] = fOverlapY;
                 isCollision = true;
             }
@@ -114,7 +116,7 @@ namespace tlib
             // Check collision with the top plane
             int y = ( ( m_CurTile->j + 1 ) - m_iHalfNumOfTiles ) * m_iTileSize;
             float fOverlapY = m_BBox.y() + vPos.y() - (float)y;
-            if( fOverlapY > 0.0f  ) {
+            if( fOverlapY > 0.0f ) {
                 vfOverlap[1] = -fOverlapY;
                 isCollision = true;
             }
@@ -124,7 +126,7 @@ namespace tlib
             // Check collision with the front plane
             int z = ( m_iHalfNumOfTiles - m_CurTile->k ) * m_iTileSize;
             float fOverlapZ = m_BBox.z() + vPos.z() - (float)z;
-            if( fOverlapZ > 0.0f  ) {
+            if( fOverlapZ > 0.0f ) {
                 vfOverlap[2] = -fOverlapZ;
                 isCollision = true;
             } 
@@ -134,7 +136,7 @@ namespace tlib
             // Check collision with the front plane
             int z = ( m_iHalfNumOfTiles - ( m_CurTile->k + 1 ) ) * m_iTileSize;
             float fOverlapZ = m_BBox.z() + (float)z - vPos.z();
-            if( fOverlapZ > 0.0f  ) {
+            if( fOverlapZ > 0.0f ) {
                 vfOverlap[2] = fOverlapZ;
                 isCollision = true;
             }
@@ -155,7 +157,7 @@ namespace tlib
             (SpacestationCorridorsDisplayList*)oCor.getComponent("visual");
 
         // Save the tile in which the object is
-        m_CurTile = cSCDL->getTile( getOwner() );
+        m_CurTile = cSCDL->getTile( getOwner()->getPos() );
         
         return (0==m_CurTile)?0:1;
     }

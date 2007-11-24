@@ -444,7 +444,7 @@ namespace tlib
             return Vector3<T>( T(0), T(1), T(0) ); 
         }
         static Vector3<T> Left() { 
-            return Vector3<T>( T(-1), Ô(0), Ô(0) ); 
+            return Vector3<T>( T(-1), T(0), T(0) ); 
         }
         static Vector3<T> Right() { 
             return Vector3<T>( T(1), T(0), T(0) ); 
@@ -602,6 +602,12 @@ namespace tlib
         return Vector3<T>( vec1.x() * val, 
                            vec1.y() * val,
                            vec1.z() * val );
+    }
+
+    template<typename T>
+    inline Vector3<T> operator*( T val, const Vector3<T> &vec1 )
+    { 
+        return ( vec1 * val );
     }
 
     /**

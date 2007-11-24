@@ -241,12 +241,9 @@ void Tile3d::addTurret()
     float vfNewOffset[3] = { vfOffset[0], vfOffset[1], vfOffset[2] };
 
     switch( m_iCorrType ) {
-        case TW_X_ALIGNED: 
-            //qCorrectRotation.toRotation( (float)M_PI_2, Vector3f::Up() ); 
-            //vfNewOffset[2] = -vfOffset[0];
-            break;
         case TW_Y_ALIGNED: 
-            qCorrectRotation.toRotation( (float)M_PI_2, Vector3f::Front() );
+            qCorrectRotation.toRotation( (float)M_PI_2, Vector3f::Right() );
+            vfNewOffset[2] = -vfOffset[1];
             break;
     }
     tr->setDir( qCorrectRotation );

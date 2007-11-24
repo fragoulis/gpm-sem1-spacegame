@@ -3,7 +3,6 @@
 #include "RotatingBlade.h"
 #include "LinearMovement.h"
 #include "BladeAnimation.h"
-#include "BladeDeathAnimation.h"
 #include "CollisionBBox.h"
 #include "Visual.h"
 #include "Config.h"
@@ -63,10 +62,11 @@ void RotatingBlade::render()
 
         // Draw system poll
         cVis = (IOCVisual*)m_oPoll.getComponent("visual");
-        cVis->render();
+        _ASSERT(cVis!=0); cVis->render();
 
         // Draw system base
         cVis = (IOCVisual*)m_oBase.getComponent("visual");
+        _ASSERT(cVis!=0);
         glPushMatrix();
             glScalef(0.2f,0.2f,0.2f);
             cVis->render();
@@ -74,7 +74,7 @@ void RotatingBlade::render()
 
         // Draw system blade
         cVis = (IOCVisual*)m_oBlade.getComponent("visual");
-        cVis->render();
+        _ASSERT(cVis!=0); cVis->render();
 
         //Quatf tempDir = m_oBlade.getDir();
         //int numscenes = 10;

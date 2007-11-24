@@ -15,6 +15,10 @@ void BladeMgr::render()
          iter != m_vBlades.end();
          iter++ )
     {
+        // If object has finished its animation, and its not visible
+        // skip it
+        if( !(*iter)->isActive() ) continue;
+
         (*iter)->render();
     }
 
@@ -29,6 +33,8 @@ void BladeMgr::update()
          iter != m_vBlades.end();
          iter++ )
     {
+        if( !(*iter)->isActive() ) continue;
+
         cAnim = (IOCAnimation*)(*iter)->getComponent("animation");
         if( !cAnim->isOn() && !cAnim->isDone() ) {
             (*iter)->getBlade().update();

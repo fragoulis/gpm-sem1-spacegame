@@ -14,47 +14,71 @@ namespace tlib
     {
         glBegin(GL_QUADS);
         {
-            // back face
+            // front face
             glNormal3f( 0.0f, 0.0f, 1.0f );
+            glTexCoord2f( 0.0f, 0.0f );
             glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 0.0f );
             glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 1.0f );
             glVertex3f(  m_vHalfDim.x(),  m_vHalfDim.y(), m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 1.0f );
             glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), m_vHalfDim.z() );
 
-            // front face
+            // back face
             glNormal3f( 0.0f, 0.0f, -1.0f );
+            glTexCoord2f( 1.0f, 0.0f );
+            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 1.0f );
             glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 1.0f );
             glVertex3f(  m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 0.0f );
             glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-
-            // right face
-            glNormal3f( 1.0f, 0.0f, 0.0f );
-            glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
-            glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
-            glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
-
-            // left face
-            glNormal3f( -1.0f, 0.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
-            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
-            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
 
             // top face
             glNormal3f( 0.0f, 1.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
-            glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
-            glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 1.0f );
             glVertex3f( -m_vHalfDim.x(), m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 0.0f );
+            glVertex3f( -m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 0.0f );
+            glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 1.0f );
+            glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(), -m_vHalfDim.z() );
 
             // bottom face
             glNormal3f( 0.0f, -1.0f, 0.0f );
+            glTexCoord2f( 1.0f, 1.0f );
             glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 1.0f );
             glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 0.0f );
             glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 0.0f );
             glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+
+            // right face
+            glNormal3f( 1.0f, 0.0f, 0.0f );
+            glTexCoord2f( 1.0f, 0.0f );
+            glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 1.0f );
+            glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 1.0f );
+            glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 0.0f );
+            glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+
+            // left face
+            glNormal3f( -1.0f, 0.0f, 0.0f );
+            glTexCoord2f( 0.0f, 0.0f );
+            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 0.0f );
+            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+            glTexCoord2f( 1.0f, 1.0f );
+            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
+            glTexCoord2f( 0.0f, 1.0f );
+            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
         }
         glEnd();
 

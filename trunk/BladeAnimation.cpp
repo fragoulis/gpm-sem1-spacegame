@@ -62,4 +62,5 @@ void BladeAnimation::onStart()
 // ----------------------------------------------------------------------------
 void BladeAnimation::onStop()
 {
+    ((TileObject*)getOwner())->deactivate();
 }
