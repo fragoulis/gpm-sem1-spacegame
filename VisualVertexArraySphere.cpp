@@ -29,7 +29,7 @@ namespace tlib
 	    int array_size;
 	    float stack_inc;
 	    float slice_inc;
-	    float x, y , z;
+	    float x, y, z;
 	    int vertex_count;
 	    int index_count;
 	    int temp_vc;

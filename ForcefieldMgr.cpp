@@ -36,6 +36,10 @@ void ForcefieldMgr::render()
          iter != m_vForcefields.end();
          iter++ )
     {
+        // If object has finished its animation, and its not visible
+        // skip it
+        if( !(*iter)->isActive() ) continue;
+
         // Apply the material for the outlet
         IOCMaterial *cMat = (IOCMaterial*)(*iter)->getComponent("material");
         cMat->apply();
@@ -58,6 +62,8 @@ void ForcefieldMgr::update()
          iter != m_vForcefields.end();
          iter++ )
     {
+        if( !(*iter)->isActive() ) continue;
+
         cAnim = (IOCAnimation*)(*iter)->getComponent("animation");
         cAnim->update();
     }

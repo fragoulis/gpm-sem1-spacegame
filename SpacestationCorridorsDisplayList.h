@@ -63,12 +63,13 @@ public:
     }
 
     /**
-     * Returns the tile which an object is in
+     * If the point [input vector] lies within a tile, 
+     * the function returns this tile
      */
-    Tile3d* getTile( const Object *obj )
+    Tile3d* getTile( const Vector3f& vIn )
     { 
         float fHalfTiles = (float)m_iNumOfTiles * 0.5f;
-        Vector3f vIndex = obj->getPos() / (float)m_iTileSize;
+        Vector3f vIndex = vIn / (float)m_iTileSize;
         vIndex.addX( fHalfTiles );
         vIndex.addY( fHalfTiles );
         vIndex.subZ( fHalfTiles);

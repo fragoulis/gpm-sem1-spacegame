@@ -1,5 +1,4 @@
 #include "Turret.h"
-#include "VisualGXModel.h"
 #include "CollisionBSphere.h"
 #include "QuatRotation.h"
 #include "Config.h"
@@ -10,13 +9,6 @@ Turret::Turret()
 {
     Config cfg("config.txt");
     cfg.loadBlock("turret");
-
-    // Initialize visual component
-    string sModel;
-    float fScale;
-    cfg.getString("model", sModel );
-    cfg.getFloat("scale", &fScale );
-    setComponent( new OCGXModel( sModel.c_str(), fScale ) );
 
     // Initialize the rotation component
     OCQuatRotation *cRot = new OCQuatRotation;

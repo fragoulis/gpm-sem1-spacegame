@@ -30,6 +30,7 @@ void DoorPanel::init( PanelId pid )
         case Right:  
             sPanel = "right_panel"; 
             m_vPos.xyz( fvDim[0], 0.0f, fvDim[2] );
+            m_qDir.toRotation( (float)M_PI, Vector3f::Right() );
             break;
 
         case Top:
@@ -41,7 +42,7 @@ void DoorPanel::init( PanelId pid )
         case Bottom: 
             sPanel = "down_panel";  
             m_vPos.xyz( 0.0f, -fvDim[0], -fvDim[2] );
-            m_qDir.toRotation( (float)M_PI_2, Vector3f::Front() );
+            m_qDir.toRotation( 3.0f * (float)M_PI_2, Vector3f::Front() );
             break;
     } // end switch( )
 

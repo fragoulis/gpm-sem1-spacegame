@@ -4,6 +4,7 @@
 #include "Door.h"
 #include "VisualBox.h"
 #include "SimpleMaterial.h"
+#include "SingleTexture.h"
 #include "Animation.h"
 #include "Config.h"
 #include "Logger.h"
@@ -21,6 +22,10 @@ void DoorMgr::init()
     float fvDim[3];
     cfg.getFloat("half_dim", fvDim, 3);
 
+    // Get panel's texture
+    string sTexture;
+    cfg.getString("texture", sTexture );
+
     // Initialize material component
     //setComponent( new OCSimpleMaterial(Color::black(),Color::red(),Color::null()) );
     setComponent( new OCSimpleMaterial );
@@ -29,6 +34,9 @@ void DoorMgr::init()
     // We will use this single component to draw all door panels
     // hence all the doors
     setComponent( new OCVisualBox( Vector3f( fvDim ) ) );
+
+    // 
+    setComponent( new OCSingleTexture( sTexture.c_str() ) );
 }
 
 void DoorMgr::render()
@@ -41,6 +49,10 @@ void DoorMgr::render()
          iter != m_vDoors.end();
          iter++ )
     {
+        // If object has finished its animation, and its not visible
+        // skip it
+        if( !(*iter)->isActive() ) continue;
+
         // For door's position shorthand
         const Vector3f& vDoorPos = (*iter)->getPos();
         glPushMatrix();
@@ -84,6 +96,8 @@ void DoorMgr::update()
          iter != m_vDoors.end();
          iter++ )
     {
+        if( !(*iter)->isActive() ) continue;
+
         cAnim = (IOCAnimation*)(*iter)->getComponent("animation");
         cAnim->update();
     }

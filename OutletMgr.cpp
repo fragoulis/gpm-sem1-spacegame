@@ -32,6 +32,7 @@ void OutletMgr::render()
 {
     // Get visual component which will draw all power outlets
     IOCVisual *cBox = (IOCVisual*)getComponent("visual");
+    IOCMaterial *cMat;
 
     vector<Outlet*>::const_iterator iter;
     for( iter = m_vOutlets.begin();
@@ -39,7 +40,7 @@ void OutletMgr::render()
          iter++ )
     {
         // Apply the material for the outlet
-        IOCMaterial *cMat = (IOCMaterial*)(*iter)->getComponent("material");
+        cMat = (IOCMaterial*)(*iter)->getComponent("material");
         cMat->apply();
 
         // Draw the door's panels

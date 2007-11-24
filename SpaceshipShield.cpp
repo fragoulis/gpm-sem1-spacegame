@@ -30,7 +30,11 @@ void SpaceshipShield::init( Spaceship *oShip )
     cfg.getInt("slices", &iSlices);
 
     // Initialize material component
-    setComponent( new OCSimpleMaterial(Color::black(),Color(1.0f,1.0f,1.0f,0.3f),Color::null()) );
+    setComponent( new OCSimpleMaterial(
+        Color::black(),
+        Color(1.0f,1.0f,1.0f,0.3f),
+        Color::null()) );
+
     //setComponent( new OCSimpleMaterial );
 
     // Initialize visual component
