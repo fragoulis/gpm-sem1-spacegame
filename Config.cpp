@@ -73,6 +73,14 @@ namespace tlib
     }
 
     // ------------------------------------------------------------------------
+    void Config::getDouble( const string &sKey, 
+                            double *out, 
+                            const int nCount )
+    {
+        _get<double>( sKey, out, nCount );
+    }
+
+    // ------------------------------------------------------------------------
     void Config::getString( const string &sKey, string &sOut ) {
         sOut = m_Items[ sKey ];
     }

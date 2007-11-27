@@ -1,6 +1,8 @@
 #pragma once
-
+//#include <iostream>
+//using namespace std;
 namespace tlib { class Object; }
+using tlib::Object;
 
 // Texture wall flags
 // Each of these indicates for each tile which of its faces will be textured
@@ -29,15 +31,14 @@ namespace tlib { class Object; }
  */
 class Tile3d
 {
-public:
-    // The index of the tile
-    int i, j, k;
-
 private:
+    // The index of the tile
+    int m_ijk[3];
+
     // Pointer to a special object
     // The list of special objects consists of lights, barriers, 
     // triggers and defence guns
-    tlib::Object *m_oOccupant;
+    Object *m_oOccupant;
 
     int 
         // The corridor type
@@ -59,9 +60,12 @@ public:
     ~Tile3d();
 
     /**
-     * Returns the occupier object
+     * Getter/Setter for the occupier object
      */
-    tlib::Object* getOccupant() const { return m_oOccupant; }
+    Object* getOccupant() const { return m_oOccupant; }
+    void setOccupant( Object *oObj ) {
+        m_oOccupant = oObj;
+    }
 
     /**
      * Getter/Setter for the tile type
@@ -81,12 +85,25 @@ public:
      */
     void addObject( int objType );
 
-private:
-    // Helper functions
-    void addDoor();
-    void addBlade();
-    void addField();
-    void addOutlet();
-    void addTurret();
+    /**
+     * 
+     */
+    void ijk( int i, int j, int k ) {
+       m_ijk[0] = i; 
+       m_ijk[1] = j; 
+       m_ijk[2] = k; 
+    }
+
+    /**
+     * 
+     */
+    int i() const { return m_ijk[0]; }
+    int j() const { return m_ijk[1]; }
+    int k() const { return m_ijk[2]; }
+
+    /**
+     * 
+     */
+    const int* ijk() const { return &m_ijk[0]; }
 
 }; // end of Tile3d class

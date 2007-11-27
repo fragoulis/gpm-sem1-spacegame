@@ -1,9 +1,7 @@
 #include "CollisionDynamicBBox.h"
 #include "Tile3d.h"
-#include "SpacestationCorridors.h"
-#include "SpacestationCorridorsDisplayList.h"
+#include "Tilemap.h"
 #include "CollisionResponse.h"
-#include "Config.h"
 
 namespace tlib 
 {
@@ -23,13 +21,8 @@ namespace tlib
     // ------------------------------------------------------------------------
     void OCCollisionDynamicBBox::_readConfig()
     {
-        Config cfg("config.txt");
-        cfg.loadBlock("spacestation");
-
-        int iNumOfTiles;
-        cfg.getInt("tile_size"  ,&m_iTileSize);
-        cfg.getInt("tiles"      ,&iNumOfTiles);
-        m_iHalfNumOfTiles = (int)(iNumOfTiles * 0.5f);
+        m_iTileSize = Tilemap::Instance().getTileSize();
+        m_iHalfNumOfTiles = (int)(Tilemap::Instance().getNumOfTiles() * 0.5f);
     }
 
     // ------------------------------------------------------------------------
@@ -84,7 +77,7 @@ namespace tlib
         // Here we check for collision with each of the tile's planes
         if( m_CurTile->getType() & TW_LEFT ) {
             // Check collision with the left plane
-            int x = ( m_CurTile->i - m_iHalfNumOfTiles ) * m_iTileSize;
+            int x = ( m_CurTile->i() - m_iHalfNumOfTiles ) * m_iTileSize;
             float fOverlapX = m_BBox.x() + (float)x - vPos.x();
             if( fOverlapX > 0.0f ) {
                 vfOverlap[0] = fOverlapX;
@@ -94,7 +87,7 @@ namespace tlib
         
         if( m_CurTile->getType() & TW_RIGHT ) {
             // Check collision with the right plane
-            int x = ( ( m_CurTile->i + 1 ) - m_iHalfNumOfTiles ) * m_iTileSize;
+            int x = ( ( m_CurTile->i() + 1 ) - m_iHalfNumOfTiles ) * m_iTileSize;
             float fOverlapX = m_BBox.x() + vPos.x() - (float)x;
             if( fOverlapX > 0.0f ) {
                 vfOverlap[0] = -fOverlapX;
@@ -104,7 +97,7 @@ namespace tlib
 
         if( m_CurTile->getType() & TW_BOTTOM ) {
             // Check collision with the bottom plane
-            int y = ( m_CurTile->j - m_iHalfNumOfTiles ) * m_iTileSize;
+            int y = ( m_CurTile->j() - m_iHalfNumOfTiles ) * m_iTileSize;
             float fOverlapY = m_BBox.y() + (float)y - vPos.y();
             if( fOverlapY > 0.0f ) {
                 vfOverlap[1] = fOverlapY;
@@ -114,7 +107,7 @@ namespace tlib
         
         if( m_CurTile->getType() & TW_TOP ) {
             // Check collision with the top plane
-            int y = ( ( m_CurTile->j + 1 ) - m_iHalfNumOfTiles ) * m_iTileSize;
+            int y = ( ( m_CurTile->j() + 1 ) - m_iHalfNumOfTiles ) * m_iTileSize;
             float fOverlapY = m_BBox.y() + vPos.y() - (float)y;
             if( fOverlapY > 0.0f ) {
                 vfOverlap[1] = -fOverlapY;
@@ -124,7 +117,7 @@ namespace tlib
         
         if( m_CurTile->getType() & TW_BACK ) {
             // Check collision with the front plane
-            int z = ( m_iHalfNumOfTiles - m_CurTile->k ) * m_iTileSize;
+            int z = ( m_iHalfNumOfTiles - m_CurTile->k() ) * m_iTileSize;
             float fOverlapZ = m_BBox.z() + vPos.z() - (float)z;
             if( fOverlapZ > 0.0f ) {
                 vfOverlap[2] = -fOverlapZ;
@@ -134,7 +127,7 @@ namespace tlib
 
         if( m_CurTile->getType() & TW_FRONT ) {
             // Check collision with the front plane
-            int z = ( m_iHalfNumOfTiles - ( m_CurTile->k + 1 ) ) * m_iTileSize;
+            int z = ( m_iHalfNumOfTiles - ( m_CurTile->k() + 1 ) ) * m_iTileSize;
             float fOverlapZ = m_BBox.z() + (float)z - vPos.z();
             if( fOverlapZ > 0.0f ) {
                 vfOverlap[2] = fOverlapZ;
@@ -150,14 +143,10 @@ namespace tlib
     }
 
     // ------------------------------------------------------------------------
-    bool OCCollisionDynamicBBox::readTile( SpacestationCorridors& oCor )
+    bool OCCollisionDynamicBBox::readTile()
     {
-        // Get corridor's [visual] display list component
-        SpacestationCorridorsDisplayList *cSCDL = 
-            (SpacestationCorridorsDisplayList*)oCor.getComponent("visual");
-
         // Save the tile in which the object is
-        m_CurTile = cSCDL->getTile( getOwner()->getPos() );
+        m_CurTile = Tilemap::Instance().getTile( getOwner()->getPos() );
         
         return (0==m_CurTile)?0:1;
     }

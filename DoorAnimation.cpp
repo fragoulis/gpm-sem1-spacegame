@@ -69,5 +69,5 @@ void DoorAnimation::onStart()
 
 void DoorAnimation::onStop()
 {
-    ((TileObject*)getOwner())->deactivate();
+    getOwner()->deactivate();
 }

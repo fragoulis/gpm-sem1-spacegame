@@ -44,5 +44,5 @@ void ForcefieldAnimation::onStart()
 
 void ForcefieldAnimation::onStop()
 {
-    ((TileObject*)getOwner())->deactivate();
+    getOwner()->deactivate();
 }

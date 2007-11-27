@@ -1,27 +1,29 @@
 #pragma once
+#include <list>
+using namespace std;
+
+#include "Vector3.h"
+using tlib::Vector3f;
+
+class Particle;
+
+// Particle list typedef
+typedef list<Particle*> ParticleList;
 
 /**
  * Abstract class for the particle emitters
  */
 class ParticleEmitter
 {
-public:
-    // The different types of emitters
-    enum EmitterType {
-        None = 0,
-        Sphere,
-        Cone,
-        Line
-    };
+protected:
+    // The number of particles to be released/spawned every time.
+    // Default: 1
+    int m_iReleaseCount;
 
 private:
-    // The type of the emitter
-    // Default: None
-    int m_iType;
-
     // Flag for whether this emitter should spawn particles or not
     // Default: False
-    bool m_bIsActive;
+    bool m_bIsOn;
 
     // The interval between particle releases in seconds.
     // A release time of null means that the emitter will spawn particles
@@ -29,27 +31,21 @@ private:
     // Default: 0.0
     double m_dReleaseTime;
 
-    // The number of particles to be released/spawned every time.
-    // Default: 1
-    int m_iReleaseCount;
-
     // Holds the time passed between spawns
     long m_lInitTime;
+
+    // The array of alive[updatable] particles
+    ParticleList m_vPAlive;
+
+    // The array of dead particles
+    ParticleList m_vPDead;
 
 public:
     /**
      * Constructors
      */
     ParticleEmitter();
-    ParticleEmitter( int iType, 
-                     bool bIsActive, 
-                     double dReleaseTime, 
-                     int iReleaseCount );
-
-    /**
-     * Destructor
-     */
-    virtual ~ParticleEmitter();
+    ParticleEmitter( double dReleaseTime, int iReleaseCount );
 
     /**
      * Starts the emitter
@@ -59,35 +55,42 @@ public:
     /**
      * Stops the emitter
      */
-    void stop() { m_bIsActive = false; }
+    void stop() { m_bIsOn = false; }
 
     /**
      * Returns whether the emitter is active or not
      */
-    bool isActive() const { return m_bIsActive; }
+    bool isOn() const { return m_bIsOn; }
 
     /**
-     * Getter/Setter for the emitter type
+     *
      */
-    void setType( int iType ) { m_iType = iType; }
-    //int getType() const { return m_iType; }
+    void init( double dReleaseTime, int iReleaseCount ) {
+        m_dReleaseTime = dReleaseTime;
+        m_iReleaseCount = iReleaseCount;
+    }
+
+    int getReleaseCount() const { return m_iReleaseCount; }
 
     /**
-     * Spawns any number of particles while checking for the time
-     * intervals
+     * Getters for the particle lists
      */
-    void spawn();
+    const ParticleList& getPAlive() const {
+        return m_vPAlive;
+    }
+    ParticleList& getPAlive() {
+        return m_vPAlive;
+    }
+    const ParticleList& getPDead() const {
+        return m_vPDead;
+    }
+    ParticleList& getPDead() {
+        return m_vPDead;
+    }
 
-protected:
     /**
-     * Spawns any number of particles
+     * Checks the time intervals between releases
      */
-    virtual void onSpawn() = 0;
-
-private:
-    /**
-     * Checks the time intervals
-     */
-    bool _checkTime();
+    bool checkRelease();
 
 }; // end of ParticleEmitter class

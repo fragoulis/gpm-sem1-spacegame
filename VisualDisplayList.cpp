@@ -15,8 +15,11 @@ namespace tlib
 
     void OCVisualDisplayList::render() const
     {
+        glPushMatrix();
+
         // get the object's position
         const Vector3f& pos = getOwner()->getPos();
+        glTranslatef( pos.x(), pos.y(), pos.z() );
 
         // Apply material if component exists
         IOCMaterial *cMaterial = (IOCMaterial*)m_oOwner->getComponent("material");
@@ -27,19 +30,17 @@ namespace tlib
         IOCTexture *cTexture = (IOCTexture*)m_oOwner->getComponent("texture");
         if( cTexture )
             cTexture->apply();
-
-        glPushMatrix();
-            glTranslatef( pos.x(), pos.y(), pos.z() );
             
-            // Load transformation quaternion and apply rotations
-            getOwner()->getDir().toMatrix(m_fRotMatrix);
-            glMultMatrixf(m_fRotMatrix);
+        // Load transformation quaternion and apply rotations
+        getOwner()->getDir().toMatrix(m_fRotMatrix);
+        glMultMatrixf(m_fRotMatrix);
 
-            glCallList( m_uiListId );
-        glPopMatrix();
+        glCallList( m_uiListId );
 
         // Turn of texturing in case texture component turned it on
         glDisable( GL_TEXTURE_2D );
+
+        glPopMatrix();
     }
 
     void OCVisualDisplayList::generate()

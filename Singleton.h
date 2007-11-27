@@ -22,10 +22,8 @@ public:
      */
     static void Destroy()
     {
-        if( pInstance ) {
-            delete pInstance;
-            pInstance = 0;
-        }
+        delete pInstance;
+        pInstance = 0;
     }
     
 protected:

@@ -141,8 +141,11 @@ namespace tlib
     // ------------------------------------------------------------------------
     void OCVisualVertexArraySphere::render() const 
     {
+        glPushMatrix();
+
         // get the object's position
         const Vector3f& pos = getOwner()->getPos();
+        glTranslatef( pos.x(), pos.y(), pos.z() );
 
         // Apply material if component exists
         IOCMaterial *cMaterial = (IOCMaterial*)m_oOwner->getComponent("material");
@@ -154,18 +157,16 @@ namespace tlib
         if( cTexture )
             cTexture->apply();
 
-        glPushMatrix();
-            glTranslatef( pos.x(), pos.y(), pos.z() );
-
-            glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[0]);
-	        for (int i = 0; i < (m_iStacks-2); i++) { 
-		        glDrawElements(GL_TRIANGLE_STRIP, (m_iSlices+1)*2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+i*(m_iSlices+1)*2]);
-	        };
-	        glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+(m_iStacks-2)*(m_iSlices+1)*2]);
-        glPopMatrix();
+        glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[0]);
+        for (int i = 0; i < (m_iStacks-2); i++) { 
+	        glDrawElements(GL_TRIANGLE_STRIP, (m_iSlices+1)*2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+i*(m_iSlices+1)*2]);
+        };
+        glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+(m_iStacks-2)*(m_iSlices+1)*2]);
 
         // Turn of texturing in case texture component turned it on
         glDisable( GL_TEXTURE_2D );
+
+        glPopMatrix();
 
     } // end render()
 

@@ -1,4 +1,5 @@
 #include "ParticleEmitter.h"
+#include "Particle.h"
 #include <ctime>
 
 // This will save us some time
@@ -6,39 +7,28 @@ const double M_CLOCKS_PER_SEC = 1.0 / CLOCKS_PER_SEC;
 
 // ----------------------------------------------------------------------------
 ParticleEmitter::ParticleEmitter():
-m_iType(None),
-m_bIsActive(false),
+m_bIsOn(false),
 m_dReleaseTime(0.0),
 m_iReleaseCount(1)
 {}
 
-ParticleEmitter::ParticleEmitter( 
-    int iType,
-    bool bIsActive, 
+ParticleEmitter::ParticleEmitter(
     double dReleaseTime, 
     int iReleaseCount ):
-m_iType(iType),
-m_bIsActive(bIsActive),
+m_bIsOn(false),
 m_dReleaseTime(dReleaseTime),
 m_iReleaseCount(iReleaseCount)
-{
-    // If active flag is true, start immediately
-    if( bIsActive )
-        start();
-}
-
-ParticleEmitter::~ParticleEmitter() 
 {}
 
 // ----------------------------------------------------------------------------
 void ParticleEmitter::start() 
 { 
-    m_bIsActive = true; 
-    m_lInitTime = clock();
+    m_bIsOn = true;
+    m_lInitTime = clock() - long(m_dReleaseTime * CLOCKS_PER_SEC);
 }
 
 // ----------------------------------------------------------------------------
-bool ParticleEmitter::_checkTime()
+bool ParticleEmitter::checkRelease()
 {
     // If release time is negligible just return true
     if( m_dReleaseTime < 1e-3 )
@@ -53,14 +43,4 @@ bool ParticleEmitter::_checkTime()
     }
     
     return false;
-}
-
-// ----------------------------------------------------------------------------
-void ParticleEmitter::spawn()
-{
-    // If time is not right don't do anything
-    if( !_checkTime() ) return;
-
-    // Call spawn from the derived class
-    onSpawn();
 }

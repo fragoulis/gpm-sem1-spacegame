@@ -1,15 +1,19 @@
 #include "TurretMgr.h"
 #include "Turret.h"
 #include "TurretAI.h"
+#include "ParticleSystemMgr.h"
+#include "PELine.h"
+#include "PSLaser.h"
 #include "VisualGXModel.h"
 #include "QuatRotation.h"
-//#include "Visual.h"
+#include "Vitals.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
 
-vector<Turret*> TurretMgr::m_vTurrets;
+TurretList TurretMgr::m_vTurrets;
 
+// ----------------------------------------------------------------------------
 void TurretMgr::init( Object *obj )
 {
     Config cfg("config.txt");
@@ -26,19 +30,73 @@ void TurretMgr::init( Object *obj )
     setComponent( new TurretAI( obj ) );
 }
 
+// ----------------------------------------------------------------------------
+void TurretMgr::update()
+{
+    IOCAI *cAI = (IOCAI*)getComponent("ai");
+    OCQuatRotation *cShipOri;
+
+    IOCVitals *cVitals;
+    TurretList toKill;
+    TurretList::const_iterator iter;
+    for( iter = m_vTurrets.begin();
+         iter != m_vTurrets.end();
+         ++iter )
+    {
+        _ASSERT((*iter)!=0);
+        // Cache dereference
+        Turret *obj = *iter;
+
+        if( !obj->isActive() ) 
+        {
+            //toKill.push_back( obj );
+            continue;
+        }
+
+        // Get turret orientation by updating the AI component
+        // ??????????????
+        cAI->update( obj );
+
+        // Update each turrets individual orientation
+        cShipOri = (OCQuatRotation*)obj->getComponent("orientation");
+        cShipOri->update();
+
+        // Update laser's view direction
+        obj->getLaser()->setDir( cShipOri->getView() );
+
+        // Update turret's health
+        cVitals = (IOCVitals*)obj->getComponent("vitals");
+        cVitals->update();
+
+    } // end for( ... )
+
+    for( iter = toKill.begin(); 
+         iter != toKill.end(); 
+         ++iter )
+    {
+         remove( *iter );
+    }
+
+} // end update()
+
+// ----------------------------------------------------------------------------
 void TurretMgr::render()
 {
     IOCVisual *cModel = (IOCVisual*)getComponent("visual");
 
     // Draw all turrets
-    vector<Turret*>::const_iterator iter;
+    TurretList::const_iterator iter;
     for( iter = m_vTurrets.begin();
          iter != m_vTurrets.end();
-         iter++ )
+         ++iter )
     {
-        // If object has finished its animation, and its not visible
-        // skip it
-        if( !(*iter)->isActive() ) continue;
+        _ASSERT((*iter)!=0);
+
+        if( !(*iter)->isActive() ) 
+        {
+            //toKill.push_back( obj );
+            continue;
+        }
 
          // Get visual component
         m_vPos.xyz( (*iter)->getPos() );
@@ -48,25 +106,15 @@ void TurretMgr::render()
 
 } // end render()
 
-void TurretMgr::update()
+// ----------------------------------------------------------------------------
+void TurretMgr::remove( Turret *value )
 {
-    IOCAI* cAI = (IOCAI*)getComponent("ai");
-    OCQuatRotation *cShipOri;
+    _ASSERT(value!=0);
 
-    vector<Turret*>::const_iterator iter;
-    for( iter = m_vTurrets.begin();
-         iter != m_vTurrets.end();
-         iter++ )
-    {
-        if( !(*iter)->isActive() ) continue;
+    // Remove it from the object list
+    m_vTurrets.remove( value );
 
-        // Get turret orientation by updating the AI component
-        //m_vPos.xyz( (*iter)->getPos() );
-        //m_qDir.wxyz( (*iter)->getDir() );
-        cAI->update( *iter );
-
-        // Update each turrets individual orientation
-        cShipOri = (OCQuatRotation*)(*iter)->getComponent("orientation");
-        cShipOri->update();
-    }
-} // end update()
+    // Delete object system from memory
+    delete value;
+    value = 0;
+}

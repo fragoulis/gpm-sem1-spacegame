@@ -1,10 +1,12 @@
 #pragma once
 #include "Object.h"
+
 using namespace tlib;
 
 // Forward declarations
 class TPCamera;
 class Tile3d;
+class PSLaser;
 
 /**
  * This is our Spaceship object
@@ -12,6 +14,8 @@ class Tile3d;
 class Spaceship : public Object
 {
 private:
+    PSLaser *m_Laser;
+
     float
         // The spaceship's maximum velocity [Config]
         m_fMaxVelocity, 
@@ -65,7 +69,8 @@ public:
     /**
      * Other actions
      */
-    //void fire();
+    void fire();
+    void ceaseFire();
     //void toggleCam();
     //void record();
 
@@ -82,6 +87,11 @@ public:
     void setCurrentTile( Tile3d *tile ) {
         m_CurrentTile = tile;
     }
+
+    void render();
+    void update();
+
+    PSLaser *getLaser() { return m_Laser; }
 
     /**
      * Getters/Setters for the collision state flags

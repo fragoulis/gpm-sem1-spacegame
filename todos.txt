@@ -1,13 +1,18 @@
-***** Na dw giati to kwlo radius tin sphere class den simvadizei
-** Na ftia3w enan collision manager
+** NA ginoun oi stl lists dikes mou aples listes
+** Stin ekri3i na mpei kai kapnos
+*** To active flag tou Object na xrisimopoieitai 
+    gia to culling.
+    To health na xrisimopoieitai gia svinetai kai to
+    object apti lista
 
-*** Na kanw culling ta turrets pou einai makria
-    apo to ship me mia sphere
-    
-* Na dior8wsw to position tou ship kai tou model
-    
-* Na metaferw tis mywindow ka myapp se diaforetika arxeia
+*** Object culling    
+***** Na dw giati to kwlo radius tis sphere class den simvadizei
+** Na ftia3w enan collision manager
 * Na ftia3w tin camera na min fevgei ektos.....
+
+* Ta particles 8a mporousan na ginoun kai me mirroring
+* Na dior8wsw to position tou ship kai tou model
+* Na metaferw tis mywindow ka myapp se diaforetika arxeia
 * Na ftia3w tin mprostini opsi tou spacestation
 * Na ftia3w ta controls se sindiasmo me to gamepad
 * Diakoptis gia to polygon mode kai minima stin o8oni
@@ -16,3 +21,7 @@
 * na kanw an8rwpini ti vector class kai tin quaternion
 
 ** to interface
+** Stoxastro 
+** Pisw ka8refti
+
+http://www.tantalon.com/pete/gdc2001roundtablereport.htm

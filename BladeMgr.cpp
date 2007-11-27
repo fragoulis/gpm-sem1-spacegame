@@ -1,3 +1,5 @@
+#include <windows.h>
+#include <gl/gl.h>
 #include "BladeMgr.h"
 #include "RotatingBlade.h"
 #include "Animation.h"
