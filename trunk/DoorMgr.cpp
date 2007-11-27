@@ -10,7 +10,7 @@
 #include "Logger.h"
 using namespace tlib;
 
-vector<Door*> DoorMgr::m_vDoors;
+DoorList DoorMgr::m_vDoors;
 
 void DoorMgr::init()
 {
@@ -44,24 +44,30 @@ void DoorMgr::render()
     // Get visual component which will draw all door panels
     IOCVisual *cBox = (IOCVisual*)getComponent("visual");
 
-    vector<Door*>::const_iterator iter;
+    DoorList toKill;
+    DoorList::const_iterator iter;
     for( iter = m_vDoors.begin();
          iter != m_vDoors.end();
-         iter++ )
+         ++iter )
     {
+        Door *obj = *iter;
         // If object has finished its animation, and its not visible
         // skip it
-        if( !(*iter)->isActive() ) continue;
+        if( !obj->isActive() ) 
+        {
+            //toKill.push_back( obj );
+            continue;
+        }
 
         // For door's position shorthand
-        const Vector3f& vDoorPos = (*iter)->getPos();
+        const Vector3f& vDoorPos = obj->getPos();
         glPushMatrix();
         {
             // Position door
             glTranslatef( vDoorPos.x(), vDoorPos.y(), vDoorPos.z() );
             // ... and rotate door
             float vfRotMatrix[16];
-            (*iter)->getDir().toMatrix(vfRotMatrix);
+            obj->getDir().toMatrix(vfRotMatrix);
             glMultMatrixf(vfRotMatrix);
 
             // Draw the door's panels
@@ -85,20 +91,44 @@ void DoorMgr::render()
 
     } // end for( )
 
+    for( iter = toKill.begin(); 
+         iter != toKill.end(); 
+         ++iter )
+    {
+         remove( *iter );
+    }
+
 } // end render()
 
 void DoorMgr::update()
 {
     IOCAnimation* cAnim;
 
-    vector<Door*>::const_iterator iter;
+    DoorList::const_iterator iter;
     for( iter = m_vDoors.begin();
          iter != m_vDoors.end();
-         iter++ )
+         ++iter )
     {
-        if( !(*iter)->isActive() ) continue;
+        if( !(*iter)->isActive() ) 
+        {
+            //toKill.push_back( obj );
+            continue;
+        }
 
         cAnim = (IOCAnimation*)(*iter)->getComponent("animation");
         cAnim->update();
     }
 } // end update()
+
+// ----------------------------------------------------------------------------
+void DoorMgr::remove( Door *value )
+{
+    _ASSERT(value!=0);
+
+    // Remove it from the object list
+    m_vDoors.remove( value );
+
+    // Delete object system from memory
+    delete value;
+    value = 0;
+}

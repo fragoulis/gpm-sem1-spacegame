@@ -2,7 +2,7 @@
 #include "Config.h"
 using tlib::Config;
 
-void TileObject::setPosFromIndex( int ijk[], float *vfOffset )
+void TileObject::setPosFromIndex( const int *ijk, float *vfOffset )
 {
     // Open the ocnfiguration file to read the spacestation's 
     // number of tiles and tile size

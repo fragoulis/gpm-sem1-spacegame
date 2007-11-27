@@ -32,20 +32,20 @@ namespace tlib
     void OCGXModel::render() const
     {
         glPushMatrix();
-        {
-            // Get object's position
-            const Vector3f& vPos = getOwner()->getPos();
 
-            // Place the object
-            glTranslatef( vPos.x(), vPos.y(), vPos.z() );
+        // Get object's position
+        const Vector3f& vPos = getOwner()->getPos();
 
-            // Load transformation quaternion and apply rotations
-            getOwner()->getDir().toMatrix(m_fRotMatrix);
-            glMultMatrixf(m_fRotMatrix);
+        // Place the object
+        glTranslatef( vPos.x(), vPos.y(), vPos.z() );
 
-            // Render the model
-            m_Model.DrawGL();
-        }
+        // Load transformation quaternion and apply rotations
+        getOwner()->getDir().toMatrix(m_fRotMatrix);
+        glMultMatrixf(m_fRotMatrix);
+
+        // Render the model
+        m_Model.DrawGL();
+
         glPopMatrix();
     }
 

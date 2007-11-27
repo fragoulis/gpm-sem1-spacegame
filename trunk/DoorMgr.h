@@ -1,10 +1,11 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "Object.h"
 using namespace std;
 using tlib::Object;
 
 class Door;
+typedef list<Door*> DoorList;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -15,7 +16,7 @@ class Door;
 class DoorMgr : public Object
 {
 private:
-    static vector<Door*> m_vDoors;
+    static DoorList m_vDoors;
 
 public:
     /**
@@ -42,11 +43,10 @@ public:
         m_vDoors.push_back( door );
     }
 
+private:
     /**
-     * Returns a door by its index
+     * 
      */
-    Door* getDoor( int index ) {
-        return m_vDoors[index];
-    }
+    void remove( Door *value );
 
 }; // end of DoorMgr class

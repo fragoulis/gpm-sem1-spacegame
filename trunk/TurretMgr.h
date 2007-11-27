@@ -1,10 +1,11 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "Object.h"
 using namespace std;
 using tlib::Object;
 
 class Turret;
+typedef list<Turret*> TurretList;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -16,11 +17,13 @@ class TurretMgr : public Object
 {
 private:
     // The list of forcefieds
-    static vector<Turret*> m_vTurrets;
+    static TurretList m_vTurrets;
 
 public:
     /**
      * Initializes the object
+     * Note: must be called after spaceship and corridors 
+     *       have been initialized
      */
     void init( Object *obj );
 
@@ -43,11 +46,10 @@ public:
         m_vTurrets.push_back( tr );
     }
 
+private:
     /**
-     * Returns a turret by its index
+     * 
      */
-    Turret* getTurret( int index ) {
-        return m_vTurrets[index];
-    }
+    void remove( Turret *turret );
 
 }; // end of TurretMgr class

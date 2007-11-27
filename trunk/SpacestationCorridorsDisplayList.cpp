@@ -1,9 +1,9 @@
-
 #include <windows.h>
 #include <gl/gl.h>
 #include <fstream>
 #include <assert.h>
 #include "SpacestationCorridorsDisplayList.h"
+#include "Tilemap.h"
 #include "Outlet.h"
 #include "Logger.h"
 #include "Config.h"
@@ -11,17 +11,15 @@
 using std::ifstream;
 using tlib::Logger;
 
-SpacestationCorridorsDisplayList::SpacestationCorridorsDisplayList():
-    m_TileList(0)
+SpacestationCorridorsDisplayList::SpacestationCorridorsDisplayList()
 {
     _LOG("Setting up spacestation corridors display list...");
     
+    // Read mapfile location from configuration file
     Config cfg("config.txt");
     cfg.loadBlock("spacestation");
 
     string filename;
-    cfg.getInt("tile_size"  ,&m_iTileSize);
-    cfg.getInt("tiles"      ,&m_iNumOfTiles);
     cfg.getString("mapfile" ,filename);
 
     // Read map from file
@@ -35,19 +33,7 @@ SpacestationCorridorsDisplayList::SpacestationCorridorsDisplayList():
 
 // ----------------------------------------------------------------------------
 SpacestationCorridorsDisplayList::~SpacestationCorridorsDisplayList()
-{
-    // Iterate and delete all tiles
-    /*_Tilemap::iterator iter;
-    for( iter = m_Tilemap.begin(); iter != m_Tilemap.end(); iter++ )
-    {
-        delete iter->second;
-        iter->second = 0;
-    }*/
-    if( m_TileList )
-        delete [] m_TileList;
-    m_TileList = 0;
-    m_Tilemap.clear();
-}
+{}
 
 // ----------------------------------------------------------------------------
 bool SpacestationCorridorsDisplayList::readMap( const char *filename )
@@ -59,16 +45,21 @@ bool SpacestationCorridorsDisplayList::readMap( const char *filename )
     _LOG("Reading filemap " + string(filename) );
 
     // Read every line to get a hold of the number of tiles
-    int iNumOfLines = 0;
-    int i, j, k, corr_type, obj_type, friend_id;
+    const int iNumOfTiles = Tilemap::Instance().getNumOfTiles();
+    int 
+        iNumOfLines = 0,
+        i, j, k, corr_type, obj_type, friend_id;
     while( fin >> i >> j >> k >> corr_type >> obj_type >> friend_id )
     {
         // Tile's index must be between our boundaries
-        if( i<0 || i>=m_iNumOfTiles || 
-            j<0 || j>=m_iNumOfTiles ||
-            k<0 || k>=m_iNumOfTiles ||
-            corr_type == 0 ) {
-            _LOG("Invalid tile on line " + toStr<size_t>(m_Tilemap.size()-1) );
+        if( i<0 || i>=iNumOfTiles || 
+            j<0 || j>=iNumOfTiles ||
+            k<0 || k>=iNumOfTiles ||
+            corr_type == 0 ) 
+        {
+            _LOG( "Invalid tile on line " + 
+                  toStr<size_t>(Tilemap::Instance().getTileArray().size()-1) );
+
             continue;
         }
 
@@ -82,7 +73,8 @@ bool SpacestationCorridorsDisplayList::readMap( const char *filename )
     fin.seekg( 0, ios_base::beg );
 
     // Allocate continuous memory for all tiles
-    m_TileList = new Tile3d[ iNumOfLines ];
+    //m_TileList = new Tile3d[ iNumOfLines ];
+    Tilemap::Instance().create( iNumOfLines );
 
     // Read info for every tile in the mapfile
     // We prefer to use a start to end for here sine we already have 
@@ -94,35 +86,44 @@ bool SpacestationCorridorsDisplayList::readMap( const char *filename )
         
         // Create tile and push it to the list
         int index = i + 
-                    j * m_iNumOfTiles + 
-                    k * m_iNumOfTiles * m_iNumOfTiles;
+                    j * iNumOfTiles + 
+                    k * iNumOfTiles * iNumOfTiles;
 
         // Setup tile
-        m_TileList[ iCurrentTile ].i = i;
-        m_TileList[ iCurrentTile ].j = j;
-        m_TileList[ iCurrentTile ].k = k;
-        m_TileList[ iCurrentTile ].setType( corr_type );
-        m_TileList[ iCurrentTile ].setFriendId( friend_id );
-        m_TileList[ iCurrentTile ].addObject( obj_type );
+        Tile3d *tile = Tilemap::Instance().getTileByIndex( iCurrentTile );
+        tile->ijk( i, j, k );
+        tile->setType( corr_type );
+        tile->setFriendId( friend_id );
+        tile->addObject( obj_type );
 
         // Save address to associative map
-        m_Tilemap[ index ] = &m_TileList[ iCurrentTile ];
+        Tilemap::Instance().setTile( index, iCurrentTile );
     }
     
     // Third and final pass... a little quicker this time
     // We have to link outlets to barriers. To do that we pass the address
     // of the occupant object of the tile with index the same as the friend id
-    // of to this tile's occupant barrier pointer :)))
+    // of this tile's occupant barrier pointer :)))
     for( int iCurrentTile = 0; iCurrentTile<iNumOfLines; ++iCurrentTile )
     {
-        // friend id is zero, then tile is not an outlet
-        if( !m_TileList[iCurrentTile].getFriendId() ) continue;
-        
-        // Associate power outlet with a barrier
-        Outlet *oOL = (Outlet*)m_TileList[iCurrentTile].getOccupant();
-        int index = m_TileList[iCurrentTile].getFriendId();
+        Tile3d *tile = Tilemap::Instance().getTileByIndex(iCurrentTile);
 
-        oOL->setBarrier( (Barrier*)m_Tilemap[index]->getOccupant() );
+        // If friend id is zero, then tile is not an outlet
+        if( !tile->getFriendId() ) continue;
+        
+        // ---- Associate power outlet with a barrier
+        // Get this tile's occupier, which by now we know is an Outlet
+        Outlet *oOL = (Outlet*)tile->getOccupant();
+
+        // This tile's friend id is the index of the tile which holds the 
+        // outlet's barrier
+        int index = tile->getFriendId();
+
+        // Get the occupier of that tile
+        Object *oOccupant = Tilemap::Instance().getTile(index)->getOccupant();
+
+        // And pass it as this outlet's barrier
+        oOL->setBarrier( (Barrier*)oOccupant );
     }
 
     return true;
@@ -133,8 +134,12 @@ bool SpacestationCorridorsDisplayList::readMap( const char *filename )
 void SpacestationCorridorsDisplayList::buildObject() const 
 {
     _LOG("Building spacestation corridors object");
-    const float halfFace = (float)(m_iTileSize * m_iNumOfTiles) * 0.5f;
-    // draw the dummy corridor paths
+
+    const int iTileSize = Tilemap::Instance().getTileSize();
+    const float halfFace = (float)(iTileSize * 
+                                   Tilemap::Instance().getNumOfTiles()) * 0.5f;
+
+    // Draw the dummy corridor paths
     glBegin(GL_QUADS);
     {
         float 
@@ -144,18 +149,21 @@ void SpacestationCorridorsDisplayList::buildObject() const
             endX, endY, endZ,
             nTileReapeat = 0.5f;
 
-        _Tilemap::const_iterator iter;
-        for( iter = m_Tilemap.begin(); iter != m_Tilemap.end(); iter++ )
+        TileArray::const_iterator iter;
+        for( iter = Tilemap::Instance().getTileArray().begin(); 
+             iter != Tilemap::Instance().getTileArray().end(); 
+             ++iter )
         {
+            // Shorthand tile
             Tile3d *oTile = iter->second;
 
-            // assign a starting point
-            startX = -halfFace + m_iTileSize * oTile->i;
-            startY = -halfFace + m_iTileSize * oTile->j;
-            startZ =  halfFace - m_iTileSize * oTile->k;
-            endX = startX + m_iTileSize;
-            endY = startY + m_iTileSize;
-            endZ = startZ - m_iTileSize;
+            // Assign a starting point
+            startX = -halfFace + iTileSize * oTile->i();
+            startY = -halfFace + iTileSize * oTile->j();
+            startZ =  halfFace - iTileSize * oTile->k();
+            endX = startX + iTileSize;
+            endY = startY + iTileSize;
+            endZ = startZ - iTileSize;
 
             if( oTile->getType() & TW_FRONT )
             {

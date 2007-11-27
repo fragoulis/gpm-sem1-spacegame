@@ -3,7 +3,6 @@
 #include "Object.h"
 
 class Tile3d;
-class SpacestationCorridors;
 
 namespace tlib 
 {
@@ -67,7 +66,7 @@ namespace tlib
          * owner is and returns true if owner is actually
          * within a tile
          */
-        bool readTile( SpacestationCorridors& oCor );
+        bool readTile();
 
         /**
          * Calls the check function and calls each object's response

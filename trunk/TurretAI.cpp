@@ -1,4 +1,7 @@
 #include "TurretAI.h"
+#include "Turret.h"
+#include "ParticleEmitter.h"
+#include "PSLaser.h"
 #include "QuatRotation.h"
 #include "Movement.h"
 #include "Logger.h"
@@ -13,22 +16,27 @@ using tlib::Config;
 TurretAI::TurretAI( Object *obj ):
 m_oTarget(obj)
 {
+    // Read turret's rotation factor and hir range
     Config cfg("config.txt");
     cfg.loadBlock("turret");
+    
     cfg.getFloat("rot_factor", &m_fRotFactor);
+    cfg.getFloat("hit_range", &m_fRange);
+    
 }
 
 void TurretAI::update( Object *oOwner )
 {
-    // Check if the spaceship target is closer than the 
-    // predefined distance set
-    const float fRange = 80.0f;
-
+    // Save distance between target and turret
     Vector3f vTarget = m_oTarget->getPos() - oOwner->getPos();
     const float fDistance = vTarget.length();
     
-    // If object is within range
-    if( fDistance < fRange )
+    // Shorthand laser emitter
+    ParticleEmitter& em = ((Turret*)oOwner)->getLaser()->getEmitter();
+
+    // Check if the spaceship target is closer than the 
+    // predefined distance set
+    if( fDistance < m_fRange )
     {
         OCQuatRotation *cOri = 
             (OCQuatRotation*)oOwner->getComponent("orientation");
@@ -41,14 +49,6 @@ void TurretAI::update( Object *oOwner )
         float fDot = cOri->getView().dot( vTarget );
         if( fDot < -1.0f || fDot > 1.0f )
             return;
-        
-        // If target view vector and view vector are close 
-        // enough
-        if( fDot > 0.9f )
-        {
-            // Fire...
-
-        } // end if( fDot > 0.9f ) ...
 
         if( fDot < 0.999f )
         {
@@ -87,14 +87,23 @@ void TurretAI::update( Object *oOwner )
             else
                 return;
 
-            //std::cout << vOut << std::endl;
             // Rotate model about the cross product
             const Quatf& qRes = cOri->addRotation( fAngle, vOut );
+
             // Rotate view vector
             cOri->updateView( qRes );
         
         } // end if( fDot < 0.999f ) ...
 
+        // If target view vector and view vector are close 
+        // enough fire
+        if( fDot > 0.99f ) {
+            if( !em.isOn() ) em.start();
+        }
+
     } // end if( fDistance < fRange ) ...
+    else {
+        em.stop();
+    }
 
 } // end update()

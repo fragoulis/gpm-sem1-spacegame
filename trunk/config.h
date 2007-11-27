@@ -71,6 +71,13 @@ namespace tlib
                        float *out, 
                        const int nCount = 1 );
 
+	/**
+         * Reads doubles
+         */
+        void getDouble( const string &sKey, 
+                        double *out, 
+                        const int nCount = 1 );
+
     private:
         /**
          * Saves any number of values of any kind from a key-value

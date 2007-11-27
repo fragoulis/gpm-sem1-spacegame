@@ -13,6 +13,9 @@ private:
     // The rotation factor
     float m_fRotFactor;
 
+    // The turret's hit range
+    float m_fRange;
+
 public:
     /**
      * Constructor

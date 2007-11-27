@@ -1,7 +1,5 @@
 #include "Spaceship.h"
-#include "Logger.h"
 #include "TPCamera.h"
-#include "Config.h"
 #include "VisualGXModel.h"
 #include "AccelMovement.h"
 #include "QuatRotation.h"
@@ -9,6 +7,11 @@
 #include "SpaceshipCollisionResponse.h"
 #include "Texture.h"
 #include "CollisionGXModel.h"
+#include "ParticleSystemMgr.h"
+#include "PELine.h"
+#include "PSLaser.h"
+#include "Logger.h"
+#include "Config.h"
 
 using namespace tlib;
 
@@ -37,13 +40,13 @@ void Spaceship::setup()
     cfg.getFloat("max_vel", &m_fMaxVelocity );
     cfg.getFloat("vel_factor", &m_fVelFactor );
 
+    // ------------------------------
     m_fRoll = 0.0f;
     m_fMaxRoll = (float)M_PI_2;
     m_fRollFactor = 2.0f*(float)M_PI;
-
     m_fRotFactor = (float)M_PI_2;
-
     m_fRotBias = 2.0f;
+    // ------------------------------
 
     // Initialize movement component
     setComponent( new OCAccelMovement );
@@ -75,7 +78,73 @@ void Spaceship::setup()
     // Initialize collision response component
     setComponent( new SpaceshipCollisionResponse );
 
+    // Read laser color
+    float vfLaserColor[4];
+    cfg.getFloat("laser_color", vfLaserColor, 4);
+
+    // Read laser emitter offset
+    float fEmitterOffset;
+    cfg.getFloat("laser_offset", &fEmitterOffset);
+
+    // A small [necessary] correction to the laser emitter position
+    float vfCorrect[3];
+    cfg.getFloat("correct_laser", vfCorrect, 3);
+    Vector3f vNewPos = m_vPos;
+    vNewPos.add( vfCorrect );
+
+    // Initialize laser system
+    m_Laser = PSManager::Instance().addLaser( 
+        this, 
+        vNewPos, 
+        fEmitterOffset, 
+        vfLaserColor );
+
 } // end setup()
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Spaceship::render()
+{
+    // render spaceship
+    ((IOCVisual*)getComponent("visual"))->render();
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Spaceship::fire()
+{
+    if( !m_Laser->getEmitter().isOn() ) 
+    {
+        m_Laser->getEmitter().start();
+    }
+}
+
+void Spaceship::ceaseFire() 
+{
+    m_Laser->getEmitter().stop();
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Spaceship::update()
+{
+    // Update keyboard calls for spaceship
+    ((OCKeyboard*)getComponent("controller"))->update();
+
+    // Update spaceship's position
+    ((IOCMovement*)getComponent("movement"))->update();
+
+    // Update spaceship's rotation
+    //IOCOrientation *cShipOri = (IOCOrientation*)m_Ship.getComponent("orientation");
+    OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
+    cRot->update();
+
+    // Update laser's view direction
+    m_Laser->setDir( cRot->getView() );
+
+    // Update laser's position
+    m_Laser->setPos( m_vPos );
+}
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

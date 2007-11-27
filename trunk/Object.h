@@ -27,7 +27,16 @@ namespace tlib
         // The list of components
         component_array m_vComponents;
 
+        // Flags whether an object should continue to get 
+        // rendered and updated
+        bool m_bActive;
+
     public:
+        /**
+         * Constructor
+         */
+        Object(): m_bActive(true) {}
+
         /**
          * Destructor
          */
@@ -96,6 +105,16 @@ namespace tlib
          * Sets the direction
          */
         void setDir( const Quatf& quat ) { m_qDir = quat; }
+
+        /**
+         * Deactivates the object
+         */
+        void deactivate() { m_bActive = false; }
+
+        /** 
+         * Returs the active flag
+         */
+        bool isActive() const { return m_bActive; }
 
     }; // end of Object class
 
