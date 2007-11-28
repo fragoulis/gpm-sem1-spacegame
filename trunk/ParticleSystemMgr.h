@@ -27,7 +27,7 @@ public:
      * 
      */
     PSLaser* addLaser( Object *oOwner,
-                       const Vector3f &vSysPos, 
+                       float vfCorrect[], 
                        float vEmitterOffset,
                        float vfLaserColor[] );
 

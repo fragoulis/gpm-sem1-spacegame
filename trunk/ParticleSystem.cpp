@@ -12,7 +12,8 @@ ParticleSystem::ParticleSystem():
 m_iType(Any),
 m_Particles(0),
 m_dLifeSpan(0.0),
-m_uiListId(0)
+m_uiListId(0),
+m_bIsExpired(true)
 {}
 
 ParticleSystem::~ParticleSystem()
@@ -63,6 +64,7 @@ void ParticleSystem::init( float fParticleSize )
     m_uiListId = glGenLists(1);
     glNewList( m_uiListId, GL_COMPILE );
         glBegin(GL_QUADS);
+            glNormal3f( 0.0f, 0.0f, 1.0f );
             glTexCoord2f( 0.0f, 0.0f );
             glVertex2f( -fParticleSize, -fParticleSize );
             glTexCoord2f( 1.0f, 0.0f );
@@ -112,7 +114,8 @@ void ParticleSystem::spawn()
         m_Emitter.getPAlive().push_back( *iter );
 
         // Set init time for its internal clock
-        (*iter)->setInitTime( clock() );
+        //(*iter)->setInitTime( clock() + long((*iter)->getLifeSpan() * CLOCKS_PER_SEC) );
+        //(*iter)->start();
 
         // Remove it from the dead list
         m_Emitter.getPDead().pop_front();

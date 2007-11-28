@@ -3,7 +3,7 @@
 //class Particle;
 
 // A very simple utility class handle the particle rearrangements
-class ParticleList
+class ParticleList_
 {
 private:
     // The first particle
@@ -20,7 +20,7 @@ private:
 
 public:
     // Constructor
-    ParticleList();
+    ParticleList_();
 
     // Accesors
     Particle *first() { return m_First; }
@@ -46,6 +46,6 @@ public:
     void push_back( Particle *particle );
 
     // Moves a particle from this list to the end of another
-    bool swap( ParticleList& list );
+    bool swap( ParticleList_& list );
 
 };

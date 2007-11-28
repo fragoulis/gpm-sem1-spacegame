@@ -148,14 +148,12 @@ void PSSmallExplosion::render() const
 // ----------------------------------------------------------------------------
 void PSSmallExplosion::onSpawn( Particle *particle ) 
 {
-    //particle->setSize( 1.0f );
     particle->setLifeSpan( tlib::randFloat( m_fLifeSpan[0], m_fLifeSpan[1] ) );
     particle->setPos( m_vPos );
     Vector3f vDir( tlib::randFloat(-1,1), tlib::randFloat(-1,1), tlib::randFloat(-1,1) );
     vDir.normalize();
     particle->setDir( vDir );
     particle->setVelocity( tlib::randFloat( m_fVelocity[0], m_fVelocity[1] ) );
-
 }
 
 // ----------------------------------------------------------------------------
