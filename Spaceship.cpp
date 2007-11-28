@@ -8,7 +8,6 @@
 #include "Texture.h"
 #include "CollisionGXModel.h"
 #include "ParticleSystemMgr.h"
-#include "PELine.h"
 #include "PSLaser.h"
 #include "Logger.h"
 #include "Config.h"
@@ -89,13 +88,11 @@ void Spaceship::setup()
     // A small [necessary] correction to the laser emitter position
     float vfCorrect[3];
     cfg.getFloat("correct_laser", vfCorrect, 3);
-    Vector3f vNewPos = m_vPos;
-    vNewPos.add( vfCorrect );
 
     // Initialize laser system
     m_Laser = PSManager::Instance().addLaser( 
         this, 
-        vNewPos, 
+        vfCorrect, 
         fEmitterOffset, 
         vfLaserColor );
 
@@ -140,10 +137,10 @@ void Spaceship::update()
     cRot->update();
 
     // Update laser's view direction
-    m_Laser->setDir( cRot->getView() );
+    //m_Laser->setDir( cRot->getView() );
 
     // Update laser's position
-    m_Laser->setPos( m_vPos );
+    //m_Laser->setPos( m_vPos );
 }
 
 // ----------------------------------------------------------------------------

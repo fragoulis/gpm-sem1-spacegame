@@ -2,7 +2,6 @@
 #include "Turret.h"
 #include "TurretAI.h"
 #include "ParticleSystemMgr.h"
-#include "PELine.h"
 #include "PSLaser.h"
 #include "VisualGXModel.h"
 #include "QuatRotation.h"
@@ -60,9 +59,6 @@ void TurretMgr::update()
         // Update each turrets individual orientation
         cShipOri = (OCQuatRotation*)obj->getComponent("orientation");
         cShipOri->update();
-
-        // Update laser's view direction
-        obj->getLaser()->setDir( cShipOri->getView() );
 
         // Update turret's health
         cVitals = (IOCVitals*)obj->getComponent("vitals");

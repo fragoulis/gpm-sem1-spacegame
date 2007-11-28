@@ -25,6 +25,7 @@ void ParticleEmitter::start()
 { 
     m_bIsOn = true;
     m_lInitTime = clock() - long(m_dReleaseTime * CLOCKS_PER_SEC);
+    //m_lInitTime = clock()
 }
 
 // ----------------------------------------------------------------------------

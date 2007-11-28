@@ -3,7 +3,6 @@
 #include "PSLaser.h"
 #include "Particle.h"
 #include "ParticleSystemMgr.h"
-#include "PERandom.h"
 #include "Movement.h"
 #include "CollisionResponse.h"
 #include "Orientation2d.h"
@@ -19,8 +18,8 @@ using tlib::OCOrientation2D;
 
 // ----------------------------------------------------------------------------
 void PSLaser::init( Object *oOwner,
-                    const Vector3f &vSysPos, 
-                    float vEmitterOffset,
+                    float vfCorrect[], 
+                    float fEmitterOffset,
                     float vfLaserColor[] )
 {
     _LOG("Initializing laser PS");
@@ -29,10 +28,10 @@ void PSLaser::init( Object *oOwner,
     m_oOwner = oOwner;
 
     // Save owner object's position
-    m_vPos = vSysPos;
+    m_vPosCorrection = Vector3f( vfCorrect );
 
     // Initialize position offset
-    m_fOffset = vEmitterOffset;
+    m_fOffset = fEmitterOffset;
 
     // Initialize particle color
     m_Color.Assign( vfLaserColor );
@@ -42,13 +41,13 @@ void PSLaser::init( Object *oOwner,
     cfg.loadBlock("laser");
 
     // Read release time and count
-    float fReleaseTime;
-    cfg.getFloat("release_time", &fReleaseTime);
+    double dReleaseTime;
+    cfg.getDouble("release_time", &dReleaseTime);
 
     int iReleaseCount;
     cfg.getInt("release_count", &iReleaseCount);
 
-    m_Emitter.init( double(fReleaseTime), iReleaseCount );
+    m_Emitter.init( dReleaseTime, iReleaseCount );
 
     // Read velocity
     cfg.getFloat("velocity", &m_fVelocity);
@@ -61,14 +60,16 @@ void PSLaser::init( Object *oOwner,
     m_Particles = new Particle[iNumOfParticles];
 
     // Read particle size and lifespan
-    float fSize, fLifeSpan;
+    float fSize;
+    double dLifeSpan;
     cfg.getFloat("size", &fSize);
-    cfg.getFloat("lifespan", &fLifeSpan);
+    cfg.getDouble("lifespan", &dLifeSpan);
 
     // At first, mark all particles as dead
     for( int i=0; i<iNumOfParticles; ++i ) {
-        m_Particles[i].setLifeSpan( (double)fLifeSpan );
+        m_Particles[i].setLifeSpan( dLifeSpan );
         m_Particles[i].setVelocity( m_fVelocity );
+        m_Particles[i].setSize( fSize );
         m_Emitter.getPDead().push_back( &m_Particles[i] );
     }
 
@@ -98,9 +99,12 @@ void PSLaser::update()
             // Get owner's orientation component
             OCOrientation2D * cOri = 
                 (OCOrientation2D*)m_oOwner->getComponent("orientation");
-            // We pass the object's position plus the position offset times
-            // the object's view vector
-            m_vDir = m_vPos + cOri->getView() * m_fOffset;
+            // We pass the object's position plus a small correction 
+            // plus the position offset times the object's view vector
+            m_vDir = cOri->getView();
+            m_vPos = m_oOwner->getPos() + 
+                     m_vPosCorrection + 
+                     m_vDir * m_fOffset;
             spawn();
         }
     }

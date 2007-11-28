@@ -1,13 +1,13 @@
 #include "ParticleList.h"
 
-ParticleList::ParticleList():
+ParticleList_::ParticleList_():
 m_First(0),
 m_Last(0),
 m_Iter(0),
 m_iSize(0)
 {}
 
-void ParticleList::push_back( Particle *particle )
+void ParticleList_::push_back( Particle *particle )
 {
     if( !m_First && !m_Last )
     {
@@ -24,7 +24,7 @@ void ParticleList::push_back( Particle *particle )
     ++m_iSize;
 }
 
-bool ParticleList::swap( ParticleList& list )
+bool ParticleList_::swap( ParticleList_& list )
 {
     if( !m_iSize ) return false;
 

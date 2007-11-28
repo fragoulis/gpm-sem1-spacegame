@@ -21,9 +21,10 @@ private:
     Vector3f m_vPrevPos;
 
     // The particle's direction
-    Vector3f m_vDir;
+    //Vector3f m_vDir;
 
     // Particle's velocity
+    float m_fVelocity;
     Vector3f m_vVelocity;
 
     // The particle's rotation
@@ -65,15 +66,22 @@ public:
         return m_vPrevPos; 
     }
 
-    const Vector3f& getDir() const {
-        return m_vDir;
-    }
+    void start();
+
+    //const Vector3f& getDir() const {
+    //    return m_vDir;
+    //}
 
     void setDir( const Vector3f &vDir ) {
-        m_vDir = vDir;
+        //m_vDir = vDir;
+        m_vVelocity = vDir * m_fVelocity;
     }
-    void setVelocity( const Vector3f &vVelocity ) {
-        m_vVelocity = vVelocity;
+    //void setVelocity( const Vector3f &vVelocity ) {
+    //    m_vVelocity = vVelocity;
+    //}
+    void setVelocity( float fVelocity ) {
+        m_fVelocity = fVelocity;
+        //m_vVelocity.xyz( fVelocity, fVelocity, fVelocity );
     }
 
     void updatePos() { 
@@ -96,10 +104,6 @@ public:
     long getInitTime() const { return m_lInitTime; }
 
     float getEnergy() const { return m_fEnergy; }
-    
-    void setVelocity( float fVelocity ) { 
-        m_vVelocity = m_vDir * fVelocity;
-    }
 
     void setRot( const Quati &qRot ) {
         m_qRot = qRot;

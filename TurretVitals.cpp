@@ -17,7 +17,7 @@ void TurretVitals::onKill()
     // Create a particle explosion in its position
     PSSmallExplosion *ex = 
         PSManager::Instance().addSmallExplosion( getOwner()->getPos() );
-    ex->getEmitter().start();
+    ex->start();
 }
 
 void TurretVitals::onRevive()

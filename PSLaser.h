@@ -15,6 +15,9 @@ private:
     // The onwer object
     Object *m_oOwner;
 
+    //
+    Vector3f m_vPosCorrection;
+
     // The direction in which the emitter will spawn new particles
     // Used for caching the direcion vector before passing it to 
     // every new particle
@@ -57,8 +60,8 @@ public:
      * Setups a laser particle system
      */
     void init( Object *oOwner,
-               const Vector3f &vSysPos, 
-               float vEmitterOffset,
+               float vfCorrect[], 
+               float fEmitterOffset,
                float vfLaserColor[] );
 
 private:

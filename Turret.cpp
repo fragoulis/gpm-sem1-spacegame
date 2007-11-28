@@ -42,8 +42,6 @@ void Turret::init()
     // A small [necessary] correction to the laser emitter position
     float vfCorrect[3];
     cfg.getFloat("correct_laser", vfCorrect, 3);
-    Vector3f vNewPos = m_vPos;
-    vNewPos.add( vfCorrect );
 
     // Read total hits a turret can withstand
     int iHits;
@@ -55,7 +53,7 @@ void Turret::init()
     // Initialize laser system
     m_Laser = PSManager::Instance().addLaser( 
         this, 
-        vNewPos, 
+        vfCorrect, 
         fEmitterOffset, 
         vfLaserColor );
 }
