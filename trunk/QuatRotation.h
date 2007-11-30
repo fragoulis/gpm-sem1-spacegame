@@ -29,26 +29,31 @@ namespace tlib
          * Returns the rotation quaternion
          */
         const Quatf& getRot() const { return m_qRot; }
+        Quatf& getRot() { return m_qRot; }
 
         /**
          * Returns the previous rotation quaternion
          */
         const Quatf& getPrevRot() const { return m_qPrevRot; }
+        Quatf& getPrevRot() { return m_qPrevRot; }
 
         /**
          * Returns the previous pitch
          */
         const Quatf& getPitch() const { return m_qPitch; }
+        Quatf& getPitch() { return m_qPitch; }
 
         /**
          * Returns the previous yaw
          */
         const Quatf& getYaw() const { return m_qYaw; }
+        Quatf& getYaw() { return m_qYaw; }
 
         /**
          * Returns the previous roll
          */
         const Quatf& getRoll() const { return m_qRoll; }
+        Quatf& getRoll() { return m_qRoll; }
 
         /**
          * Sets the rotation quaternion

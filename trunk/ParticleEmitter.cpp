@@ -3,7 +3,7 @@
 #include <ctime>
 
 // This will save us some time
-const double M_CLOCKS_PER_SEC = 1.0 / CLOCKS_PER_SEC;
+extern const double M_CLOCKS_PER_SEC;
 
 // ----------------------------------------------------------------------------
 ParticleEmitter::ParticleEmitter():

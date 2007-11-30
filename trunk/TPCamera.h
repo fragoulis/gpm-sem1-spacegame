@@ -1,6 +1,5 @@
 #pragma once
-#include "camera.h"
-
+#include "Camera.h"
 using tlib::Vector3f;
 
 class TPCamera : public Camera
@@ -12,11 +11,13 @@ protected:
     // The offset from the target object's position
     Vector3f m_vPosOffset;
 
-    //
-    float m_fFollowBias;
+    // This factor animates the camera following the spaceship
+    // while it is speeding up
+    float m_fPositionBias;
 
-    //
-    bool m_bActive;
+    // This factor animates the camera following the spaceship
+    // after it has rotated
+    float m_fRotationBias;
 
 public:
     /**
@@ -32,7 +33,7 @@ public:
     /**
      * 
      */
-    void setup( Object *oTarget );
+    void init( Object *oTarget );
 
     /**
      * Updates the position of the camera
@@ -52,32 +53,5 @@ public:
 	void setPosOffset( const Vector3f& vOff ) {
 		m_vPosOffset = vOff;
 	}
-
-    /**
-     *
-     */
-    void updateBias( float fDelta )
-    {
-        m_fFollowBias += 2.0f * fDelta;
-        if( m_fFollowBias > 1.0f ) {
-            m_bActive = false;
-            m_fFollowBias = 1.0f;
-        }
-    }
-
-    /**
-     *
-     */
-    void activate() { 
-        m_bActive = true;
-        m_fFollowBias = 0.0f; 
-    }
-
-    /**
-     *
-     */
-    void setActive( bool bActive ) { 
-        m_bActive = bActive;
-    }
 
 }; // end of TPCamera class

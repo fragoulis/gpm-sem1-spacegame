@@ -63,7 +63,7 @@ public:
     /**
      * Saves the selected camera to the active camera pointer
      */
-    Camera* activate( const string &id );
+    inline Camera* activate( const string &id );
 
 }; // end of CameraMgr class
 
@@ -94,4 +94,8 @@ Camera* CameraMgr::get( const string &id ) {
 
 void CameraMgr::apply() const { 
     m_pActiveCamera->apply(); 
+}
+
+Camera* CameraMgr::activate( const string &id ) {
+    return (m_pActiveCamera = m_vCamera[ id ]);
 }

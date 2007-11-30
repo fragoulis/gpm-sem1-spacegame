@@ -1,54 +1,48 @@
-#include <windows.h>
-#include <gl/gl.h>
-#include "PSLaser.h"
+#include "PSSmoke.h"
 #include "Particle.h"
-#include "ParticleSystemMgr.h"
-#include "CollisionResponse.h"
-#include "Orientation2d.h"
-#include "PSScorchMarks.h"
-#include "Tile3d.h"
+#include "gx/image.h"
+#include "Object.h"
 #include "Config.h"
 #include "Logger.h"
 using tlib::Config;
 using tlib::Logger;
-using tlib::IOCCollisionResponse;
-using tlib::OCOrientation2D;
+using tlib::Object;
+
+PSSmoke::PSSmoke()
+{ setType( Smoke ); }
 
 // ----------------------------------------------------------------------------
-void PSLaser::init( Object *oOwner,
-                    float vfCorrect[], 
-                    float fEmitterOffset,
-                    float vfLaserColor[] )
+void PSSmoke::init( const Vector3f &vSysPos )
 {
-    _LOG("Initializing laser PS");
-
-    // Save owner object pointer
-    m_oOwner = oOwner;
+    _LOG("Initializing smoke PS");
 
     // Save owner object's position
-    m_vPosCorrection = Vector3f( vfCorrect );
-
-    // Initialize position offset
-    m_fOffset = fEmitterOffset;
-
-    // Initialize particle color
-    m_Color.Assign( vfLaserColor );
+    m_vPos = vSysPos;
 
     // Open configuration file
     Config cfg("config.txt");
-    cfg.loadBlock("laser");
+    cfg.loadBlock("explosion_smoke");
+
+    // Read particle color
+    float vfLaserColor[4];
+    cfg.getFloat("color", vfLaserColor, 4);
+    m_Color.Assign( vfLaserColor );
 
     // Read release time and count
     double dReleaseTime;
-    cfg.getDouble("release_time", &dReleaseTime);
-
     int iReleaseCount;
+    cfg.getDouble("release_time", &dReleaseTime);
     cfg.getInt("release_count", &iReleaseCount);
-
     m_Emitter.init( dReleaseTime, iReleaseCount );
 
-    // Read velocity
-    cfg.getFloat("velocity", &m_fVelocity);
+    // Read particles' velocity, size and lifespan limits
+    float fSize;
+    cfg.getFloat("size", &fSize);
+    cfg.getFloat("lifespan", m_fLifeSpan, 2);
+    cfg.getFloat("velocity", m_fVelocity, 2);
+
+    // Read system's lifespan
+    cfg.getDouble("sys_lifespan", &m_dLifeSpan);
 
     // Read particle number
     int iNumOfParticles;
@@ -57,17 +51,8 @@ void PSLaser::init( Object *oOwner,
     // Initialize particle array
     m_Particles = new Particle[iNumOfParticles];
 
-    // Read particle size and lifespan
-    float fSize;
-    double dLifeSpan;
-    cfg.getFloat("size", &fSize);
-    cfg.getDouble("lifespan", &dLifeSpan);
-
     // At first, mark all particles as dead
     for( int i=0; i<iNumOfParticles; ++i ) {
-        m_Particles[i].setLifeSpan( dLifeSpan );
-        m_Particles[i].setVelocity( m_fVelocity );
-        m_Particles[i].setSize( fSize );
         m_Emitter.getPDead().push_back( &m_Particles[i] );
     }
 
@@ -76,31 +61,17 @@ void PSLaser::init( Object *oOwner,
     cfg.getString("texture", sTexture);
     setTexture( sTexture );
 
-    // Initialize base class [compile's a display list for the particle]
     ParticleSystem::init( fSize );
-
-    // Initialize collidable's class
-    PSCollidable::init();
-
-    // Initialize the scorch marks' particle system
-    m_Marks = PSManager::Instance().addScorchMark();
 
 } // end init()
 
 // ----------------------------------------------------------------------------
-void PSLaser::update()
+void PSSmoke::update()
 {
     // Only create new particles if emitter is active
     if( m_Emitter.isOn() ) {
         // If time is not right don't do anything
         if( m_Emitter.checkRelease() ) {
-            // Get owner's orientation component
-            OCOrientation2D * cOri = 
-                (OCOrientation2D*)m_oOwner->getComponent("orientation");
-            // We pass the object's position plus a small correction 
-            // plus the position offset times the object's view vector
-            m_vDir = cOri->getView();
-            m_vPos = m_oOwner->getPos() + m_vDir * m_fOffset;
             spawn();
         }
     }
@@ -125,9 +96,6 @@ void PSLaser::update()
         // Update particles' positions
         obj->updatePos();
 
-        // Check for collisions
-        checkCollision( obj );
-
     } // end for( ... )
     
     // Kill the temporary list
@@ -136,31 +104,33 @@ void PSLaser::update()
 } // end update()
 
 // ----------------------------------------------------------------------------
-void PSLaser::render() const
+void PSSmoke::render() const
 {   
     // Disable depth test
     glDepthMask( GL_FALSE );
 
     // Enable blending
     glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
     // Disable lighting
     glDisable( GL_LIGHTING );
 
-    // Set color
-    glColor4fv( m_Color.rgba() );
-
     // Enable texture
     glEnable( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D, m_uiTexId );
-        
+
     // Render all alive particles
+    float matrix[16];
     ParticleList::const_iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
          ++iter )
     {
+        // Set color
+        float rgba[] = { 1.0f, 1.0f, 1.0f, (*iter)->getEnergy() };
+        glColor4fv( rgba );
+
         const Vector3f& vPos = (*iter)->getPos();
         glPushMatrix();
         {
@@ -168,11 +138,10 @@ void PSLaser::render() const
             glPushMatrix();
             {
                 // Render as billboard
-                float matrix[16];
                 glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
                 matrix[0] = matrix[5] = matrix[10] = matrix[11] = 1.0f;
-                matrix[1] = matrix[2] = matrix[3] = matrix[4] =
-                matrix[6] = matrix[7] = matrix[8] = matrix[9] = 0.0f;
+                matrix[1] = matrix[2] = matrix[ 3] = matrix[ 4] =
+                matrix[6] = matrix[7] = matrix[ 8] = matrix[ 9] = 0.0f;
                 glLoadMatrixf(matrix);
 
                 glCallList( m_uiListId );
@@ -193,43 +162,18 @@ void PSLaser::render() const
     glDisable( GL_BLEND );
 
     // Enable depth test 
+    //glEnable( GL_DEPTH_TEST );
     glDepthMask( GL_TRUE );
 
 } // end render()
 
 // ----------------------------------------------------------------------------
-void PSLaser::onCollisionWithTiles( Particle *particle, 
-                                    const Vector3f &vColDir,
-                                    const Vector3f &vColPoint )
+void PSSmoke::onSpawn( Particle *particle ) 
 {
-    particle->bounce( vColDir, 0.5f );
-    particle->setLifeSpan(0.4f);
-
-    // Set the scorch mark's direction
-    m_Marks->setDir( vColDir );
-
-    // Create a scorch mark on the point of collision
-    m_Marks->setPos( vColPoint );
-    m_Marks->spawn();
-}
-
-// ----------------------------------------------------------------------------
-void PSLaser::onCollisionWithObjects( Particle *particle, 
-                                      const Vector3f &vColDir )
-{
-    particle->bounce( vColDir, 0.5f );
-    particle->setLifeSpan(0.4f);
-
-    // Call collision response for the object
-    IOCCollisionResponse *cColRes =
-        (IOCCollisionResponse*)getTile()->getOccupant()->getComponent("collisionresponse");
-    if( cColRes )
-        cColRes->respond( vColDir );
-}
-
-// ----------------------------------------------------------------------------
-void PSLaser::onSpawn( Particle *particle ) 
-{
+    particle->setLifeSpan( tlib::randFloat( m_fLifeSpan[0], m_fLifeSpan[1] ) );
     particle->setPos( m_vPos );
-    particle->setDir( m_vDir );
+    Vector3f vDir( tlib::randFloat(-1,1), tlib::randFloat(-1,1), tlib::randFloat(-1,1) );
+    vDir.normalize();
+    particle->setDir( vDir );
+    particle->setVelocity( tlib::randFloat( m_fVelocity[0], m_fVelocity[1] ) );
 }

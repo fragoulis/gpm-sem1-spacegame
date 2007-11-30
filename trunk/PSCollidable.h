@@ -1,6 +1,8 @@
 #pragma once
 #include "ParticleSystem.h"
 
+namespace tlib { class Object; }
+using tlib::Object;
 class Tile3d;
 
 class PSCollidable : public ParticleSystem
@@ -35,34 +37,14 @@ public:
     const Tile3d *getTile() const { return m_CurTile; }
     const Tile3d *getPrevTile() const { return m_PrevTile; }
 
-    /**
-     * 
-     */
-    bool checkCollisionWithTiles( 
-        const Vector3f &vPos, 
-        Vector3f &vCollDir,
-        Vector3f &vCollPoint );
-
-    /**
-     * 
-     */
-    bool checkCollisionWithObjects(
-        Particle *particle, 
-        Vector3f &vCollDir );
-
-    /**
-     * 
-     */
-    bool readTile( Particle *particle );
-    bool readPrevTile( Particle *particle );
-
 protected:
     /**
      * 
      */
     virtual void onCollisionWithTiles( 
         Particle *particle, 
-        const Vector3f &vCollDir ) = 0;
+        const Vector3f &vCollDir,
+        const Vector3f &vColPoint ) = 0;
 
     /**
      * 
@@ -76,7 +58,34 @@ protected:
      */
     void init();
 
+    /**
+     * 
+     */
+    void checkCollision( Particle *particle );
+
 private:
+    /**
+     * 
+     */
+    bool checkCollisionWithTiles( 
+        const Vector3f &vPos, 
+        Vector3f &vCollDir,
+        Vector3f &vCollPoint );
+
+    /**
+     * 
+     */
+    bool checkCollisionWithObject(
+        Particle *particle, 
+        Object *oObj,
+        Vector3f &vCollDir );
+
+    /**
+     * 
+     */
+    bool readTile( Particle *particle );
+    bool readPrevTile( Particle *particle );
+
     /**
      *
      */

@@ -97,7 +97,7 @@ void Reactor::render()
         matrix[6] = matrix[7] = matrix[8] = matrix[9] = 0.0f;
         glLoadMatrixf(matrix);*/
 
-        glScalef(5.0f,5.0f,5.0f);
+        //glScalef(5.0f,5.0f,5.0f);
         cVisual->render();
     glPopMatrix();
     

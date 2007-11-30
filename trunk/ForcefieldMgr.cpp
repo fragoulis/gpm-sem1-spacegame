@@ -5,11 +5,12 @@
 #include "VisualBox.h"
 #include "SimpleMaterial.h"
 #include "Animation.h"
+#include "ObjectMgr.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
 
-vector<Forcefield*> ForcefieldMgr::m_vForcefields;
+ForcefieldList ForcefieldMgr::m_vForcefields;
 
 void ForcefieldMgr::init()
 {
@@ -26,45 +27,90 @@ void ForcefieldMgr::init()
     setComponent( new OCVisualBox( Vector3f( vfBBox ) * 0.5f ) );
 }
 
-void ForcefieldMgr::render()
-{
-    // Get visual component which will draw all door panels
-    IOCVisual *cBox = (IOCVisual*)getComponent("visual");
-
-    vector<Forcefield*>::const_iterator iter;
-    for( iter = m_vForcefields.begin();
-         iter != m_vForcefields.end();
-         iter++ )
-    {
-        // If object has finished its animation, and its not visible
-        // skip it
-        if( !(*iter)->isActive() ) continue;
-
-        // Apply the material for the outlet
-        IOCMaterial *cMat = (IOCMaterial*)(*iter)->getComponent("material");
-        cMat->apply();
-
-        // Draw the door's panels
-        m_vPos.xyz( (*iter)->getPos() );
-        m_qDir.wxyz( (*iter)->getDir() );
-        cBox->render();
-
-    } // end for( )
-
-} // end render()
-
+// ----------------------------------------------------------------------------
 void ForcefieldMgr::update()
 {
     IOCAnimation* cAnim;
 
-    vector<Forcefield*>::const_iterator iter;
+    Forcefield *obj;
+    ForcefieldList toKill;
+    ForcefieldList::const_iterator iter;
     for( iter = m_vForcefields.begin();
          iter != m_vForcefields.end();
          iter++ )
     {
-        if( !(*iter)->isActive() ) continue;
+        obj = *iter;
 
-        cAnim = (IOCAnimation*)(*iter)->getComponent("animation");
+        if( ObjectMgr::Instance().isCulled( obj ) ) {
+            // If object is not active dont bother updating it
+            // since it is culled
+            continue;
+        }
+
+        cAnim = (IOCAnimation*)obj->getComponent("animation");
+        // If object has finished its animation kill it
+        if( cAnim->isDone() )
+        {
+            toKill.push_back( obj );
+            continue;
+        }
+
         cAnim->update();
     }
+
+    for( iter = toKill.begin(); 
+         iter != toKill.end(); 
+         ++iter )
+    {
+         remove( *iter );
+    }
+
 } // end update()
+
+// ----------------------------------------------------------------------------
+void ForcefieldMgr::render()
+{
+    glEnable(GL_BLEND);
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+
+    // Get visual component which will draw all door panels
+    IOCVisual *cBox = (IOCVisual*)getComponent("visual");
+
+    Forcefield *obj;
+    ForcefieldList::const_iterator iter;
+    for( iter = m_vForcefields.begin();
+         iter != m_vForcefields.end();
+         iter++ )
+    {
+        obj = *iter;
+
+        // If it's not active don't render as it is culled
+        if( !obj->isActive() ) continue;
+
+        // Apply the material for the outlet
+        IOCMaterial *cMat = (IOCMaterial*)obj->getComponent("material");
+        cMat->apply();
+
+        // Draw the door's panels
+        m_vPos.xyz( obj->getPos() );
+        m_qDir.wxyz( obj->getDir() );
+        cBox->render();
+
+    } // end for( )
+
+    glDisable(GL_BLEND);
+
+} // end render()
+
+// ----------------------------------------------------------------------------
+void ForcefieldMgr::remove( Forcefield *value )
+{
+    _ASSERT(value!=0);
+
+    // Remove it from the object list
+    m_vForcefields.remove( value );
+
+    // Delete object system from memory
+    delete value;
+    value = 0;
+}

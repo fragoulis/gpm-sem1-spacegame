@@ -1,10 +1,11 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "Object.h"
 using namespace std;
 using tlib::Object;
 
 class Outlet;
+typedef list<Outlet*> OutletList;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -15,7 +16,7 @@ class Outlet;
 class OutletMgr : public Object
 {
 private:
-    static vector<Outlet*> m_vOutlets;
+    static OutletList m_vOutlets;
 
 public:
     /**
@@ -42,11 +43,4 @@ public:
         m_vOutlets.push_back( ol );
     }
 
-    /**
-     * Returns an outlet by its index
-     */
-    Outlet* getOutlet( int index ) {
-        return m_vOutlets[index];
-    }
-
-}; // end of DoorRenderer class
+}; // end of OutletMgr class

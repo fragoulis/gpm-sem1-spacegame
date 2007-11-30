@@ -1,9 +1,10 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "Object.h"
 using namespace std;
 
 class RotatingBlade;
+typedef list<RotatingBlade*> RotatingBladeList;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -15,7 +16,7 @@ class BladeMgr
 {
 private:
     // The list of blades in our scene
-    static vector<RotatingBlade*> m_vBlades;
+    static RotatingBladeList m_vBlades;
 
 public:
     /**
@@ -37,11 +38,10 @@ public:
         m_vBlades.push_back( obj );
     }
 
+private:
     /**
-     * Returns a blade by its index
+     * 
      */
-    RotatingBlade* getBlade( int index ) {
-        return m_vBlades[index];
-    }
+    void remove( RotatingBlade *value );
 
 }; // end of BladeMgr class

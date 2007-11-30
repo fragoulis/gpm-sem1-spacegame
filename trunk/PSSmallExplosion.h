@@ -1,6 +1,5 @@
 #pragma once
 #include "ParticleSystem.h"
-#include "PSScorchMarks.h"
 
 namespace tlib { class Object; }
 using tlib::Object;
@@ -40,8 +39,5 @@ public:
      * speed
      */
     void onSpawn( Particle *particle );
-
-    // empty
-    void onKill( Particle *particle );
 
 };

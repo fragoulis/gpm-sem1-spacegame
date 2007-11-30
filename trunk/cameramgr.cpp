@@ -20,13 +20,3 @@ CameraMgr::~CameraMgr()
         iter->second = 0;
     }
 }
-
-/**
- * Saves the selected camera to the active camera pointer
- */
-Camera* CameraMgr::activate( const string &id )
-{
-    m_pActiveCamera = m_vCamera[ id ];
-
-    return m_pActiveCamera;
-}

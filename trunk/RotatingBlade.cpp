@@ -67,10 +67,7 @@ void RotatingBlade::render()
         // Draw system base
         cVis = (IOCVisual*)m_oBase.getComponent("visual");
         _ASSERT(cVis!=0);
-        glPushMatrix();
-            glScalef(0.2f,0.2f,0.2f);
-            cVis->render();
-        glPopMatrix();
+        cVis->render();
 
         // Draw system blade
         cVis = (IOCVisual*)m_oBlade.getComponent("visual");

@@ -72,7 +72,7 @@ namespace tlib
          * Calls the check function and calls each object's response
          * component if collision was detected
          */
-        void actOnCollision() const;
+        void checkCollision() const;
 
     private:
         /**

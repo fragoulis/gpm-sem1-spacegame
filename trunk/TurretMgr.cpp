@@ -6,6 +6,7 @@
 #include "VisualGXModel.h"
 #include "QuatRotation.h"
 #include "Vitals.h"
+#include "ObjectMgr.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
@@ -42,27 +43,31 @@ void TurretMgr::update()
          iter != m_vTurrets.end();
          ++iter )
     {
-        _ASSERT((*iter)!=0);
         // Cache dereference
         Turret *obj = *iter;
+        _ASSERT(obj!=0);
 
-        if( !obj->isActive() ) 
+        if( ObjectMgr::Instance().isCulled( obj ) ) {
+            // If object is not active dont bother updating it
+            // since it is culled
+            continue;
+        }
+
+        // Check the turret's health status
+        cVitals = (IOCVitals*)obj->getComponent("vitals");
+        if( !cVitals->update() ) 
         {
-            //toKill.push_back( obj );
+            // If turret is dead, remove it from the list
+            toKill.push_back( obj );
             continue;
         }
 
         // Get turret orientation by updating the AI component
-        // ??????????????
         cAI->update( obj );
 
         // Update each turrets individual orientation
         cShipOri = (OCQuatRotation*)obj->getComponent("orientation");
         cShipOri->update();
-
-        // Update turret's health
-        cVitals = (IOCVitals*)obj->getComponent("vitals");
-        cVitals->update();
 
     } // end for( ... )
 
@@ -86,17 +91,44 @@ void TurretMgr::render()
          iter != m_vTurrets.end();
          ++iter )
     {
-        _ASSERT((*iter)!=0);
+        // Cache dereference
+        Turret *obj = *iter;
+        _ASSERT(obj!=0);
 
-        if( !(*iter)->isActive() ) 
-        {
-            //toKill.push_back( obj );
+        if( !obj->isActive() ) {
+            // If object is not active dont bother rendering it
+            // since it is culled
             continue;
         }
 
          // Get visual component
-        m_vPos.xyz( (*iter)->getPos() );
-        m_qDir.wxyz( (*iter)->getDir() );
+        m_vPos.xyz( obj->getPos() );
+        m_qDir.wxyz( obj->getDir() );
+
+#ifdef _SHOW_AXIS
+        glPushMatrix();
+            glTranslatef( m_vPos.x(), m_vPos.y(), m_vPos.z() );
+            IComponent *cmp = obj->getComponent("orientation");
+            OCOrientation3D *qr = (OCOrientation3D*)cmp;
+            const Vector3f& view = qr->getView() * 20.0f;
+            const Vector3f& right = qr->getRight() * 20.0f;
+            const Vector3f& up = qr->getUp() * 20.0f;
+            
+            glDisable(GL_LIGHTING);
+            glBegin(GL_LINES);
+                glColor3f(1,0,0);
+                glVertex3f(0,0,0);
+                glVertex3f(view.x(), view.y(), view.z());
+                glColor3f(0,1,0);
+                glVertex3f(0,0,0);
+                glVertex3f(right.x(), right.y(), right.z());
+                glColor3f(0,0,1);
+                glVertex3f(0,0,0);
+                glVertex3f(up.x(), up.y(), up.z());
+            glEnd();
+            glEnable(GL_LIGHTING);
+        glPopMatrix();
+#endif
         cModel->render();
     }
 

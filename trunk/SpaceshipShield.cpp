@@ -50,5 +50,6 @@ void SpaceshipShield::init( Spaceship *oShip )
 // ----------------------------------------------------------------------------
 void SpaceshipShield::update()
 {
-    m_vPos = m_oShip->getPos() + Vector3f(0.55f,0.0f,0.0f);
+    //m_vPos = m_oShip->getPos() + Vector3f(0.55f,0.0f,0.0f);
+    m_vPos = m_oShip->getPos();
 }

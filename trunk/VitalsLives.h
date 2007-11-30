@@ -31,10 +31,15 @@ namespace tlib
         }
 
         /**
+         * Returns the number of remaining lives
+         */
+        int getLives() const { return m_iLives; }
+
+        /**
          * Checks the health status and takes care of the object's
          * death
          */
-        virtual void update();
+        virtual bool update();
 
         /**
          * This is called on an object's death

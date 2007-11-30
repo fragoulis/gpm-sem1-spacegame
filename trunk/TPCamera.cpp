@@ -1,16 +1,16 @@
 #include "TPCamera.h"
 #include "QuatRotation.h"
 #include "CollisionDynamicBBox.h"
+#include "CollisionResponse.h"
+#include "Movement.h"
 #include "Config.h"
 
 using namespace tlib;
 
-TPCamera::TPCamera():
-    m_fFollowBias(0.0f),
-    m_bActive(0)
-    {}
+TPCamera::TPCamera()
+{}
 
-void TPCamera::setup( Object *oTarget )
+void TPCamera::init( Object *oTarget )
 {
     m_oTarget = oTarget;
 
@@ -33,14 +33,13 @@ void TPCamera::setup( Object *oTarget )
     m_vPos = m_oTarget->getPos() + m_vPosOffset;
     //std::cout << m_vPos << std::endl;
     // Calculate the view point by adding to the target's position
-    // its view vector times the offset scalar
+    // the offset
     Vector3f vViewPoint = m_oTarget->getPos() + vViewOffset;
     //std::cout << vViewPoint << std::endl;
     // Setup view vector
     Vector3f vView = vViewPoint - m_vPos;
     vView.normalize();
     cCamOri->setView( vView );
-    //std::cout << vView << std::endl;
 
     // We know that the object's and camera's right vectors are 
     // going to be parallel
@@ -52,13 +51,24 @@ void TPCamera::setup( Object *oTarget )
     Vector3f vUp = cCamOri->getView().cross( cCamOri->getRight() ) * (-1);
     vUp.normalize();
     cCamOri->setUp( vUp );
-    //std::cout << vUp << std::endl;
+
+    // Read camera's rotation and position bias
+    cfg.getFloat("rotation_bias", &m_fRotationBias);
+    cfg.getFloat("position_bias", &m_fPositionBias);
+
+    // Read camera's bounding box
+    float vfBBox[3];
+    cfg.getFloat("bbox", vfBBox, 3);
 
     // Initialize collision component
     // [Here we give our object its bounding box]
     OCCollisionDynamicBBox *cCol = new OCCollisionDynamicBBox;
-    cCol->setBBox( Vector3f( 1.0f, 1.0f, 1.0f ) );
+    cCol->setBBox( Vector3f( vfBBox ) );
     setComponent( cCol );
+
+    // Initialize collision response component
+    // [This is the simplest for of response, just position correction]
+    setComponent( new IOCCollisionResponse );
 }
 
 /**
@@ -67,38 +77,30 @@ void TPCamera::setup( Object *oTarget )
 void TPCamera::update()
 {
     if( !m_oTarget ) return;
-    //if( !m_bActive ) return;
 
-    OCQuatRotation *cTarOri = (OCQuatRotation*)m_oTarget->getComponent("orientation");
+    OCQuatRotation *cTarOri = 
+        (OCQuatRotation*)m_oTarget->getComponent("orientation");
     OCQuatRotation *cCamOri = (OCQuatRotation*)getComponent("orientation");
-    //std::cout << "\nLOOP" << std::endl;
 
-    Quatf qRes = cTarOri->getYaw() * cTarOri->getPitch();
-    //Quatf qRes;
-    //cCamOri->getRot().slerp( qRot, m_fFollowBias, qRes );
-    //cCamOri->setRot(qRes);
-    
+    Quatf qRot = cTarOri->getYaw() * cTarOri->getPitch();
+    Quatf qRes;
+    cCamOri->getRot().slerp( qRot, m_fRotationBias, qRes );
+    cCamOri->setRot(qRes);
     // Apply to the vectors the same rotations that were 
     // applied to the spaceship
     // View
-    Vector3f vView = cCamOri->getView();
-    vView.selfRotate( qRes );
-    cCamOri->setView( vView );
-    //std::cout << vView << std::endl;
-    // Up
-    Vector3f vUp = cCamOri->getUp();
-    vUp.selfRotate( qRes );
-    cCamOri->setUp( vUp );
-    //std::cout << vUp << std::endl;
-    
-    //
-    //Vector3f vInvCamPos = m_vPos - m_oTarget->getPos();
-    //vInvCamPos.selfRotate( qRes );
-    //vInvCamPos.normalize();
-    m_vPosOffset.selfRotate( qRes );
-    m_vPos = m_oTarget->getPos() + m_vPosOffset;
-    //m_vPos = m_oTarget->getPos() + vInvCamPos;
-    //std::cout << m_vPos << std::endl;
+    cCamOri->getView().selfRotate( qRes );
 
+    // Up
+    cCamOri->getUp().selfRotate( qRes );
+    
+    // Save position
+    m_vPrevPos = m_vPos;
+
+    // Recalculate the position
+    m_vPosOffset.selfRotate( qRes );
+    m_vPos += ( m_oTarget->getPos() + m_vPosOffset - m_vPos ) * m_fPositionBias;
+
+    // Reset the rotations of the orientation component
     cTarOri->resetAngles();
 }

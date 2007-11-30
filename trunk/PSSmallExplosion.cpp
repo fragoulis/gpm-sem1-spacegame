@@ -1,11 +1,9 @@
 #include "PSSmallExplosion.h"
 #include "Particle.h"
 #include "gx/image.h"
-#include "Movement.h"
 #include "Object.h"
 #include "Config.h"
 #include "Logger.h"
-using tlib::IOCMovement;
 using tlib::Config;
 using tlib::Logger;
 using tlib::Object;
@@ -58,6 +56,11 @@ void PSSmallExplosion::init( const Vector3f &vSysPos )
         m_Emitter.getPDead().push_back( &m_Particles[i] );
     }
 
+    // Read texture
+    string sTexture;
+    cfg.getString("texture", sTexture);
+    setTexture( sTexture );
+
     ParticleSystem::init( fSize );
 
 } // end init()
@@ -75,13 +78,13 @@ void PSSmallExplosion::update()
 
     // Here we save the particles to be killed after the next update
     ParticleList toKill;
-
+    Particle *obj;
     ParticleList::const_iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
          ++iter )
     {
-        Particle *obj = *iter;
+        obj = *iter;
 
         // Check if the particle has expired
         if( obj->hasExpired() )
@@ -103,9 +106,19 @@ void PSSmallExplosion::update()
 // ----------------------------------------------------------------------------
 void PSSmallExplosion::render() const
 {   
+    // Disable depth test
+    glDepthMask( GL_FALSE );
+
+    // Enable blending
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
     // Disable lighting
     glDisable( GL_LIGHTING );
+
+    // Enable texture
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, m_uiTexId );
 
     // Render all alive particles
     float matrix[16];
@@ -114,12 +127,11 @@ void PSSmallExplosion::render() const
          iter != m_Emitter.getPAlive().end();
          ++iter )
     {
-        const Vector3f& vPos = (*iter)->getPos();
-
         // Set color
-        float rgba[] = { 1.0f, 1.0f - (*iter)->getEnergy(), 0.0f, 1.0f };
+        float rgba[] = { 1.0f, 1.0f - (*iter)->getEnergy(), 0.0f, (*iter)->getEnergy() };
         glColor4fv( rgba );
 
+        const Vector3f& vPos = (*iter)->getPos();
         glPushMatrix();
         {
             glTranslatef( vPos.x(), vPos.y(), vPos.z() );
@@ -140,8 +152,17 @@ void PSSmallExplosion::render() const
 
     } // end for( ... )
     
+    // Disable texturing
+    glDisable( GL_TEXTURE_2D );
+
     // Enable lighting
     glEnable( GL_LIGHTING );
+
+    // Disable blending
+    glDisable( GL_BLEND );
+
+    // Enable depth test 
+    glDepthMask( GL_TRUE );
 
 } // end render()
 
@@ -155,7 +176,3 @@ void PSSmallExplosion::onSpawn( Particle *particle )
     particle->setDir( vDir );
     particle->setVelocity( tlib::randFloat( m_fVelocity[0], m_fVelocity[1] ) );
 }
-
-// ----------------------------------------------------------------------------
-void PSSmallExplosion::onKill( Particle *particle )
-{}

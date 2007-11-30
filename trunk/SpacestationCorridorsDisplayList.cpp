@@ -48,25 +48,27 @@ bool SpacestationCorridorsDisplayList::readMap( const char *filename )
     const int iNumOfTiles = Tilemap::Instance().getNumOfTiles();
     int 
         iNumOfLines = 0,
+        iAllLines = 0,
         i, j, k, corr_type, obj_type, friend_id;
     while( fin >> i >> j >> k >> corr_type >> obj_type >> friend_id )
     {
+        iAllLines++;
         // Tile's index must be between our boundaries
         if( i<0 || i>=iNumOfTiles || 
             j<0 || j>=iNumOfTiles ||
             k<0 || k>=iNumOfTiles ||
             corr_type == 0 ) 
         {
-            _LOG( "Invalid tile on line " + 
-                  toStr<size_t>(Tilemap::Instance().getTileArray().size()-1) );
+            _LOG("Invalid tile on line " +toStr<size_t>(iAllLines));
 
             continue;
         }
 
+        //_LOG("Tile["+ toStr<int>(i) +","+ toStr<int>(j) +","+ toStr<int>(k) +"]");
         iNumOfLines++;
     }
 
-    _LOG("Counted " + toStr<size_t>(iNumOfLines) + " tiles");
+    _LOG("Counted "+ toStr<size_t>(iNumOfLines) +" tiles");
 
     // Return at the start of the file
     fin.clear();
@@ -147,7 +149,7 @@ void SpacestationCorridorsDisplayList::buildObject() const
             startX, startY, startZ, 
             // the upper, front, right corner of the tile
             endX, endY, endZ,
-            nTileReapeat = 0.5f;
+            nRepeat = 0.5f;
 
         TileArray::const_iterator iter;
         for( iter = Tilemap::Instance().getTileArray().begin(); 
@@ -169,25 +171,21 @@ void SpacestationCorridorsDisplayList::buildObject() const
             {
                 // front face
                 glNormal3f( 0.0f, 0.0f, 1.0f );
-                glTexCoord2f( 0.0f, 0.0f );
-                glVertex3f( startX, startY, endZ );
-                glTexCoord2f( nTileReapeat, 0.0f );
-                glVertex3f(   endX, startY, endZ );
-                glTexCoord2f( nTileReapeat, nTileReapeat );
-                glVertex3f(   endX,   endY, endZ );
-                glTexCoord2f( 0.0f, nTileReapeat );
-                glVertex3f( startX,   endY, endZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, startY, endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f(   endX, startY, endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f(   endX,   endY, endZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX,   endY, endZ );
             } // end of front face
 
             if( oTile->getType() & TW_BACK )
             {
                 // back face
                 glNormal3f( 0.0f, 0.0f, -1.0f );
-                glTexCoord2f( 0.0f, nTileReapeat );
+                glTexCoord2f( 0.0f, nRepeat );
                 glVertex3f( startX,   endY, startZ );
-                glTexCoord2f( nTileReapeat, nTileReapeat );
+                glTexCoord2f( nRepeat, nRepeat );
                 glVertex3f(   endX,   endY, startZ );
-                glTexCoord2f( nTileReapeat, 0.0f );
+                glTexCoord2f( nRepeat, 0.0f );
                 glVertex3f(   endX, startY, startZ );
                 glTexCoord2f( 0.0f, 0.0f );
                 glVertex3f( startX, startY, startZ );
@@ -199,11 +197,11 @@ void SpacestationCorridorsDisplayList::buildObject() const
                 glNormal3f( 1.0f, 0.0f, 0.0f );
                 glTexCoord2f( 0.0f, 0.0f );
                 glVertex3f( startX, startY, startZ );
-                glTexCoord2f( 0.0f, nTileReapeat );
+                glTexCoord2f( 0.0f, nRepeat );
                 glVertex3f( startX, startY, endZ );
-                glTexCoord2f( nTileReapeat, nTileReapeat );
+                glTexCoord2f( nRepeat, nRepeat );
                 glVertex3f( startX,   endY, endZ );
-                glTexCoord2f( nTileReapeat, 0.0f );
+                glTexCoord2f( nRepeat, 0.0f );
                 glVertex3f( startX,   endY, startZ );
             }
 
@@ -211,13 +209,13 @@ void SpacestationCorridorsDisplayList::buildObject() const
             {
                 // right face
                 glNormal3f( -1.0f, 0.0f, 0.0f );
-                glTexCoord2f( 0.0f, nTileReapeat );
+                glTexCoord2f( 0.0f, nRepeat );
                 glVertex3f( endX, startY, endZ );
                 glTexCoord2f( 0.0f, 0.0f );
                 glVertex3f( endX, startY, startZ );
-                glTexCoord2f( nTileReapeat, 0.0f );
+                glTexCoord2f( nRepeat, 0.0f );
                 glVertex3f( endX,   endY, startZ );
-                glTexCoord2f( nTileReapeat, nTileReapeat );
+                glTexCoord2f( nRepeat, nRepeat );
                 glVertex3f( endX,   endY, endZ );
             }
 
@@ -225,11 +223,11 @@ void SpacestationCorridorsDisplayList::buildObject() const
             {   
                 // top face
                 glNormal3f( 0.0f, -1.0f, 0.0f );
-                glTexCoord2f( 0.0f, nTileReapeat );
+                glTexCoord2f( 0.0f, nRepeat );
                 glVertex3f( startX, endY, endZ );
-                glTexCoord2f( nTileReapeat, nTileReapeat );
+                glTexCoord2f( nRepeat, nRepeat );
                 glVertex3f(   endX, endY, endZ );
-                glTexCoord2f( nTileReapeat, 0.0f );
+                glTexCoord2f( nRepeat, 0.0f );
                 glVertex3f(   endX, endY, startZ );
                 glTexCoord2f( 0.0f, 0.0f );
                 glVertex3f( startX, endY, startZ );

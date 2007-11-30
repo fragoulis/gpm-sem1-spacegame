@@ -26,7 +26,7 @@ namespace tlib
     }
 
     // ------------------------------------------------------------------------
-    void OCCollisionDynamicBBox::actOnCollision() const
+    void OCCollisionDynamicBBox::checkCollision() const
     {
         // The resulting collision vector
         Vector3f vCollDir;

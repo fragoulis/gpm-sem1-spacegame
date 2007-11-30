@@ -9,14 +9,16 @@ namespace tlib
     m_iHealth(iMaxHealth)
     {}
 
-    void OCVitalsHealth::update()
+    bool OCVitalsHealth::update()
     {
-        if( isAlive() ) return;
+        if( isAlive() ) return true;
         
         // If health is below zero make the object inactive
         // [aka kill it]
         onKill();
         getOwner()->deactivate();
+
+        return false;
     }
 
 } // end of namespace tlib

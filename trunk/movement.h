@@ -39,6 +39,7 @@ namespace tlib
          * Returns the direction vector
          */
         const Vector3f& getDir() const { return m_vDir; }
+	Vector3f& getDir() { return m_vDir; }
         
         /**
          * Sets the direction vector
