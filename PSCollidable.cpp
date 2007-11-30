@@ -1,5 +1,6 @@
 #include "PSCollidable.h"
 #include "Particle.h"
+#include "Object.h"
 #include "Tilemap.h"
 #include "CollisionBBox.h"
 #include "CollisionBSphere.h"
@@ -35,6 +36,70 @@ bool PSCollidable::readPrevTile( Particle *particle )
     m_PrevTile = Tilemap::Instance().getTile( particle->getPrevPos() );
       
     return (0==m_PrevTile)?0:1;
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void PSCollidable::checkCollision( Particle *particle )
+{
+    // The collision direction
+    Vector3f vColDir;
+
+    // If particle is currently inside a corridor
+    if( readTile( particle ) )
+    {
+        // Check it against the tile's occupier, the shield and the spaceship
+        bool isCollision = false;
+        Object *objToCheck = getTile()->getOccupant();
+
+        // Check for collisions with tile occupiers
+        // if tile has an object
+        if( objToCheck )
+        {
+            isCollision = checkCollisionWithObject( 
+                particle, 
+                objToCheck, 
+                vColDir );
+        }
+
+        // If particle did not collide with a tile occupier
+        // object check it with the spaceship shield
+        if( !isCollision )
+        {
+            // Check with shield
+
+            //objToCheck = shield
+        }
+
+        // If particle did not collide with the shield either
+        // check it with the spaceship
+        if( !isCollision )
+        {
+            // Check with spaceship
+            //objToCheck = ship
+        }
+
+        if( isCollision )
+            onCollisionWithObjects( particle, vColDir );
+    }
+    // If particle is just outside the corridor
+    else if( readPrevTile( particle ) )
+    {
+        Vector3f vColPoint;
+
+        // Check the collision with the corridor walls
+        if( checkCollisionWithTiles( particle->getPos(), 
+                                     vColDir,
+                                     vColPoint ) ) 
+        {   
+            onCollisionWithTiles( particle, vColDir, vColPoint );
+        }
+    }
+    else 
+    {
+        // At last check with the reactor
+
+    } // end else if( .. )
 }
 
 // ----------------------------------------------------------------------------
@@ -118,26 +183,18 @@ bool PSCollidable::checkCollisionWithTiles( const Vector3f &vPos,
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-bool PSCollidable::checkCollisionWithObjects( Particle *particle,
-                                              Vector3f &vCollDir )
+bool PSCollidable::checkCollisionWithObject( Particle *particle,
+                                             Object *oObj,
+                                             Vector3f &vCollDir )
 {
     _ASSERT(m_CurTile!=0);
-
-    // If tile has no occupant return false
-    if( !m_CurTile->getOccupant() )
-        return false;
-
-    Object *oObj = m_CurTile->getOccupant();
 
     // Get object's collision component
     IComponent *cCom = oObj->getComponent("collision");
     IOCCollision *cObjCol = (IOCCollision*)cCom;
     // If object has is not collidable return false
-    if( !cObjCol )
-        return false;
-
-    // If the component is deactivated, skip detection
-    if( !cObjCol->isActive() ) return false;
+    //if( !cObjCol )
+    //    return false;
 
     // Switch between the differect kinds of collision
     if( cObjCol->getType() == IOCCollision::BBox ) {
@@ -195,9 +252,11 @@ bool PSCollidable::checkWithBox(
                     // The smallest overlap is at x-axis
                     if( vDiffPos.x() > 0.0f ) { 
                         // Object came from right
+                        //std::cout << "Right collision" << std::endl;
                         vCollDir.xyz( 1.0f, 0.0f, 0.0f );
                     } else { 
                         // Object came from left
+                        //std::cout << "Left collision" << std::endl;
                         vCollDir.xyz( -1.0f, 0.0f, 0.0f );
                     }
                 }
@@ -205,9 +264,11 @@ bool PSCollidable::checkWithBox(
                     // The smallest overlap is at y-axis
                     if( vDiffPos.y() > 0.0f ) { 
                         // Object came from up
+                        //std::cout << "Top collision" << std::endl;
                         vCollDir.xyz( 0.0f, 1.0f, 0.0f );
                     } else { 
                         // Object came from down
+                        //std::cout << "Bottom collision" << std::endl;
                         vCollDir.xyz( 0.0f, -1.0f, 0.0f );
                     }
                 }
@@ -215,9 +276,11 @@ bool PSCollidable::checkWithBox(
                     // The smallest overlap is at z-axis
                     if( vDiffPos.z() > 0.0f ) { 
                         // Object came from back
+                        //std::cout << "Front collision" << std::endl;
                         vCollDir.xyz( 0.0f, 0.0f, 1.0f );
                     } else { 
                         // Object came from front
+                        //std::cout << "Back collision" << std::endl;
                         vCollDir.xyz( 0.0f, 0.0f, -1.0f );
                     }
                 }
@@ -268,7 +331,8 @@ bool PSCollidable::checkWithSphere(
                 // Then we mulitply with the overlap components to 
                 // return not only the collision direction but the 
                 // amount of penetration as well
-                vCollDir.mul( fOverlapX, fOverlapY, fOverlapZ );
+                //vCollDir.mul( fOverlapX, fOverlapY, fOverlapZ );
+                //std::cout << vCollDir << std::endl;
 
                 // Collision detected
                 return true;

@@ -9,7 +9,8 @@ class ParticleSystem
 public:
     enum Type {
         Any = 0,
-        SmallExplosion = 1
+        SmallExplosion,
+        Smoke
     };
 
 protected:
@@ -33,6 +34,9 @@ protected:
 
     // The particle's display list id
     unsigned int m_uiListId;
+
+    // An array of random numbers
+    static float m_vfRandom[500];
 
 private:
     // Holds the initialization time
@@ -116,11 +120,6 @@ public:
     void init( float fParticleSize );
 
     /**
-     * Assigns a texture to the particles
-     */
-    void setTexture( std::string sTexture );
-
-    /**
      * Updates all child particles
      */
     virtual void update() = 0;
@@ -130,14 +129,22 @@ public:
      */
     virtual void render() const = 0;
 
+protected:
+    /**
+     * Assigns a texture to the particles
+     */
+    void setTexture( const std::string sTexture );
+
     /**
      * Is called for every particle that is created
      */
     virtual void onSpawn( Particle *particle ) = 0;
 
+private:
     /**
-     * Is called for every particle that is killed
+     * Generates an array of random numbers to be used
+     * for the particle spawning
      */
-    virtual void onKill( Particle *particle ) = 0;
+    void genNumbers();
 
 }; // end of ParticleSystem class

@@ -21,6 +21,6 @@ public:
     /**
      * Creates the spacestation
      */
-    void setup();
+    void init();
 
 }; // end of Spacestation class

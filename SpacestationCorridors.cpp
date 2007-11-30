@@ -7,9 +7,11 @@
 
 SpacestationCorridors::SpacestationCorridors() {}
 
-void SpacestationCorridors::setup()
+void SpacestationCorridors::init()
 {
     _LOG("Setting up spacestation corridors...");
+
+    m_vPos.xyz( 0.0f, 0.0f, 0.0f );
 
     // Read texture filename from configuration file
     string sTexture;

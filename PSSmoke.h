@@ -8,22 +8,20 @@ using tlib::Object;
 /**
  * This could be an component system object !?~!@*&^!@
  */
-class PSScorchMarks : public ParticleSystem
+class PSSmoke : public ParticleSystem
 {
 private:
-    // Standard color values
-    float m_vfAmbient[4], m_vfDiffuse[4];
+    // The particle's limits
+    float m_fSize[2], m_fLifeSpan[2], m_fVelocity[2];
 
-    // The direction in which the emitter will spawn new particles
-    Vector3f m_vDir;
+    // The color of the smoke particles
+    Color m_Color;
 
 public:
     /**
-     * Direction setter
+     * Constructor
      */
-    void setDir( const Vector3f &vDir ) {
-        m_vDir = vDir;
-    }
+    PSSmoke();
 
     /**
      * Updates all particle positions
@@ -38,11 +36,12 @@ public:
     /**
      * Setups a laser particle system
      */
-    void init();
+    void init( const Vector3f &vSysPos );
 
     /**
-     * Creates a scorch mark in a given position
+     * Resets the position of a particle and gives a random direction and 
+     * speed
      */
     void onSpawn( Particle *particle );
 
-};
+}; // end of PSSmoke class

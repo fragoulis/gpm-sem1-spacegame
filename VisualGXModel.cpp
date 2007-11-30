@@ -38,7 +38,29 @@ namespace tlib
 
         // Place the object
         glTranslatef( vPos.x(), vPos.y(), vPos.z() );
-
+#ifdef _SHOW_AXIS
+        IComponent *cmp = getOwner()->getComponent("orientation");
+        OCOrientation3D *qr = (OCOrientation3D*)cmp;
+        if( qr ) {
+            const Vector3f& view = qr->getView() * 20.0f;
+            const Vector3f& right = qr->getRight() * 20.0f;
+            const Vector3f& up = qr->getUp() * 20.0f;
+            
+            glDisable(GL_LIGHTING);
+            glBegin(GL_LINES);
+                glColor3f(1,0,0);
+                glVertex3f(0,0,0);
+                glVertex3f(view.x(), view.y(), view.z());
+                glColor3f(0,1,0);
+                glVertex3f(0,0,0);
+                glVertex3f(right.x(), right.y(), right.z());
+                glColor3f(0,0,1);
+                glVertex3f(0,0,0);
+                glVertex3f(up.x(), up.y(), up.z());
+            glEnd();
+            glEnable(GL_LIGHTING);
+        }
+#endif
         // Load transformation quaternion and apply rotations
         getOwner()->getDir().toMatrix(m_fRotMatrix);
         glMultMatrixf(m_fRotMatrix);

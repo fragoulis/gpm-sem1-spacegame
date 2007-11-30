@@ -1,10 +1,11 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "Object.h"
 using namespace std;
 using tlib::Object;
 
 class Forcefield;
+typedef list<Forcefield*> ForcefieldList;
 
 /** 
  * This class should actually be a singleton but there would 
@@ -16,7 +17,7 @@ class ForcefieldMgr : public Object
 {
 private:
     // The list of forcefieds
-    static vector<Forcefield*> m_vForcefields;
+    static ForcefieldList m_vForcefields;
 
 public:
     /**
@@ -43,11 +44,10 @@ public:
         m_vForcefields.push_back( ff );
     }
 
+private:
     /**
-     * Returns a forcefield by its index
+     * 
      */
-    Forcefield* getForcefield( int index ) {
-        return m_vForcefields[index];
-    }
+    void remove( Forcefield *value );
 
 }; // end of ForcefieldMgr class

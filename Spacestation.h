@@ -14,6 +14,6 @@ public:
      * This can also be called from within the constructor
      * NOTE: Error/Action logger doesn't not log contructor messages
      */
-    void setup();
+    void init();
 
 }; // end of Spacestation class

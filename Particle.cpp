@@ -2,7 +2,7 @@
 #include <ctime>
 
 // This will save us some time
-const double M_CLOCKS_PER_SEC = 1.0 / CLOCKS_PER_SEC;
+extern const double M_CLOCKS_PER_SEC;
 
 Particle::Particle(): 
 m_fEnergy(1.0f),
@@ -32,4 +32,11 @@ bool Particle::hasExpired()
     m_fEnergy = 1.0f - float(dCurrent / m_dLifeSpan);
 
     return false;
+}
+
+// ----------------------------------------------------------------------------
+void Particle::bounce( const Vector3f &vColDir, float fSpeedRatio )
+{
+    m_vVelocity = 
+        ( - 2.0f * m_vVelocity.dot( vColDir ) * vColDir + m_vVelocity ) * fSpeedRatio;
 }

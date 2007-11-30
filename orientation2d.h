@@ -32,6 +32,7 @@ namespace tlib
          * Returns the view vector
          */
         const Vector3f& getView() const { return m_vView; }
+        Vector3f& getView() { return m_vView; }
 
         /**
          * Sets the view vector
@@ -42,6 +43,7 @@ namespace tlib
          * Returns the up vector
          */
         const Vector3f& getUp() const { return m_vUp; }
+        Vector3f& getUp() { return m_vUp; }
 
         /**
          * Sets the up vector

@@ -1,12 +1,12 @@
-#include "GX/Image.h"
 #include "ParticleSystem.h"
 #include "Particle.h"
+#include "TextureMgr.h"
 #include "Logger.h"
 #include <ctime>
 using tlib::Logger;
 
 // This will save us some time
-const double M_CLOCKS_PER_SEC = 1.0 / CLOCKS_PER_SEC;
+extern const double M_CLOCKS_PER_SEC = 1.0 / CLOCKS_PER_SEC;
 
 ParticleSystem::ParticleSystem():
 m_iType(Any),
@@ -28,6 +28,9 @@ ParticleSystem::~ParticleSystem()
     if( m_uiListId )
         glDeleteLists( m_uiListId, 1 );
 }
+
+// ----------------------------------------------------------------------------
+float ParticleSystem::m_vfRandom[500];
 
 // ----------------------------------------------------------------------------
 void ParticleSystem::start() 
@@ -77,22 +80,11 @@ void ParticleSystem::init( float fParticleSize )
     glEndList();
 }
 
-void ParticleSystem::setTexture( std::string sTexture )
+// ----------------------------------------------------------------------------
+void ParticleSystem::setTexture( const std::string sTexture )
 {
-    // Initialize texture
-    gxbase::Image image;
-    if( image.Load( sTexture.c_str() ) )
-    {
-        _LOG("Successfully loaded texture "+ sTexture +"particle system");
-        if( image.SetFormat( gxbase::Image::ALPHA ) )
-        {
-            _LOG("Successfully changed the texture format");
-            glGenTextures( 1, &m_uiTexId );
-            glBindTexture( GL_TEXTURE_2D, m_uiTexId );
-            image.gluBuild2DMipmaps();
-        }
-    }
-    image.Free();
+    TextureMgr::Instance().setFormat( Image::ALPHA );
+    m_uiTexId = TextureMgr::Instance().getTexture( sTexture.c_str() );
 }
 
 // ----------------------------------------------------------------------------
@@ -115,7 +107,7 @@ void ParticleSystem::spawn()
 
         // Set init time for its internal clock
         //(*iter)->setInitTime( clock() + long((*iter)->getLifeSpan() * CLOCKS_PER_SEC) );
-        //(*iter)->start();
+        (*iter)->start();
 
         // Remove it from the dead list
         m_Emitter.getPDead().pop_front();
@@ -138,11 +130,14 @@ void ParticleSystem::kill( ParticleList &toKill )
 
         // Push it to the dead list
         m_Emitter.getPDead().push_back( *iter );
-
-        // call derived callback
-        onKill( *iter );
     }
 
     // Empty kill list
     toKill.clear();
+}
+
+// ----------------------------------------------------------------------------
+void ParticleSystem::genNumbers()
+{ 
+    // Generate 500 floats 
 }

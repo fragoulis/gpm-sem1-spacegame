@@ -4,7 +4,6 @@
 using namespace tlib;
 
 // Forward declarations
-class TPCamera;
 class Tile3d;
 class PSLaser;
 
@@ -25,16 +24,7 @@ private:
         m_fRoll, m_fMaxRoll, m_fRollFactor,
         m_fRotFactor, m_fRotBias;
 
-    bool 
-        m_bResetSpeed, m_bResetRoll,
-        // Collision detection flags
-        // These flags will help speed up collision detection by cutting out
-        // the objects we have to compare the spaceship with
-        m_bInStation, m_bInReactor;
-
-
-    TPCamera *m_TPCamera;
-    Tile3d *m_CurrentTile;
+    bool m_bResetSpeed, m_bResetRoll;
 
 public:
     /**
@@ -48,7 +38,7 @@ public:
      * This can also be called from within the constructor
      * NOTE: Error/Action logger doesn't not log contructor messages
      */
-    void setup();
+    void init();
 
     /**
      * Control the spaceship's speed
@@ -67,38 +57,25 @@ public:
     void resetRoll();
 
     /**
-     * Other actions
+     * Fire actions
      */
     void fire();
     void ceaseFire();
-    //void toggleCam();
     //void record();
 
     /**
-     * Sets the third-person camera 
+     * Returns the health of the ship with a number between 0 and 100
      */
-    void setCamera( TPCamera *cam ) {
-        m_TPCamera = cam;
-    }
+    int getHealth();
 
     /**
-     * Sets the current tile the ship is at
+     * Updates all aspects of the spaceship
      */
-    void setCurrentTile( Tile3d *tile ) {
-        m_CurrentTile = tile;
-    }
-
-    void render();
     void update();
 
-    PSLaser *getLaser() { return m_Laser; }
-
     /**
-     * Getters/Setters for the collision state flags
+     * Returns the laser system associated with the spaceship
      */
-    bool isInStation() const { return m_bInStation; }
-    bool isInReactor() const { return m_bInReactor; }
-    void setInStation( bool flag ) { m_bInStation = flag; }
-    void setInReactor( bool flag ) { m_bInReactor = flag; }
+    PSLaser *getLaser() { return m_Laser; }
 
 }; // end Spaceship class

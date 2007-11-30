@@ -5,11 +5,12 @@
 #include "VisualBox.h"
 #include "Material.h"
 #include "Animation.h"
+#include "ObjectMgr.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
 
-vector<Outlet*> OutletMgr::m_vOutlets;
+OutletList OutletMgr::m_vOutlets;
 
 void OutletMgr::init()
 {
@@ -34,18 +35,27 @@ void OutletMgr::render()
     IOCVisual *cBox = (IOCVisual*)getComponent("visual");
     IOCMaterial *cMat;
 
-    vector<Outlet*>::const_iterator iter;
+    Outlet *obj;
+    OutletList::const_iterator iter;
     for( iter = m_vOutlets.begin();
          iter != m_vOutlets.end();
          iter++ )
     {
+        obj = *iter;
+
+        if( ObjectMgr::Instance().isCulled( obj ) ) {
+            // If object is not active dont bother updating it
+            // since it is culled
+            continue;
+        }
+
         // Apply the material for the outlet
-        cMat = (IOCMaterial*)(*iter)->getComponent("material");
+        cMat = (IOCMaterial*)obj->getComponent("material");
         cMat->apply();
 
         // Draw the door's panels
-        m_vPos.xyz( (*iter)->getPos() );
-        m_qDir.wxyz( (*iter)->getDir() );
+        m_vPos.xyz( obj->getPos() );
+        m_qDir.wxyz( obj->getDir() );
         cBox->render();
 
     } // end for( )
@@ -57,12 +67,18 @@ void OutletMgr::update()
 {
     IOCAnimation* cAnim;
 
-    vector<Outlet*>::const_iterator iter;
+    Outlet *obj;
+    OutletList::const_iterator iter;
     for( iter = m_vOutlets.begin();
          iter != m_vOutlets.end();
          iter++ )
     {
-        cAnim = (IOCAnimation*)(*iter)->getComponent("animation");
+        obj = *iter;
+
+        // If it's not active don't render as it is culled
+        if( !obj->isActive() ) continue;
+
+        cAnim = (IOCAnimation*)obj->getComponent("animation");
         cAnim->update();
     }
 } // end update()

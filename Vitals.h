@@ -22,7 +22,7 @@ namespace tlib
         /**
          * Updates and checks the vitals of an object
          */
-        virtual void update() = 0;
+        virtual bool update() = 0;
 
         /**
          * This is called on an object's death

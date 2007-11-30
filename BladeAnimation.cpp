@@ -2,6 +2,7 @@
 #include "RotatingBlade.h"
 #include "LinearMovement.h"
 #include "Collision.h"
+#include "Tilemap.h"
 using namespace tlib;
 
 // ----------------------------------------------------------------------------
@@ -57,10 +58,15 @@ void BladeAnimation::onStart()
     // requests the length to get the current position of the object only 
     // for the axis along it is moving
     m_fPrevPos = (getOwner()->getPos() * cMov->getDir()).length();
+
+    // This object occupies a tile
+    // We must set this tile's object pointer to null so that 
+    // we can safely remove the object
+    Tile3d* tile = Tilemap::Instance().getTile( getOwner()->getPos() );
+    tile->setOccupant(0);
 }
 
 // ----------------------------------------------------------------------------
 void BladeAnimation::onStop()
 {
-    getOwner()->deactivate();
 }

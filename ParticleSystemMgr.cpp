@@ -2,6 +2,7 @@
 #include "PSLaser.h"
 #include "PSScorchMarks.h"
 #include "PSSmallExplosion.h"
+#include "PSSmoke.h"
 
 ParticleSystemMgr::ParticleSystemMgr()
 {}
@@ -63,6 +64,28 @@ PSSmallExplosion* ParticleSystemMgr::addSmallExplosion( const Vector3f &vSysPos 
     {
         // Create the explosion particle system
         ps = new PSSmallExplosion;
+        ps->init( vSysPos );
+
+        // Push it pack to the list
+        m_vPSList.push_back( (ParticleSystem*)ps );
+    } else {
+        ps->setPos( vSysPos );
+    }
+    
+    return ps;
+}
+
+// ----------------------------------------------------------------------------
+PSSmoke* ParticleSystemMgr::addSmoke( const Vector3f &vSysPos )
+{
+    PSSmoke *ps;
+
+    // Before allcating a new system
+    // Search for an unused/expired system
+    if( !(ps = (PSSmoke*)checkForSameType( ParticleSystem::Smoke )) )
+    {
+        // Create the explosion particle system
+        ps = new PSSmoke;
         ps->init( vSysPos );
 
         // Push it pack to the list

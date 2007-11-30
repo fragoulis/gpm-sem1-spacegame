@@ -81,8 +81,14 @@ public:
     //}
     void setVelocity( float fVelocity ) {
         m_fVelocity = fVelocity;
-        //m_vVelocity.xyz( fVelocity, fVelocity, fVelocity );
     }
+    void setVelocity( const Vector3f &vVel ) {
+        m_vVelocity = vVel;
+    }
+    const Vector3f& getVelocity() const {
+        return m_vVelocity;
+    }
+
 
     void updatePos() { 
         m_vPrevPos = m_vPos;
@@ -121,5 +127,7 @@ public:
     Particle* getNext() { return m_pNext; }
 
     bool hasExpired();
+
+    void bounce( const Vector3f &vColDir, float speed );
 
 };

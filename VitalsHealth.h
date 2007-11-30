@@ -34,7 +34,7 @@ namespace tlib
          * Checks the health status and takes care of the object's
          * death
          */
-        virtual void update();
+        virtual bool update();
 
         /**
          * This is called on an object's death
@@ -57,7 +57,10 @@ namespace tlib
          * Applies damage to the object
          */
         void hit( int iAmount ) {
-            m_iHealth -= iAmount;
+            if( m_iHealth > 0 )
+                m_iHealth -= iAmount;
+            else
+                m_iHealth = 0;
         }
 
         /**
@@ -75,6 +78,14 @@ namespace tlib
         void revive() {
             m_iHealth = m_iMaxHealth;
             onRevive();
+        }
+
+        /**
+         * Returns the ration of the current health ot the 
+         * maximum health
+         */
+        float healthRatio() {
+            return (float)m_iHealth/m_iMaxHealth;
         }
 
     }; // end of OCVitalsHealth class

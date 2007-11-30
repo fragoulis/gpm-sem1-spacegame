@@ -1,7 +1,6 @@
 #include "SingleTexture.h"
-#include "gx/Image.h"
+#include "TextureMgr.h"
 #include "Logger.h"
-using gxbase::Image;
 
 namespace tlib
 {
@@ -24,14 +23,17 @@ namespace tlib
         }
 
         // Generate texture
-        glGenTextures( 1, &m_TexId );
+        glGenTextures( 1, &m_uiTexId );
 
         // Generate mipmaps and free image from memory
-        glBindTexture( GL_TEXTURE_2D, m_TexId );
+        glBindTexture( GL_TEXTURE_2D, m_uiTexId );
         image.gluBuild2DMipmaps();
         image.Free();
 
-        return true;
+        // Get a handle for the texture
+        //m_uiTexId = TextureMgr::Instance().getTexture( filename );
+
+        //return (0==m_uiTexId)?false:true;
     }
 
 } // end of namespace tlib

@@ -1,5 +1,4 @@
 #include "Spaceship.h"
-#include "TPCamera.h"
 #include "VisualGXModel.h"
 #include "AccelMovement.h"
 #include "QuatRotation.h"
@@ -7,6 +6,7 @@
 #include "SpaceshipCollisionResponse.h"
 #include "Texture.h"
 #include "CollisionGXModel.h"
+#include "SpaceshipVitals.h"
 #include "ParticleSystemMgr.h"
 #include "PSLaser.h"
 #include "Logger.h"
@@ -16,14 +16,10 @@ using namespace tlib;
 
 Spaceship::Spaceship(): 
     m_bResetSpeed(0), 
-    m_bResetRoll(0),
-    m_bInStation(0), 
-    m_bInReactor(0),
-    m_TPCamera(0),
-    m_CurrentTile(0)
+    m_bResetRoll(0)
 {}
 
-void Spaceship::setup()
+void Spaceship::init()
 {
     _LOG("Setting up spaceship...");
 
@@ -44,7 +40,7 @@ void Spaceship::setup()
     m_fMaxRoll = (float)M_PI_2;
     m_fRollFactor = 2.0f*(float)M_PI;
     m_fRotFactor = (float)M_PI_2;
-    m_fRotBias = 2.0f;
+    m_fRotBias = 3.0f;
     // ------------------------------
 
     // Initialize movement component
@@ -55,7 +51,13 @@ void Spaceship::setup()
     float fScale;
     cfg.getString("model", sModel );
     cfg.getFloat("scale", &fScale );
-    setComponent( new OCGXModel( sModel.c_str(), fScale ) );
+    OCGXModel *model = new OCGXModel( sModel.c_str(), fScale );
+    setComponent( model );
+    
+    // Correct the position of the spaceship by adding this offset
+    m_vPos.sub( model->getGXModel().GetBoxCentre().x,
+                model->getGXModel().GetBoxCentre().y,
+                model->getGXModel().GetBoxCentre().z );
 
     // Initialize the rotation component
     OCQuatRotation *cRot = new OCQuatRotation;
@@ -89,6 +91,14 @@ void Spaceship::setup()
     float vfCorrect[3];
     cfg.getFloat("correct_laser", vfCorrect, 3);
 
+    // Read maximum lives and health
+    int iMaxLives, iMaxHealth;
+    cfg.getInt("lives", &iMaxLives);
+    cfg.getInt("hits", &iMaxHealth);
+
+    // Initialize health component
+    setComponent( new SpaceshipVitals( iMaxLives, iMaxHealth ) );
+
     // Initialize laser system
     m_Laser = PSManager::Instance().addLaser( 
         this, 
@@ -97,14 +107,6 @@ void Spaceship::setup()
         vfLaserColor );
 
 } // end setup()
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-void Spaceship::render()
-{
-    // render spaceship
-    ((IOCVisual*)getComponent("visual"))->render();
-}
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -136,11 +138,16 @@ void Spaceship::update()
     OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
     cRot->update();
 
-    // Update laser's view direction
-    //m_Laser->setDir( cRot->getView() );
+    // Update and check health status
+    IOCVitals *cVitals = (IOCVitals*)getComponent("vitals");
+    cVitals->update();
+}
 
-    // Update laser's position
-    //m_Laser->setPos( m_vPos );
+// ----------------------------------------------------------------------------
+int Spaceship::getHealth()
+{
+    OCVitalsHealth *cVitals = (OCVitalsHealth*)getComponent("vitals");
+    return int( 100 * cVitals->healthRatio() );
 }
 
 // ----------------------------------------------------------------------------
@@ -208,10 +215,9 @@ void Spaceship::moveUp()
     cRot->updateUp( qPitch );
 
     // Update view vector
-    cLM->setDir( cRot->getView() );
+    //cLM->setDir( cRot->getView() );
+    cLM->getDir().selfRotate( qPitch );
 
-    // Tell the camera to follow
-    m_TPCamera->activate();
 }
 
 // ----------------------------------------------------------------------------
@@ -232,10 +238,9 @@ void Spaceship::moveDown()
     cRot->updateUp( qPitch );
 
     // Update direction vector
-    cLM->setDir( cRot->getView() );
+    //cLM->setDir( cRot->getView() );
+    cLM->getDir().selfRotate( qPitch );
 
-    // Tell the camera to follow
-    m_TPCamera->activate();
 }
 
 // ----------------------------------------------------------------------------
@@ -268,10 +273,8 @@ void Spaceship::moveLeft()
     }
 
     // Update direction vector
-    cLM->setDir( cRot->getView() );
-
-    // Tell the camera to follow
-    m_TPCamera->activate();
+    //cLM->setDir( cRot->getView() );
+    cLM->getDir().selfRotate( qYaw );
 }
 
 // ----------------------------------------------------------------------------
@@ -303,10 +306,8 @@ void Spaceship::moveRight()
     }
         
     // Update direction vector
-    cLM->setDir( cRot->getView() );
-
-    // Tell the camera to follow
-    m_TPCamera->activate();
+    //cLM->setDir( cRot->getView() );
+    cLM->getDir().selfRotate( qYaw );
 }
 
 // ----------------------------------------------------------------------------

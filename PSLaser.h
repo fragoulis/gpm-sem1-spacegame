@@ -65,8 +65,20 @@ public:
                float vfLaserColor[] );
 
 private:
-    void onCollisionWithTiles( Particle *particle, const Vector3f &vColDir );
-    void onCollisionWithObjects( Particle *particle, const Vector3f &vColDir );
+    /**
+     * 
+     */
+    void onCollisionWithTiles( 
+        Particle *particle, 
+        const Vector3f &vColDir,
+        const Vector3f &vColPoint );
+
+    /**
+     * 
+     */
+    void onCollisionWithObjects( 
+        Particle *particle, 
+        const Vector3f &vColDir );
 
     /**
      * Resets the position of a particle and gives a random direction and 
@@ -74,6 +86,4 @@ private:
      */
     void onSpawn( Particle *particle );
 
-    // empty
-    void onKill( Particle *particle );
 };

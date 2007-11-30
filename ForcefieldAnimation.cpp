@@ -3,6 +3,7 @@
 #include "SimpleMaterial.h"
 #include "Movement.h"
 #include "Collision.h"
+#include "Tilemap.h"
 using namespace tlib;
 
 void ForcefieldAnimation::onUpdate()
@@ -44,5 +45,9 @@ void ForcefieldAnimation::onStart()
 
 void ForcefieldAnimation::onStop()
 {
-    getOwner()->deactivate();
+    // This object occupies a tile
+    // We must set this tile's object pointer to null so that 
+    // we can safely remove the object
+    Tile3d* tile = Tilemap::Instance().getTile( getOwner()->getPos() );
+    tile->setOccupant(0);
 }

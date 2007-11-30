@@ -6,11 +6,13 @@
 #include "Logger.h"
 #include "Config.h"
 
-void Spacestation::setup()
+void Spacestation::init()
 {
     int iTileSize;
     int iNumOfTiles;
     string sTexture;
+
+    m_vPos.xyz( 0.0f, 0.0f, 0.0f );
 
     Config cfg("config.txt");
     cfg.loadBlock("spacestation");

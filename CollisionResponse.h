@@ -20,11 +20,16 @@ namespace tlib
             return string("collisionresponse"); 
         }
 
+        virtual const string componentID() const {
+            return string("collisionresponse"); 
+        }
+
         /**
          * Responds to the collision
          * The parameter is the collision vector [optional]
          */
-        virtual void respond( const Vector3f &vCollVector = Vector3f::Null() ) const = 0;
+        virtual void respond( const Vector3f &vCollVector ) const;
+
     };
 
 } // end of namespace tlib

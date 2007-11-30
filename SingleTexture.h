@@ -9,7 +9,7 @@ namespace tlib
     class OCSingleTexture : public IOCTexture
     {
     private:
-        unsigned int m_TexId;
+        unsigned int m_uiTexId;
 
     public:
         /**
@@ -41,7 +41,7 @@ namespace tlib
         void apply() const 
         {
             glEnable( GL_TEXTURE_2D );
-            glBindTexture( GL_TEXTURE_2D, m_TexId );
+            glBindTexture( GL_TEXTURE_2D, m_uiTexId );
         }
 
     }; // end of OCSingleTexture class

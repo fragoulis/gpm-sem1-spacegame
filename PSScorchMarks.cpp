@@ -2,14 +2,12 @@
 #include <gl/gl.h>
 #include "PSScorchMarks.h"
 #include "Particle.h"
-#include "Movement.h"
 #include "CollisionResponse.h"
 #include "Orientation2d.h"
 #include "Object.h"
 #include "Tile3d.h"
 #include "Config.h"
 #include "Logger.h"
-using tlib::IOCMovement;
 using tlib::Config;
 using tlib::Logger;
 using tlib::IOCCollisionResponse;
@@ -87,17 +85,19 @@ void PSScorchMarks::update()
 // ----------------------------------------------------------------------------
 void PSScorchMarks::render() const
 {   
+    // Disable depth test
+    glDepthMask( GL_FALSE );
+
     // Enable blending
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
+    // Disable lighting
+    glDisable( GL_LIGHTING );
+
     // Enable texture
     glEnable( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D, m_uiTexId );
-        
-    // Set black ambient
-    glMaterialfv( GL_FRONT, GL_AMBIENT, m_vfAmbient );
-    glMaterialfv( GL_FRONT, GL_DIFFUSE, m_vfDiffuse );
 
     // Render all alive particles
     ParticleList::const_iterator iter;
@@ -105,6 +105,10 @@ void PSScorchMarks::render() const
          iter != m_Emitter.getPAlive().end();
          ++iter )
     {
+        // Set color
+        float rgba[] = { 0.0f, 0.0f, 0.0f, (*iter)->getEnergy() };
+        glColor4fv( rgba );
+
         glPushMatrix();
         {
             // Translate particle
@@ -128,8 +132,15 @@ void PSScorchMarks::render() const
     // Disable texturing
     glDisable( GL_TEXTURE_2D );
 
+    // Enable lighting
+    glEnable( GL_LIGHTING );
+
     // Disable blending
     glDisable( GL_BLEND );
+
+    // Enable depth test 
+    //glEnable( GL_DEPTH_TEST );
+    glDepthMask( GL_TRUE );
 
 } // end render()
 
@@ -168,6 +179,3 @@ void PSScorchMarks::onSpawn( Particle *particle )
     particle->setPos( vPos );
     particle->setRot( qRot );
 }
-
-void PSScorchMarks::onKill( Particle *particle )
-{}

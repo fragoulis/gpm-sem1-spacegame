@@ -29,6 +29,7 @@ namespace tlib
          * Returns the right vector
          */
         const Vector3f& getRight() const { return m_vRight; }
+        Vector3f& getRight() { return m_vRight; }
 
         /**
          * Sets the right vector

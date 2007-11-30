@@ -1,11 +1,14 @@
-
 #pragma once
-
-#include "object.h"
+#include "Object.h"
 using tlib::Object;
+using tlib::Vector3f;
 
 class Camera : public Object
 {
+protected:
+    // The camera's previous position
+    Vector3f m_vPrevPos;
+
 public:
     /**
      * Constructor
@@ -16,6 +19,12 @@ public:
      * Destructor
      */
     virtual ~Camera() {}
+
+    /**
+     * Previous position getter
+     */
+    const Vector3f& getPrevPos() const { return m_vPrevPos; }
+    Vector3f& getPrevPos() { return m_vPrevPos; }
 
     /**
      * Applies the view changes to the modelview matrix

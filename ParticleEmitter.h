@@ -1,5 +1,4 @@
 #pragma once
-#include "ParticleList.h"
 #include <list>
 using namespace std;
 
@@ -41,9 +40,6 @@ private:
     // The array of dead particles
     ParticleList m_vPDead;
 
-    ParticleList_ m_Alive;
-    ParticleList_ m_Dead;
-
 public:
     /**
      * Constructors
@@ -79,19 +75,6 @@ public:
     /**
      * Getters for the particle lists
      */
-    const ParticleList_& listAlive() const {
-        return m_Alive;
-    }
-    ParticleList_& listAlive() {
-        return m_Alive;
-    }
-    const ParticleList_& listDead() const {
-        return m_Dead;
-    }
-    ParticleList_& listDead() {
-        return m_Dead;
-    }
-
     const ParticleList& getPAlive() const {
         return m_vPAlive;
     }

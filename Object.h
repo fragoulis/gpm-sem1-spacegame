@@ -111,6 +111,11 @@ namespace tlib
          */
         void deactivate() { m_bActive = false; }
 
+        /**
+         * Activates the object
+         */
+        void activate() { m_bActive = true; }
+
         /** 
          * Returs the active flag
          */

@@ -11,6 +11,7 @@ class ParticleSystem;
 class PSLaser;
 class PSScorchMarks;
 class PSSmallExplosion;
+class PSSmoke;
 
 typedef list<ParticleSystem*> PSList;
 
@@ -35,6 +36,11 @@ public:
      * 
      */
     PSSmallExplosion* addSmallExplosion( const Vector3f &vSysPos );
+
+    /**
+     * 
+     */
+    PSSmoke* addSmoke( const Vector3f &vSysPos );
 
     /**
      * 
