@@ -3,19 +3,38 @@
 #include "SimpleMaterial.h"
 #include "VisualVertexArraySphere.h"
 #include "CollisionDynamicBSphere.h"
-//#include "ShieldCollisionResponse.h"
-#include "SpaceshipCollisionResponse.h"
+#include "SpaceshipShieldCollisionResponse.h"
+#include "SpaceshipShieldVitals.h"
 #include "Config.h"
 using namespace tlib;
 
 // ----------------------------------------------------------------------------
 void SpaceshipShield::init( Spaceship *oShip )
 {
+    // Set object's type
+    setType( SPACESHIP_SHIELD );
+
     // Assign the spaceship pointer
     m_oShip = oShip;
 
     Config cfg("config.txt");
     cfg.loadBlock("shield");
+
+    // Initialize material component
+    setComponent( new OCSimpleMaterial(
+        Color::black(),
+        Color(1.0f,1.0f,1.0f,0.3f),
+        Color::null()) );
+
+    // Read maximum lives and health
+    int iMaxLives, iMaxHealth;
+    cfg.getInt("lives", &iMaxLives);
+    cfg.getInt("hits", &iMaxHealth);
+
+    // Read shield's life
+
+    // Initialize health component
+    setComponent( new SpaceshipShieldVitals( iMaxLives, iMaxHealth ) );
 
     // Read shield's radius
     float fRadius;
@@ -29,14 +48,6 @@ void SpaceshipShield::init( Spaceship *oShip )
     int iSlices;
     cfg.getInt("slices", &iSlices);
 
-    // Initialize material component
-    setComponent( new OCSimpleMaterial(
-        Color::black(),
-        Color(1.0f,1.0f,1.0f,0.3f),
-        Color::null()) );
-
-    //setComponent( new OCSimpleMaterial );
-
     // Initialize visual component
     setComponent( new OCVisualVertexArraySphere( fRadius, iStacks, iSlices ) );
 
@@ -44,12 +55,11 @@ void SpaceshipShield::init( Spaceship *oShip )
     setComponent( new OCCollisionDynamicBSphere( fRadius ) );
 
     // Initialize collision response component
-    setComponent( new SpaceshipCollisionResponse );
+    setComponent( new SpaceshipShieldCollisionResponse );
 }
 
 // ----------------------------------------------------------------------------
-void SpaceshipShield::update()
+void SpaceshipShield::update() 
 {
-    //m_vPos = m_oShip->getPos() + Vector3f(0.55f,0.0f,0.0f);
     m_vPos = m_oShip->getPos();
 }

@@ -1,8 +1,6 @@
 #pragma once
 #include "ParticleSystem.h"
 
-namespace tlib { class Object; }
-using tlib::Object;
 class Tile3d;
 
 class PSCollidable : public ParticleSystem
@@ -19,6 +17,8 @@ private:
 
     // The halh number of tiles per side
     int m_iHalfNumOfTiles;
+
+    // A list of object types to avoid detecting collision with
 
 public:
     /**
@@ -51,7 +51,8 @@ protected:
      */
     virtual void onCollisionWithObjects(
         Particle *particle, 
-        const Vector3f &vCollDir ) = 0;
+        const Vector3f &vCollDir,
+        Object *obj ) = 0;
 
     /**
      * 

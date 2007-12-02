@@ -27,8 +27,7 @@ public:
     /**
      * 
      */
-    PSLaser* addLaser( Object *oOwner,
-                       float vfCorrect[], 
+    PSLaser* addLaser( Object *oOwner,                 
                        float vEmitterOffset,
                        float vfLaserColor[] );
 

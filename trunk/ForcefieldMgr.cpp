@@ -1,11 +1,15 @@
-#include <windows.h>
-#include <gl/gl.h>
+#include <gl/glee.h>
 #include "ForcefieldMgr.h"
 #include "Forcefield.h"
-#include "VisualBox.h"
 #include "SimpleMaterial.h"
 #include "Animation.h"
+#include "SimpleMaterial.h"
+#include "MultiTexture.h"
+#include "VisualBox.h"
 #include "ObjectMgr.h"
+#include "Shader.h"
+#include "Visual.h"
+#include "Tile3d.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
@@ -18,13 +22,49 @@ void ForcefieldMgr::init()
     Config cfg("config.txt");
     cfg.loadBlock("forcefield");
 
-    // Read the bounding box of the forcefield
+    // Read the 'warping' speed
+    cfg.getFloat("warp_step", &m_fWarpStep);
+
+    // Read vertex and pixel shader files
+    string sVertex, sPixel;
+    cfg.getString("vertex_shader", sVertex);
+    cfg.getString("pixel_shader", sPixel);
+
+    // Read forcefield's color
+    float vfColor[4];
+    cfg.getFloat("color", vfColor, 4);
+
+    // Initialize material component
+    setComponent( new OCSimpleMaterial( 
+        Color::black(),
+        Color(vfColor),
+        Color::null()) 
+        );
+
+    // Read textures for the forcefield
+    string sColorMap, sNoiseMap;
+    cfg.getString("color_map", sColorMap);
+    cfg.getString("noise_map", sNoiseMap);
+
+    // Initialize textures
+    OCMultiTexture *cMTex = new OCMultiTexture( 2 );
+    cMTex->set( 0, sColorMap.c_str() );
+    cMTex->setName( 0, "colorMap" );
+    cMTex->set( 1, sNoiseMap.c_str() );
+    cMTex->setName( 1, "noiseMap" );
+    setComponent( cMTex );
+
+    // Read the visual box of the forcefield
     float vfBBox[3];
     cfg.getFloat("bbox", vfBBox, 3);
     
     // Initialize visual component
-    // We will use this single component to draw all forcefields
-    setComponent( new OCVisualBox( Vector3f( vfBBox ) * 0.5f ) );
+    OCVisualBox *cVBox = new OCVisualBox;
+    setComponent( cVBox );
+    cVBox->init( Vector3f( vfBBox ) * 0.5f );
+
+    // Initialize shader object
+    setComponent( new OCShader( sVertex.c_str(), sPixel.c_str() ) );
 }
 
 // ----------------------------------------------------------------------------
@@ -49,8 +89,7 @@ void ForcefieldMgr::update()
 
         cAnim = (IOCAnimation*)obj->getComponent("animation");
         // If object has finished its animation kill it
-        if( cAnim->isDone() )
-        {
+        if( cAnim->isDone() ) {
             toKill.push_back( obj );
             continue;
         }
@@ -70,10 +109,28 @@ void ForcefieldMgr::update()
 // ----------------------------------------------------------------------------
 void ForcefieldMgr::render()
 {
+    // Declare a variable to hold some the change
+    static float fTimer = 0.0f;
+
+    // Start using the shader
+    OCShader *cShader = (OCShader*)getComponent("shader");
+    cShader->begin();
+
+    // The a timer value to the shader
+    glUniform1f(cShader->getUniform("timer"), fTimer);
+
+    // Enable blending
     glEnable(GL_BLEND);
     glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
-    // Get visual component which will draw all door panels
+    // Enable material
+    OCSimpleMaterial *cMat = (OCSimpleMaterial*)getComponent("material");
+
+    // Enable textures
+    IOCTexture *cText = (IOCTexture*)getComponent("texture");
+    cText->apply();
+
+    // Get visual component which will draw the door panels
     IOCVisual *cBox = (IOCVisual*)getComponent("visual");
 
     Forcefield *obj;
@@ -87,18 +144,33 @@ void ForcefieldMgr::render()
         // If it's not active don't render as it is culled
         if( !obj->isActive() ) continue;
 
-        // Apply the material for the outlet
-        IOCMaterial *cMat = (IOCMaterial*)obj->getComponent("material");
+        // Apply the same material by with individual alpha values
+        cMat->getDiffuse().alpha( obj->getAlpha() );
         cMat->apply();
 
-        // Draw the door's panels
+        // Draw the forcefield
         m_vPos.xyz( obj->getPos() );
         m_qDir.wxyz( obj->getDir() );
         cBox->render();
 
     } // end for( )
 
+    // Alter the timer value
+    float sign = m_fWarpStep;
+    if( fTimer > 1000.0f )
+        sign = -m_fWarpStep;
+    else if( fTimer < -1000.0f )
+        sign = m_fWarpStep;
+    fTimer += sign;
+    
+    // Reset textures
+    cText->reset();
+
+    // Disable blending 
     glDisable(GL_BLEND);
+
+    // Stop using the shader
+    cShader->end();
 
 } // end render()
 
@@ -113,4 +185,22 @@ void ForcefieldMgr::remove( Forcefield *value )
     // Delete object system from memory
     delete value;
     value = 0;
+}
+
+// ----------------------------------------------------------------------------
+Forcefield* ForcefieldMgr::add( Tile3d *oTile )
+{
+    // Allocate object
+    Forcefield *field = new Forcefield;
+
+    // Set its position
+    field->setPosFromIndex( oTile->ijk() );
+
+    // Save it as this tile's occupant
+    oTile->setOccupant( (Object*)field );
+
+    // Push it to the list
+    m_vForcefields.push_back( field );
+
+    return field;
 }

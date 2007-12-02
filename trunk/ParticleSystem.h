@@ -2,12 +2,13 @@
 #include "ParticleEmitter.h"
 #include <string>
 
-//class Particle;  // Defined in particle emitter
+namespace tlib { class Object; }
+using tlib::Object;
 
 class ParticleSystem
 {
 public:
-    enum Type {
+    enum PSType {
         Any = 0,
         SmallExplosion,
         Smoke
@@ -38,6 +39,10 @@ protected:
     // An array of random numbers
     static float m_vfRandom[500];
 
+    // Every particle system can have an owner object,
+    // most likely the one its emitting from
+    Object *m_oOwner;
+
 private:
     // Holds the initialization time
     long m_lInitTime;
@@ -47,7 +52,7 @@ private:
 
     // The particle system's type
     // Default: 0[Any]
-    int m_iType;
+    PSType m_iType;
 
 public:
     /**
@@ -71,12 +76,13 @@ public:
     }
 
     /**
-     * 
+     * Return whether the particle system has expired or not
      */
     bool isExpired() const { return m_bIsExpired; }
 
     /**
-     * 
+     * Returns true if the particle system is of the same type 
+     * as the given parameter
      */
     bool isType( int iType ) const { return (m_iType==iType); }
 
@@ -88,9 +94,9 @@ public:
     }
 
     /**
-     * 
+     * Sets the particle system's type
      */
-    void setType( int iType ) {
+    void setType( PSType iType ) {
         m_iType = iType;
     }
 

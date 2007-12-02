@@ -20,7 +20,7 @@ void Particle::start()
 bool Particle::hasExpired() 
 {
     // Particles with life span of zero never expire
-    //if( m_dLifeSpan < 1e-6 ) return false;
+    if( m_dLifeSpan < 1e-6 ) return false;
 
     // Check pariticle's expiration time
     double dCurrent = (double)(clock() - m_lInitTime)*M_CLOCKS_PER_SEC;
@@ -39,4 +39,12 @@ void Particle::bounce( const Vector3f &vColDir, float fSpeedRatio )
 {
     m_vVelocity = 
         ( - 2.0f * m_vVelocity.dot( vColDir ) * vColDir + m_vVelocity ) * fSpeedRatio;
+
+    //// Normalize velocity
+    //m_vVelocity.normalize();
+    //// Calculate bounce vector
+    //Vector3f vBounce = ( - 2.0f * m_vVelocity.dot( vColDir ) * vColDir + m_vVelocity );
+    //vBounce.normalize();
+    //// Set the new velocity vector
+    //m_vVelocity = vBounce * m_fVelocity * fSpeedRatio;
 }

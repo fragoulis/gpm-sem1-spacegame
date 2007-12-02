@@ -11,100 +11,105 @@ using std::list;
 // Forward declarations
 class Tile3d;
 
-typedef list<Object*> ObjectList;
-
-class ObjectMgr : public Singleton<ObjectMgr>
+namespace tlib
 {
-    friend Singleton<ObjectMgr>;
 
-private:
-    // This list holds all obejct's in the scene
-    // except of the reactor, the shield and the 
-    // spaceship which are unique
-    //ObjectList m_vObjects;
+    typedef list<Object*> ObjectList;
 
-    // An imaginary radius of a sphere, used to skip
-    // object outside of it
-    float m_fCullDistance;
+    class ObjectMgr : public Singleton<ObjectMgr>
+    {
+        friend Singleton<ObjectMgr>;
 
-    // Unique object's of our world
-    Spaceship               m_Ship;
-    SpaceshipShield         m_Shield;
-    Reactor                 m_Reactor;
-    Spacestation            m_Station;
-    SpacestationCorridors   m_Corridors;
+    private:
+        // This list holds all obejct's in the scene
+        // except of the reactor, the shield and the 
+        // spaceship which are unique
+        //ObjectList m_vObjects;
 
-public:
-    /**
-     * Accessors for the unique objects
-     */
-    const Spaceship& getShip() const { return m_Ship; }
-    Spaceship& getShip() { return m_Ship; }
-    const SpaceshipShield& getShield() const { return m_Shield; }
-    const Reactor& getReactor() const { return m_Reactor; }
+        // An imaginary radius of a sphere, used to skip
+        // object outside of it
+        float m_fCullDistance;
 
-    /**
-     * 
-     */
-    void update();
+        // Unique object's of our world
+        Spaceship               m_Ship;
+        SpaceshipShield         m_Shield;
+        Reactor                 m_Reactor;
+        Spacestation            m_Station;
+        SpacestationCorridors   m_Corridors;
 
-    /**
-     * 
-     */
-    void render();
+    public:
+        /**
+         * Accessors for the unique objects
+         */
+        const Spaceship& getShip() const { return m_Ship; }
+        Spaceship& getShip() { return m_Ship; }
+        const SpaceshipShield& getShield() const { return m_Shield; }
+        const Reactor& getReactor() const { return m_Reactor; }
 
-    /**
-     * 
-     */
-    void checkCollision();
+        /**
+         * 
+         */
+        void update();
 
-    /**
-     * 
-     */
-    void addDoor( Tile3d *oTile );
-    
-    /**
-     * 
-     */
-    void addBlade( Tile3d *oTile );
+        /**
+         * 
+         */
+        void render();
 
-    /**
-     * 
-     */
-    void addForcefield( Tile3d *oTile );
+        /**
+         * 
+         */
+        void checkCollision();
 
-    /**
-     * 
-     */
-    void addOutlet( Tile3d *oTile );
+        /**
+         * 
+         */
+        void addDoor( Tile3d *oTile );
+        
+        /**
+         * 
+         */
+        void addBlade( Tile3d *oTile );
 
-    /**
-     * 
-     */
-    void addTurret( Tile3d *oTile );
+        /**
+         * 
+         */
+        void addForcefield( Tile3d *oTile );
 
-    /**
-     * Checks if an object is far from the currently active
-     * camera so that it can be excused from the updates
-     * and the rendering
-     */
-    bool isCulled( Object *obj );
+        /**
+         * 
+         */
+        void addOutlet( Tile3d *oTile );
 
-    /** 
-     * Calls the initialization functions for the unique objects
-     */
-    void init();
+        /**
+         * 
+         */
+        void addTurret( Tile3d *oTile );
 
-private:
-    /**
-     * Constructor
-     */
-    ObjectMgr();
+        /**
+         * Checks if an object is far from the currently active
+         * camera so that it can be excused from the updates
+         * and the rendering
+         */
+        bool isCulled( Object *obj );
+
+        /** 
+         * Calls the initialization functions for the unique objects
+         */
+        void init();
+
+    private:
+        /**
+         * Constructor
+         */
+        ObjectMgr();
 
 
-    /**
-     * Destructor
-     */
-    ~ObjectMgr();
+        /**
+         * Destructor
+         */
+        ~ObjectMgr();
 
 }; // end of ParticleSystemMgr class
+
+} // end of namespace tlib

@@ -1,13 +1,13 @@
-#include "SpaceshipVitals.h"
+#include "SpaceshipShieldVitals.h"
 #include "ParticleSystemMgr.h"
 #include "PSSmallExplosion.h"
 #include "PSSmoke.h"
 
-SpaceshipVitals::SpaceshipVitals( int iMaxLives, int iMaxHealth ):
+SpaceshipShieldVitals::SpaceshipShieldVitals( int iMaxLives, int iMaxHealth ):
 OCVitalsLives( iMaxLives, iMaxHealth )
 {}
 
-void SpaceshipVitals::onKill()
+void SpaceshipShieldVitals::onKill()
 {
     // Create a particle explosion in its position
     //PSSmallExplosion *ex = 
@@ -20,7 +20,7 @@ void SpaceshipVitals::onKill()
     //smoke->start();
 }
 
-void SpaceshipVitals::onRevive()
+void SpaceshipShieldVitals::onRevive()
 {
     
 }

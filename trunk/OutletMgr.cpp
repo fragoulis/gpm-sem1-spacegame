@@ -14,6 +14,9 @@ OutletList OutletMgr::m_vOutlets;
 
 void OutletMgr::init()
 {
+    // Set object's type
+    setType( OUTLET );
+
     _LOG("Initializing outlet renderer...");
     Config cfg("config.txt");
     cfg.loadBlock("outlet");

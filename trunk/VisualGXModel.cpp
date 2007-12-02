@@ -14,6 +14,11 @@ namespace tlib
         load( filename, scale );
     }
 
+    OCGXModel::~OCGXModel() {
+        //m_Model.Free();
+        m_Model.FreeGL();
+    }
+
     // ------------------------------------------------------------------------
     bool OCGXModel::load( const char *filename, float scale )
     {
@@ -31,44 +36,46 @@ namespace tlib
     // ------------------------------------------------------------------------
     void OCGXModel::render() const
     {
+        glPushAttrib(GL_ENABLE_BIT);
         glPushMatrix();
+        {
+            // Get object's position
+            const Vector3f& vPos = getOwner()->getPos();
 
-        // Get object's position
-        const Vector3f& vPos = getOwner()->getPos();
-
-        // Place the object
-        glTranslatef( vPos.x(), vPos.y(), vPos.z() );
+            // Place the object
+            glTranslatef( vPos.x(), vPos.y(), vPos.z() );
 #ifdef _SHOW_AXIS
-        IComponent *cmp = getOwner()->getComponent("orientation");
-        OCOrientation3D *qr = (OCOrientation3D*)cmp;
-        if( qr ) {
-            const Vector3f& view = qr->getView() * 20.0f;
-            const Vector3f& right = qr->getRight() * 20.0f;
-            const Vector3f& up = qr->getUp() * 20.0f;
-            
-            glDisable(GL_LIGHTING);
-            glBegin(GL_LINES);
-                glColor3f(1,0,0);
-                glVertex3f(0,0,0);
-                glVertex3f(view.x(), view.y(), view.z());
-                glColor3f(0,1,0);
-                glVertex3f(0,0,0);
-                glVertex3f(right.x(), right.y(), right.z());
-                glColor3f(0,0,1);
-                glVertex3f(0,0,0);
-                glVertex3f(up.x(), up.y(), up.z());
-            glEnd();
-            glEnable(GL_LIGHTING);
-        }
+            IComponent *cmp = getOwner()->getComponent("orientation");
+            OCOrientation3D *qr = (OCOrientation3D*)cmp;
+            if( qr ) {
+                const Vector3f& view = qr->getView() * 20.0f;
+                const Vector3f& right = qr->getRight() * 20.0f;
+                const Vector3f& up = qr->getUp() * 20.0f;
+                
+                glDisable(GL_LIGHTING);
+                glBegin(GL_LINES);
+                    glColor3f(1,0,0);
+                    glVertex3f(0,0,0);
+                    glVertex3f(view.x(), view.y(), view.z());
+                    glColor3f(0,1,0);
+                    glVertex3f(0,0,0);
+                    glVertex3f(right.x(), right.y(), right.z());
+                    glColor3f(0,0,1);
+                    glVertex3f(0,0,0);
+                    glVertex3f(up.x(), up.y(), up.z());
+                glEnd();
+                glEnable(GL_LIGHTING);
+            }
 #endif
-        // Load transformation quaternion and apply rotations
-        getOwner()->getDir().toMatrix(m_fRotMatrix);
-        glMultMatrixf(m_fRotMatrix);
+            // Load transformation quaternion and apply rotations
+            getOwner()->getDir().toMatrix(m_fRotMatrix);
+            glMultMatrixf(m_fRotMatrix);
 
-        // Render the model
-        m_Model.DrawGL();
-
+            // Render the model
+            m_Model.DrawGL();
+        }
         glPopMatrix();
+        glPopAttrib();
     }
 
 } // end of namespace tlib

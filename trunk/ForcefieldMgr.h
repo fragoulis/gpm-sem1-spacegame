@@ -4,6 +4,7 @@
 using namespace std;
 using tlib::Object;
 
+class Tile3d;
 class Forcefield;
 typedef list<Forcefield*> ForcefieldList;
 
@@ -18,6 +19,9 @@ class ForcefieldMgr : public Object
 private:
     // The list of forcefieds
     static ForcefieldList m_vForcefields;
+
+    // The warping effect step
+    float m_fWarpStep;
 
 public:
     /**
@@ -40,9 +44,7 @@ public:
     /**
      * Pushes a forcefield to the list
      */
-    static void add( Forcefield *ff ) {
-        m_vForcefields.push_back( ff );
-    }
+    static Forcefield* add( Tile3d *oTile );
 
 private:
     /**

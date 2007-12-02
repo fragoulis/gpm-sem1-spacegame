@@ -24,6 +24,7 @@ public:
      */
     bool readMap( const char *filename );
 
+private:
     /**
      * Builds the cube object with textures using immediate mode
      */

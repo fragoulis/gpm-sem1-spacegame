@@ -1,11 +1,8 @@
-
 #pragma once
-
-#include <map>
 #include "component.h"
 #include "vector3.h"
 #include "quaternion.h"
-
+#include <map>
 using std::map;
 
 namespace tlib
@@ -17,6 +14,18 @@ namespace tlib
 
     class Object
     {
+    public:
+        // A enumeration to help as identify which object is what
+        enum ObjectType {
+            DEFAULT = 0,
+            SPACESHIP, 
+            SPACESHIP_SHIELD,
+            TURRET,
+            BARRIER, // This could alternatively be the barrier's separately
+            OUTLET,
+            REACTOR
+        };
+
     protected:
         // The object's position
         Vector3f m_vPos;
@@ -25,66 +34,48 @@ namespace tlib
         Quatf m_qDir;
 
         // The list of components
-        component_array m_vComponents;
+        mutable component_array m_vComponents;
 
         // Flags whether an object should continue to get 
         // rendered and updated
         bool m_bActive;
 
+        // The type of the object
+        ObjectType m_iType;
+
+
     public:
         /**
          * Constructor
          */
-        Object(): m_bActive(true) {}
+        Object();
 
         /**
          * Destructor
          */
-        virtual ~Object()
-        {
-             clearComponentList();           
-        }
+        virtual ~Object();
 
         /**
          * Frees all memory that the components occupy
          */
-        void clearComponentList()
-        {
-            component_array::iterator iter;
-            for( iter = m_vComponents.begin(); 
-                 iter != m_vComponents.end(); 
-                 iter++ )
-            {
-                delete iter->second;
-                iter->second = 0;
-            }
-        }
+        void clearComponentList();
 
         /**
          * Pushes a component to the component list
          */
-        IComponent* setComponent( IComponent *comp ) 
-        { 
-            // Get the component that MAY already exists of the
-            // same interface
-            IComponent *oldComp = m_vComponents[ comp->familyID() ];
-
-            // set the owner of this component to be this
-            comp->setOwner( this );
-
-            // push the component to the list
-            m_vComponents[ comp->familyID() ] = comp;
-
-            return oldComp;
-        }
+        IComponent* setComponent( IComponent *comp );
 
         /**
          * Returns a component by its string identifier (ID)
+         * const and non-const
          */
-        IComponent* getComponent( const string &id )
-        { 
+        const IComponent* getComponent( const string &id ) const { 
             return m_vComponents[id]; 
         }
+        IComponent* getComponent( const string &id ) { 
+            return m_vComponents[id]; 
+        }
+
 
         /**
          * Returns the position
@@ -120,6 +111,14 @@ namespace tlib
          * Returs the active flag
          */
         bool isActive() const { return m_bActive; }
+
+        /**
+         * Getter/Setter for the type of the object
+         */
+        int getType() const { return m_iType; }
+        void setType( ObjectType iType ) {
+            m_iType = iType;
+        }
 
     }; // end of Object class
 

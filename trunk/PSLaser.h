@@ -3,8 +3,6 @@
 #include "Color.h"
 
 class PSScorchMarks;
-namespace tlib { class Object; }
-using tlib::Object;
 
 /**
  * This could be an component system object !?~!@*&^!@
@@ -12,12 +10,6 @@ using tlib::Object;
 class PSLaser : public PSCollidable
 {
 private:
-    // The onwer object
-    Object *m_oOwner;
-
-    //
-    Vector3f m_vPosCorrection;
-
     // The direction in which the emitter will spawn new particles
     // Used for caching the direcion vector before passing it to 
     // every new particle
@@ -27,10 +19,9 @@ private:
     float m_fOffset;
 
     // The velocity of the laser bolts
-    // Note: the velocity exists here and not in every particle
-    // since in this system the particles are bound to have a constant
-    // velocity from spawn to death.
-    float m_fVelocity;
+    // This variable hold the default lifespan of the particles
+    // and is used to initialize the particles in every spawn
+    double m_dLifeSpan;
 
     // The color of the laser bolts
     Color m_Color;
@@ -60,7 +51,6 @@ public:
      * Setups a laser particle system
      */
     void init( Object *oOwner,
-               float vfCorrect[], 
                float fEmitterOffset,
                float vfLaserColor[] );
 
@@ -78,7 +68,8 @@ private:
      */
     void onCollisionWithObjects( 
         Particle *particle, 
-        const Vector3f &vColDir );
+        const Vector3f &vColDir, 
+        Object *obj );
 
     /**
      * Resets the position of a particle and gives a random direction and 

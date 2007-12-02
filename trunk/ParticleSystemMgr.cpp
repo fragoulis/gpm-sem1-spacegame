@@ -39,13 +39,12 @@ ParticleSystem* ParticleSystemMgr::checkForSameType( int iType )
 
 // ----------------------------------------------------------------------------
 PSLaser* ParticleSystemMgr::addLaser( Object *oOwner,
-                                      float vfCorrect[], 
                                       float vEmitterOffset,
                                       float vfLaserColor[] )
 {
     // Create the new laser particle system
     PSLaser *ps = new PSLaser;
-    ps->init( oOwner, vfCorrect, vEmitterOffset, vfLaserColor );
+    ps->init( oOwner, vEmitterOffset, vfLaserColor );
 
     // Push it pack to the list
     m_vPSList.push_back( (ParticleSystem*)ps );

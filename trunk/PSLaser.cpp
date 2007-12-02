@@ -16,7 +16,6 @@ using tlib::OCOrientation2D;
 
 // ----------------------------------------------------------------------------
 void PSLaser::init( Object *oOwner,
-                    float vfCorrect[], 
                     float fEmitterOffset,
                     float vfLaserColor[] )
 {
@@ -24,9 +23,6 @@ void PSLaser::init( Object *oOwner,
 
     // Save owner object pointer
     m_oOwner = oOwner;
-
-    // Save owner object's position
-    m_vPosCorrection = Vector3f( vfCorrect );
 
     // Initialize position offset
     m_fOffset = fEmitterOffset;
@@ -47,9 +43,6 @@ void PSLaser::init( Object *oOwner,
 
     m_Emitter.init( dReleaseTime, iReleaseCount );
 
-    // Read velocity
-    cfg.getFloat("velocity", &m_fVelocity);
-
     // Read particle number
     int iNumOfParticles;
     cfg.getInt("max_particles", &iNumOfParticles);
@@ -57,16 +50,16 @@ void PSLaser::init( Object *oOwner,
     // Initialize particle array
     m_Particles = new Particle[iNumOfParticles];
 
-    // Read particle size and lifespan
-    float fSize;
-    double dLifeSpan;
+    // Read particle size, velocity and lifespan
+    float fSize, fVelocity;
     cfg.getFloat("size", &fSize);
-    cfg.getDouble("lifespan", &dLifeSpan);
+    cfg.getFloat("velocity", &fVelocity);
+    cfg.getDouble("lifespan", &m_dLifeSpan);
 
     // At first, mark all particles as dead
     for( int i=0; i<iNumOfParticles; ++i ) {
-        m_Particles[i].setLifeSpan( dLifeSpan );
-        m_Particles[i].setVelocity( m_fVelocity );
+        m_Particles[i].setLifeSpan( m_dLifeSpan );
+        m_Particles[i].setVelocity( fVelocity );
         m_Particles[i].setSize( fSize );
         m_Emitter.getPDead().push_back( &m_Particles[i] );
     }
@@ -215,14 +208,15 @@ void PSLaser::onCollisionWithTiles( Particle *particle,
 
 // ----------------------------------------------------------------------------
 void PSLaser::onCollisionWithObjects( Particle *particle, 
-                                      const Vector3f &vColDir )
+                                      const Vector3f &vColDir,
+                                      Object *oObj )
 {
     particle->bounce( vColDir, 0.5f );
-    particle->setLifeSpan(0.4f);
+    particle->setLifeSpan(0.1f);
 
     // Call collision response for the object
-    IOCCollisionResponse *cColRes =
-        (IOCCollisionResponse*)getTile()->getOccupant()->getComponent("collisionresponse");
+    IOCCollisionResponse *cColRes = 
+        (IOCCollisionResponse*)oObj->getComponent("collisionresponse");
     if( cColRes )
         cColRes->respond( vColDir );
 }
@@ -232,4 +226,5 @@ void PSLaser::onSpawn( Particle *particle )
 {
     particle->setPos( m_vPos );
     particle->setDir( m_vDir );
+    particle->setLifeSpan( m_dLifeSpan );
 }

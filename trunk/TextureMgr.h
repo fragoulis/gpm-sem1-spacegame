@@ -2,7 +2,7 @@
 #include <map>
 #include <string>
 #include "Singleton.h"
-#include "GX/GXBase.h"
+#include "GX/Image.h"
 
 using std::map;
 using std::string;
@@ -51,4 +51,4 @@ public:
         m_iFormat = iFormat;
     }
 
-}; // end of CameraMgr class
+}; // end of TextureMgr class

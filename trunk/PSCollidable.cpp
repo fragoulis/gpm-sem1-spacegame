@@ -1,6 +1,6 @@
 #include "PSCollidable.h"
 #include "Particle.h"
-#include "Object.h"
+#include "ObjectMgr.h"
 #include "Tilemap.h"
 #include "CollisionBBox.h"
 #include "CollisionBSphere.h"
@@ -44,45 +44,30 @@ void PSCollidable::checkCollision( Particle *particle )
 {
     // The collision direction
     Vector3f vColDir;
+    // The object to check against
+    Object *objToCheck;
 
+    // ________________________________________________________________________
     // If particle is currently inside a corridor
     if( readTile( particle ) )
     {
-        // Check it against the tile's occupier, the shield and the spaceship
-        bool isCollision = false;
-        Object *objToCheck = getTile()->getOccupant();
+        // Check it against the tile's occupier
+        objToCheck = getTile()->getOccupant();
 
-        // Check for collisions with tile occupiers
-        // if tile has an object
+        // Check for collisions with tile occupier
         if( objToCheck )
         {
-            isCollision = checkCollisionWithObject( 
-                particle, 
-                objToCheck, 
-                vColDir );
+            if( checkCollisionWithObject( particle, 
+                                          objToCheck, 
+                                          vColDir ) ) 
+            {
+                onCollisionWithObjects( particle, vColDir, objToCheck );
+                return;
+            }
         }
-
-        // If particle did not collide with a tile occupier
-        // object check it with the spaceship shield
-        if( !isCollision )
-        {
-            // Check with shield
-
-            //objToCheck = shield
-        }
-
-        // If particle did not collide with the shield either
-        // check it with the spaceship
-        if( !isCollision )
-        {
-            // Check with spaceship
-            //objToCheck = ship
-        }
-
-        if( isCollision )
-            onCollisionWithObjects( particle, vColDir );
     }
-    // If particle is just outside the corridor
+    // ________________________________________________________________________
+    // If particle is just outside a corridor
     else if( readPrevTile( particle ) )
     {
         Vector3f vColPoint;
@@ -93,14 +78,45 @@ void PSCollidable::checkCollision( Particle *particle )
                                      vColPoint ) ) 
         {   
             onCollisionWithTiles( particle, vColDir, vColPoint );
+            return;
         }
     }
-    else 
-    {
-        // At last check with the reactor
 
-    } // end else if( .. )
-}
+    // ________________________________________________________________________
+    // Before checking with the spaceship or the shield check if this particle
+    // has an owner with type of spaceship
+    // If so, skip the next check
+    if( m_oOwner && m_oOwner->getType() != Object::SPACESHIP )
+    {
+        // Check particle against the spaceship's shield, if shield is active
+        objToCheck = (Object*)&ObjectMgr::Instance().getShield();
+        if( !objToCheck->isActive() ) {
+            // If shield is not active, it means that the ship has been 
+            // massively damaged.
+            // So, instead, check with the ship
+            objToCheck = (Object*)&ObjectMgr::Instance().getShip();
+        }
+        
+        // Check either with ship or shield
+        if( checkCollisionWithObject( particle, objToCheck, vColDir ) )
+        {   
+            onCollisionWithObjects( particle, vColDir, objToCheck );
+            return;
+        }
+    }
+
+    // ________________________________________________________________________
+    // The final check consists of checking against the reactor if everything 
+    // else did not hit
+    objToCheck = (Object*)&ObjectMgr::Instance().getReactor();
+    if( checkCollisionWithObject( particle, 
+                                  objToCheck, 
+                                  vColDir ) )
+    {   
+        onCollisionWithObjects( particle, vColDir, objToCheck );
+    }
+
+} // end checkCollision()
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -187,11 +203,10 @@ bool PSCollidable::checkCollisionWithObject( Particle *particle,
                                              Object *oObj,
                                              Vector3f &vCollDir )
 {
-    _ASSERT(m_CurTile!=0);
-
     // Get object's collision component
     IComponent *cCom = oObj->getComponent("collision");
     IOCCollision *cObjCol = (IOCCollision*)cCom;
+    _ASSERT(cObjCol!=0);
     // If object has is not collidable return false
     //if( !cObjCol )
     //    return false;

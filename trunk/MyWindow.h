@@ -1,6 +1,8 @@
 #pragma once
-
+#pragma comment( lib, "glee" )
+#include <GL/GLee.h>
 #include "GX/GXBase.h"
+
 // Object managers
 #include "DoorMgr.h"
 #include "BladeMgr.h"
@@ -33,4 +35,5 @@ public:
     void OnDestroy();
 	void OnKeyboard(int key, bool down);
     void drawInterface();
+    GLuint compilePlane(bool);
 };

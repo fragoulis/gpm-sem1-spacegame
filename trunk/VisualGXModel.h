@@ -26,10 +26,7 @@ namespace tlib
         /**
          * Destructors
          */
-        virtual ~OCGXModel()
-        {
-            m_Model.FreeGL();
-        }
+        virtual ~OCGXModel();
 
         /**
          * Returns the model

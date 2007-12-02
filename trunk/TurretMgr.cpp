@@ -16,6 +16,9 @@ TurretList TurretMgr::m_vTurrets;
 // ----------------------------------------------------------------------------
 void TurretMgr::init( Object *obj )
 {
+    // Set object's type
+    setType( TURRET );
+
     Config cfg("config.txt");
     cfg.loadBlock("turret");
 
@@ -86,13 +89,14 @@ void TurretMgr::render()
     IOCVisual *cModel = (IOCVisual*)getComponent("visual");
 
     // Draw all turrets
+    Turret *obj;
     TurretList::const_iterator iter;
     for( iter = m_vTurrets.begin();
          iter != m_vTurrets.end();
          ++iter )
     {
         // Cache dereference
-        Turret *obj = *iter;
+        obj = *iter;
         _ASSERT(obj!=0);
 
         if( !obj->isActive() ) {

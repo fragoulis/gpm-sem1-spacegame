@@ -23,6 +23,9 @@ void Spaceship::init()
 {
     _LOG("Setting up spaceship...");
 
+    // Set object's type
+    setType( SPACESHIP );
+
     Config cfg("config.txt");
     cfg.loadBlock("spaceship");
 
@@ -87,10 +90,6 @@ void Spaceship::init()
     float fEmitterOffset;
     cfg.getFloat("laser_offset", &fEmitterOffset);
 
-    // A small [necessary] correction to the laser emitter position
-    float vfCorrect[3];
-    cfg.getFloat("correct_laser", vfCorrect, 3);
-
     // Read maximum lives and health
     int iMaxLives, iMaxHealth;
     cfg.getInt("lives", &iMaxLives);
@@ -101,8 +100,7 @@ void Spaceship::init()
 
     // Initialize laser system
     m_Laser = PSManager::Instance().addLaser( 
-        this, 
-        vfCorrect, 
+        this,
         fEmitterOffset, 
         vfLaserColor );
 

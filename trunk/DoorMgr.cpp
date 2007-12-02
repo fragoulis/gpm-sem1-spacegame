@@ -6,6 +6,7 @@
 #include "SimpleMaterial.h"
 #include "SingleTexture.h"
 #include "Animation.h"
+#include "Shader.h"
 #include "ObjectMgr.h"
 #include "Config.h"
 #include "Logger.h"
@@ -31,13 +32,15 @@ void DoorMgr::init()
     //setComponent( new OCSimpleMaterial(Color::black(),Color::red(),Color::null()) );
     setComponent( new OCSimpleMaterial );
     
+    // Initialize texture component
+    setComponent( new OCSingleTexture( sTexture.c_str() ) );
+
     // Initialize visual component
     // We will use this single component to draw all door panels
     // hence all the doors
-    setComponent( new OCVisualBox( Vector3f( fvDim ) ) );
-
-    // Initialize texture component
-    setComponent( new OCSingleTexture( sTexture.c_str() ) );
+    OCVisualBox *cVBox = new OCVisualBox;
+    setComponent( cVBox );
+    cVBox->init( Vector3f( fvDim ) );
 }
 
 // ----------------------------------------------------------------------------
@@ -86,7 +89,7 @@ void DoorMgr::render()
 {
     // Get visual component which will draw all door panels
     IOCVisual *cBox = (IOCVisual*)getComponent("visual");
-
+    
     Door *obj;
     DoorList::const_iterator iter;
     for( iter = m_vDoors.begin();
@@ -110,20 +113,20 @@ void DoorMgr::render()
             glMultMatrixf(vfRotMatrix);
 
             // Draw the door's panels
-            m_vPos.xyz( (*iter)->leftPanel()->getPos() );
-            m_qDir.wxyz( (*iter)->leftPanel()->getDir() );
+            m_vPos.xyz( obj->leftPanel()->getPos() );
+            m_qDir.wxyz( obj->leftPanel()->getDir() );
             cBox->render();
 
-            m_vPos.xyz( (*iter)->rightPanel()->getPos() );
-            m_qDir.wxyz( (*iter)->rightPanel()->getDir() );
+            m_vPos.xyz( obj->rightPanel()->getPos() );
+            m_qDir.wxyz( obj->rightPanel()->getDir() );
             cBox->render();
 
-            m_vPos.xyz( (*iter)->topPanel()->getPos() );
-            m_qDir.wxyz( (*iter)->topPanel()->getDir() );
+            m_vPos.xyz( obj->topPanel()->getPos() );
+            m_qDir.wxyz( obj->topPanel()->getDir() );
             cBox->render();
 
-            m_vPos.xyz( (*iter)->bottomPanel()->getPos() );
-            m_qDir.wxyz( (*iter)->bottomPanel()->getDir() );
+            m_vPos.xyz( obj->bottomPanel()->getPos() );
+            m_qDir.wxyz( obj->bottomPanel()->getDir() );
             cBox->render();
         }
         glPopMatrix();
