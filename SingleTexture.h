@@ -36,12 +36,19 @@ namespace tlib
         bool load( const char *filename );
 
         /**
-         * Applies the material
+         * Applies the texture
          */
         void apply() const 
         {
             glEnable( GL_TEXTURE_2D );
             glBindTexture( GL_TEXTURE_2D, m_uiTexId );
+        }
+
+        /**
+         * Disables the texture
+         */
+        void reset() const {
+            glDisable( GL_TEXTURE_2D );
         }
 
     }; // end of OCSingleTexture class

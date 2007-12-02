@@ -24,6 +24,7 @@ public:
      */
     virtual ~SpacestationDisplayList();
 
+private:
     /**
      * Builds the cube object with textures using immediate mode
      */

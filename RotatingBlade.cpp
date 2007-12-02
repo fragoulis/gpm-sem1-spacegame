@@ -6,10 +6,8 @@
 #include "CollisionBBox.h"
 #include "Visual.h"
 #include "Config.h"
-using tlib::OCCollisionBBox;
-using tlib::OCLinearMovement;
-using tlib::IOCVisual;
-using tlib::Config;
+#include "SingleTexture.h"
+using namespace tlib;
 
 float RotatingBlade::DistToDie;
 
@@ -42,6 +40,9 @@ RotatingBlade::RotatingBlade()
     // Initialize animation component
     setComponent( new BladeAnimation );
 
+    // 
+    //setComponent( new OCSingleTexture( "textures/beam.jpg" ) );
+
     // Initialize system parts
     m_oBlade.init();
     m_oPoll.init();
@@ -51,8 +52,8 @@ RotatingBlade::RotatingBlade()
 // ----------------------------------------------------------------------------
 void RotatingBlade::render()
 {
-    IOCVisual *cVis;
     glPushMatrix();
+    {
         // Position system
         glTranslatef( m_vPos.x(), m_vPos.y(), m_vPos.z() );
         // Rotate system
@@ -61,7 +62,7 @@ void RotatingBlade::render()
         glMultMatrixf(vfRotMatrix);
 
         // Draw system poll
-        cVis = (IOCVisual*)m_oPoll.getComponent("visual");
+        IOCVisual *cVis = (IOCVisual*)m_oPoll.getComponent("visual");
         _ASSERT(cVis!=0); cVis->render();
 
         // Draw system base
@@ -72,19 +73,6 @@ void RotatingBlade::render()
         // Draw system blade
         cVis = (IOCVisual*)m_oBlade.getComponent("visual");
         _ASSERT(cVis!=0); cVis->render();
-
-        //Quatf tempDir = m_oBlade.getDir();
-        //int numscenes = 10;
-        //cVis = (IOCVisual*)m_oBlade.getComponent("visual");
-        //glClear(GL_ACCUM_BUFFER_BIT);
-        //for(int i=0; i<numscenes; i++)
-        //{
-        //    cVis->render();
-        //    m_oBlade.update();
-        //    glAccum(GL_ACCUM, 0.1f);
-        //}
-        //glAccum(GL_RETURN, 1.0);
-        //m_oBlade.setDir( tempDir );
-
+    }
     glPopMatrix();
 }

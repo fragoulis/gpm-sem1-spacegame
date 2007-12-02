@@ -53,8 +53,13 @@ namespace tlib
          * Accessor methods for diffuse, ambient and emission
          */
         const Color& getAmbient() const { return m_Ambient; }
+        Color& getAmbient() { return m_Ambient; }
+
         const Color& getDiffuse() const { return m_Diffuse; }
+        Color& getDiffuse() { return m_Diffuse; }
+
         const Color& getEmission() const { return m_Emission; }
+        Color& getEmission() { return m_Emission; }
 
         /**
          * Assignment methods for diffuse, ambient and emission

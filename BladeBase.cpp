@@ -1,9 +1,11 @@
 #include "BladeBase.h"
 #include "SimpleMaterial.h"
 #include "VisualVertexArraySphere.h"
+#include "VisualBox.h"
 #include "Config.h"
 using tlib::OCSimpleMaterial;
 using tlib::OCVisualVertexArraySphere;
+using tlib::OCVisualBox;
 using tlib::Config;
 using tlib::Vector3f;
 

@@ -2,19 +2,19 @@
 #include "VitalsLives.h"
 using tlib::OCVitalsLives;
 
-class SpaceshipVitals : public OCVitalsLives
+class SpaceshipShieldVitals : public OCVitalsLives
 {
 public:
     /**
      * Constructor
      */
-    SpaceshipVitals( int iMaxLives, int iMaxHealth );
+    SpaceshipShieldVitals( int iMaxLives, int iMaxHealth );
     
     /**
      * Returns the unique component ID
      */
     const string componentID() const { 
-        return string("spaceshipvitals"); 
+        return string("SpaceshipShieldVitals"); 
     }
 
     /**
@@ -27,4 +27,4 @@ public:
      */
     virtual void onRevive();
 
-}; // end of SpaceshipVitals class
+}; // end of SpaceshipShieldVitals class

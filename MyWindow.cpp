@@ -2,8 +2,6 @@
 // System
 #include <iostream>
 #include <cstdlib>
-// GXBase
-#include "gx/gxbase.h"
 // Misc
 #include "Config.h"
 #include "Math.h"
@@ -21,12 +19,17 @@
 #include "Tilemap.h"
 #include "Logger.h"
 #include "TextureMgr.h"
+#include "ShaderMgr.h"
 
 using namespace std;
 using namespace tlib;
 
+GLuint program;
+GLuint tplane, plane;
+GLuint tex1, tex2;
+
 MyWindow::MyWindow() 
-{
+{   
     SetSize( 1024, 768 );
     SetPosition(100,100);
 }
@@ -39,12 +42,12 @@ void MyWindow::OnCreate()
     SetCursor( CRNone );
 
     glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
-    // enable backface culling
+    //// enable backface culling
     glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
 
-    // ----SETUP SOME DEFAULT GLOBAL LIGHTING -------
+    //// ----SETUP SOME DEFAULT GLOBAL LIGHTING -------
     glEnable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
     float _light[][4] = {
@@ -53,15 +56,15 @@ void MyWindow::OnCreate()
         { 15.0f, 15.0f, 690.0f, 1.0f }
     };
     glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
-    
-    // Low ambient
+    //
+    //// Low ambient
     Config cfg("config.txt");
     float gAmbient[4];
     cfg.loadBlock("global");
     cfg.getFloat("light", gAmbient, 4);
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gAmbient);
 
-    // Open log file
+    //// Open log file
     Logger::Instance().open( Logger::ERROR_LOG, true );
 
     ObjectMgr::Instance().init();
@@ -110,11 +113,48 @@ void MyWindow::OnDisplay()
     ObjectMgr::Instance().render();
     // Draw forcefields at the end because of the transparency
     // What if we do it in shaders???? 
-    m_ForcefieldMgr.render();
     PSManager::Instance().render();
+    m_ForcefieldMgr.render();
+
     drawInterface();
 
     SwapBuffers();
+}
+
+GLuint MyWindow::compilePlane(bool texture)
+{
+    GLuint id = glGenLists(1);
+    glNewList(id, GL_COMPILE);
+        glBegin(GL_QUADS);
+            glNormal3f(0,0,1);
+            //glTexCoord2f(0,0);
+            if(texture){
+                glMultiTexCoord2f( GL_TEXTURE0_ARB, 0.0f, 0.0f );
+                glMultiTexCoord2f( GL_TEXTURE1_ARB, 0.0f, 0.0f );
+            }
+            glVertex2f(0,0);
+            //glTexCoord2f(1,0);
+            if(texture){
+                glMultiTexCoord2f( GL_TEXTURE0_ARB, 1.0f, 0.0f );
+                glMultiTexCoord2f( GL_TEXTURE1_ARB, 1.0f, 0.0f );
+            }
+            glVertex2f(10,0);
+            //glTexCoord2f(1,1);
+            if(texture){
+                glMultiTexCoord2f( GL_TEXTURE0_ARB, 1.0f, 1.0f );
+                glMultiTexCoord2f( GL_TEXTURE1_ARB, 1.0f, 1.0f );
+            }
+            glVertex2f(10,10);
+            //glTexCoord2f(0,1);
+            if(texture){
+                glMultiTexCoord2f( GL_TEXTURE0_ARB, 0.0f, 1.0f );
+                glMultiTexCoord2f( GL_TEXTURE1_ARB, 0.0f, 1.0f );
+            }
+            glVertex2f(0,10);
+        glEnd();
+    glEndList();
+
+    return id;
 }
 
 void MyWindow::OnIdle() 
@@ -122,11 +162,11 @@ void MyWindow::OnIdle()
 	// Update spaceship and its shield
     ObjectMgr::Instance().update();
 
-    // Update third-person camera
+    //// Update third-person camera
     TPCamera *camTP = (TPCamera*)CameraMgr::Instance().get("stalker");
     camTP->update();
 
-    // Update barriers, defence guns and outlets
+    //// Update barriers, defence guns and outlets
     m_DoorMgr.update();
     m_BladeMgr.update();
     m_ForcefieldMgr.update();
@@ -167,6 +207,10 @@ void MyWindow::OnDestroy()
     Tilemap::Destroy();
     CameraMgr::Destroy();
     Logger::Destroy();
+    ShaderMgr::Destroy();
+
+    //glDeleteLists(tplane,1);
+    //glDeleteLists(plane,1);
 }
 
 void MyWindow::OnKeyboard(int key, bool down) 

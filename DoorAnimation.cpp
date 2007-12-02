@@ -55,7 +55,7 @@ bool DoorAnimation::condition()
 
 void DoorAnimation::onStart()
 {
-    // When door starts opening the field in clear for the spaceship to 
+    // When door starts opening the field is clear for the spaceship to 
     // cross, thus we turn of the detection with this bounding box by 
     // deactivating it
     IOCCollision *cDoorCol = (IOCCollision*)getOwner()->getComponent("collision");

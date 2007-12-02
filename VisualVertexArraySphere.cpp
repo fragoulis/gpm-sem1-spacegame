@@ -127,13 +127,6 @@ namespace tlib
 		    m_IndexArray[index_count++] = vertex_count+slices-j;
 	    };
 
-	    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	    glTexCoordPointer(2, GL_FLOAT, 0, m_TexArray);
-	    glEnableClientState(GL_NORMAL_ARRAY);
-	    glNormalPointer(GL_FLOAT, 0, m_NormalArray);
-	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(3, GL_FLOAT, 0, m_VertexArray);
-
 	    return true;
 
     } // end create()
@@ -142,30 +135,46 @@ namespace tlib
     void OCVisualVertexArraySphere::render() const 
     {
         glPushMatrix();
+        {
+            // get the object's position
+            const Vector3f& pos = getOwner()->getPos();
+            glTranslatef( pos.x(), pos.y(), pos.z() );
 
-        // get the object's position
-        const Vector3f& pos = getOwner()->getPos();
-        glTranslatef( pos.x(), pos.y(), pos.z() );
+            // Apply material if component exists
+            IOCMaterial *cMaterial = (IOCMaterial*)m_oOwner->getComponent("material");
+            if( cMaterial )
+                cMaterial->apply();
 
-        // Apply material if component exists
-        IOCMaterial *cMaterial = (IOCMaterial*)m_oOwner->getComponent("material");
-        if( cMaterial )
-            cMaterial->apply();
+            // Apply texture if component exists
+            IOCTexture *cTexture = (IOCTexture*)m_oOwner->getComponent("texture");
+            if( cTexture ) {
+                cTexture->apply();
+                glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+	            glTexCoordPointer   (2, GL_FLOAT, 0, m_TexArray);
+            }
 
-        // Apply texture if component exists
-        IOCTexture *cTexture = (IOCTexture*)m_oOwner->getComponent("texture");
-        if( cTexture )
-            cTexture->apply();
+            // Enable client states
+	        glEnableClientState (GL_NORMAL_ARRAY);
+	        glNormalPointer     (GL_FLOAT, 0, m_NormalArray);
+	        glEnableClientState (GL_VERTEX_ARRAY);
+	        glVertexPointer     (3, GL_FLOAT, 0, m_VertexArray);
 
-        glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[0]);
-        for (int i = 0; i < (m_iStacks-2); i++) { 
-	        glDrawElements(GL_TRIANGLE_STRIP, (m_iSlices+1)*2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+i*(m_iSlices+1)*2]);
-        };
-        glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+(m_iStacks-2)*(m_iSlices+1)*2]);
+            // Draw sphere
+            glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[0]);
+            for (int i = 0; i < (m_iStacks-2); i++) { 
+	            glDrawElements(GL_TRIANGLE_STRIP, (m_iSlices+1)*2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+i*(m_iSlices+1)*2]);
+            };
+            glDrawElements(GL_TRIANGLE_FAN, m_iSlices+2, GL_UNSIGNED_INT, &m_IndexArray[m_iSlices+2+(m_iStacks-2)*(m_iSlices+1)*2]);
 
-        // Turn of texturing in case texture component turned it on
-        glDisable( GL_TEXTURE_2D );
-
+            // Turn of texturing in case texture component turned it on
+            if( cTexture ) {
+                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+                cTexture->reset();
+            }
+            // Disable client states
+            glDisableClientState(GL_NORMAL_ARRAY);
+            glDisableClientState(GL_VERTEX_ARRAY);
+        }
         glPopMatrix();
 
     } // end render()

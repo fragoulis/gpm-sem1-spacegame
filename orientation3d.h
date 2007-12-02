@@ -34,6 +34,7 @@ namespace tlib
         /**
          * Sets the right vector
          */
+
         void setRight( const Vector3f& vec ) { m_vRight = vec; }
 
         /**

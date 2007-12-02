@@ -16,6 +16,9 @@ void Reactor::init()
 {
     _LOG("Setting up reactor...");
 
+    // Set object's type
+    setType( REACTOR );
+
     Config cfg("config.txt");
     cfg.loadBlock("reactor");
 

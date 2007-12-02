@@ -43,8 +43,8 @@ namespace tlib
         /**
          * Returns the component's owner object
          */
-        //const Object* getOwner() const { return m_oOwner; }
-        Object* getOwner() const { return m_oOwner; }
+        const Object* getOwner() const { return m_oOwner; }
+        Object* getOwner() { return m_oOwner; }
         
         /**
          * Assigns an owner object to the component

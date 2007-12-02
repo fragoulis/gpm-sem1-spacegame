@@ -13,7 +13,8 @@ m_iType(Any),
 m_Particles(0),
 m_dLifeSpan(0.0),
 m_uiListId(0),
-m_bIsExpired(true)
+m_bIsExpired(true),
+m_oOwner(0)
 {}
 
 ParticleSystem::~ParticleSystem()
@@ -93,21 +94,22 @@ void ParticleSystem::spawn()
     // Do nothing if there are no available particles
     if( m_Emitter.getPDead().empty() ) return;
 
+    Particle *obj;
     ParticleList::const_iterator iter;
     for( int i = 0; i < m_Emitter.getReleaseCount(); ++i )
     {
         // Take the last particle of the list
-        iter = m_Emitter.getPDead().begin();
-
+        obj = *(m_Emitter.getPDead().begin());
+        
         // call derived callback
-        onSpawn( *iter );
+        onSpawn( obj );
 
         // Push it to the alive list
-        m_Emitter.getPAlive().push_back( *iter );
+        m_Emitter.getPAlive().push_back( obj );
 
         // Set init time for its internal clock
-        //(*iter)->setInitTime( clock() + long((*iter)->getLifeSpan() * CLOCKS_PER_SEC) );
-        (*iter)->start();
+        //obj->setInitTime( clock() + long((*iter)->getLifeSpan() * CLOCKS_PER_SEC) );
+        obj->start();
 
         // Remove it from the dead list
         m_Emitter.getPDead().pop_front();
@@ -120,16 +122,18 @@ void ParticleSystem::spawn()
 // ----------------------------------------------------------------------------
 void ParticleSystem::kill( ParticleList &toKill )
 {
+    Particle *obj;
     ParticleList::const_iterator iter;
     for( iter = toKill.begin();
          iter != toKill.end();
          ++iter )
     {
+        obj = *iter;
         // Remove it from the alive list
-        m_Emitter.getPAlive().remove( *iter );
+        m_Emitter.getPAlive().remove( obj );
 
         // Push it to the dead list
-        m_Emitter.getPDead().push_back( *iter );
+        m_Emitter.getPDead().push_back( obj );
     }
 
     // Empty kill list

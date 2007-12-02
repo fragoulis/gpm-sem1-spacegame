@@ -10,6 +10,7 @@ private:
 public:
 	void Assign(float r, float g, float b, float a);
     void Assign(float rgba[]);
+    void alpha( float a ) { _rgba[3] = a; }
 
 	Color();
 

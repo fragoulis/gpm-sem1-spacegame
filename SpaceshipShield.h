@@ -2,6 +2,7 @@
 #include "TileObject.h"
 
 class Spaceship;
+
 class SpaceshipShield : public TileObject
 {
 private:
@@ -18,4 +19,10 @@ public:
      * Updates the shield's position
      */
     void update();
+
+    /**
+     * Returns a base pointer of the spaceship
+     */
+    const Spaceship* getShip() const { return (Spaceship*)m_oShip; }
+    Spaceship* getShip() { return (Spaceship*)m_oShip; }
 };

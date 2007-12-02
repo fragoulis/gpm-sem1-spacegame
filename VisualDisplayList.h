@@ -28,6 +28,7 @@ namespace tlib
          */
         void render() const;
 
+    protected:
         /**
          * Generates the display list
          */

@@ -15,7 +15,8 @@ namespace tlib
         /**
          * Constructor
          */
-        OCVisualBox( const Vector3f& );
+        OCVisualBox();
+        OCVisualBox( const Vector3f& vBBox );
 
         /**
          * Destructor
@@ -30,9 +31,9 @@ namespace tlib
         }
 
         /**
-         * Builds the cube object with textures using immediate mode
+         * Initializes the display list explicitly
          */
-        void buildObject() const;
+        void init( const Vector3f& vBBox );
 
         /**
          * Half dimensions getter/setter
@@ -52,6 +53,18 @@ namespace tlib
         void setDim( const Vector3f &vDim ) {
             m_vHalfDim = vDim * 0.5f;
         }
+
+    private:
+        /**
+         * Builds the cube object with textures using immediate mode
+         */
+        void buildObject() const;
+
+        /**
+         * Sets the texture coordinates for the obejct we are building
+         * independently of the number of textures
+         */
+        void texCoord( int iTextures, float x, float y ) const;
 
     }; // end of OCVisualBox class
 

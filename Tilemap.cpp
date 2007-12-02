@@ -37,9 +37,14 @@ Tile3d* Tilemap::getTile( const Vector3f& vIn )
 
     // Convert position vector to 'tile' coordinates
     Vector3f vIndex = vIn / (float)m_iTileSize;
-    vIndex.addX( fHalfTiles );
-    vIndex.addY( fHalfTiles );
-    vIndex.subZ( fHalfTiles );
+    vIndex.x( vIndex.x() + fHalfTiles );
+    vIndex.y( vIndex.y() + fHalfTiles );
+    vIndex.z( vIndex.z() - fHalfTiles );
+
+    //vIndex += Vector3f( fHalfTiles, fHalfTiles, -fHalfTiles );
+    //vIndex.addX( fHalfTiles );
+    //vIndex.addY( fHalfTiles );
+    //vIndex.subZ( fHalfTiles );
     
     return getTile( (int)floor((float)vIndex.x()), 
                     (int)floor((float)vIndex.y()),
