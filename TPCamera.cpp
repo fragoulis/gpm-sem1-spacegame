@@ -30,14 +30,14 @@ void TPCamera::init( Object *oTarget )
     const Vector3f vViewOffset(vfViewOffset);
 
     // Position the camera
-    m_vPos = m_oTarget->getPos() + m_vPosOffset;
+    setPos( m_oTarget->getPos() + m_vPosOffset );
     //std::cout << m_vPos << std::endl;
     // Calculate the view point by adding to the target's position
     // the offset
     Vector3f vViewPoint = m_oTarget->getPos() + vViewOffset;
     //std::cout << vViewPoint << std::endl;
     // Setup view vector
-    Vector3f vView = vViewPoint - m_vPos;
+    Vector3f vView = vViewPoint - getPos();
     vView.normalize();
     cCamOri->setView( vView );
 
@@ -95,11 +95,12 @@ void TPCamera::update()
     cCamOri->getUp().selfRotate( qRes );
     
     // Save position
-    m_vPrevPos = m_vPos;
+    m_vPrevPos = getPos();
 
     // Recalculate the position
     m_vPosOffset.selfRotate( qRes );
-    m_vPos += ( m_oTarget->getPos() + m_vPosOffset - m_vPos ) * m_fPositionBias;
+    setPos( getPos() + 
+            ( m_oTarget->getPos() + m_vPosOffset - getPos() ) * m_fPositionBias );
 
     // Reset the rotations of the orientation component
     cTarOri->resetAngles();

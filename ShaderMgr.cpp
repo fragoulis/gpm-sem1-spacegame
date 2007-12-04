@@ -10,7 +10,9 @@ namespace tlib
     const int ShaderMgr::COMPILE_FAILED    = -2;
 
     ShaderMgr::ShaderMgr()
-    {}
+    {
+        //memset( m_vProgIds, 0, NUM_OF_SHADERS*sizeof(unsigned int) );
+    }
 
     ShaderMgr::~ShaderMgr()
     {
@@ -28,19 +30,63 @@ namespace tlib
     }
 
     // ------------------------------------------------------------------------
-    GLuint ShaderMgr::addProgram( const char *vertex, const char *pixel )
+    void ShaderMgr::begin( ShaderProgram iType )
     {
+        _ASSERT((iType>=0)&&(iType<NUM_OF_SHADERS));
+        glUseProgram( m_vProgIds[ iType ] );
+    }
+
+    // ------------------------------------------------------------------------
+    void ShaderMgr::end() {
+        glUseProgram(0);
+    }
+
+    // ------------------------------------------------------------------------
+    void ShaderMgr::init()
+    {
+        if( !addProgram( POINT_LIGHT_SINGLE_TEX, 
+                         "shaders/point_single_tex.vert", 
+                         "shaders/point_single_tex.frag" ) ) {
+            _LOG("POINT_LIGHT_SINGLE_TEX shader program failed!");
+        }
+        if( !addProgram( SPOT_LIGHT_SINGLE_TEX, 
+                         "shaders/spot_single_tex.vert", 
+                         "shaders/spot_single_tex.frag" ) ) {
+            _LOG("SPOT_LIGHT_SINGLE_TEX shader program failed!");
+        }
+        if( !addProgram( POINT_AND_SPOT_LIGHT_SINGLE_TEX, 
+                         "shaders/point_spot_single_tex.vert", 
+                         "shaders/point_spot_single_tex.frag" ) ) {
+            _LOG("POINT_AND_SPOT_LIGHT_SINGLE_TEX shader program!");
+        }
+        if( !addProgram( FORCEFIELD_DOUBLE_TEX, 
+                         "shaders/forcefield_double_tex.vert", 
+                         "shaders/forcefield_double_tex.frag" ) ) {
+            _LOG("FORCEFIELD_DOUBLE_TEX shader program failed!");
+        }
+        if( !addProgram( POINT_AND_SPOT_LIGHT_NO_TEX, 
+                         "shaders/point_spot_no_tex.vert", 
+                         "shaders/point_spot_no_tex.frag" ) ) {
+            _LOG("POINT_AND_SPOT_LIGHT_NO_TEX shader program!");
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    bool ShaderMgr::addProgram( ShaderProgram iType, 
+                                const char *vertex, const char *pixel )
+    {
+        _ASSERT((iType>=0)&&(iType<NUM_OF_SHADERS));
 
         // Load vertex shader
         GLuint uiVertex = addShader( GL_VERTEX_SHADER, vertex );
         switch( uiVertex ) {
             case INVALID_FILENAME: 
-                printf("Failed to load vertex shader from file\n");
-                return 0;
+                _LOG("Failed to load vertex shader from file");
+                return false;
                 break;
             case COMPILE_FAILED: 
-                printf("Failed to compile vertex shader\n");
-                return 0;
+                _LOG("Failed to compile vertex shader");
+                return false;
                 break;
         }
 
@@ -48,12 +94,12 @@ namespace tlib
         GLuint uiPixel = addShader( GL_FRAGMENT_SHADER, pixel );
         switch( uiPixel ) {
             case INVALID_FILENAME: 
-                printf("Failed to load pixel shader from file\n");
-                return 0;
+                _LOG("Failed to load pixel shader from file");
+                return false;
                 break;
             case COMPILE_FAILED: 
-                printf("Failed to compile pixel shader\n");
-                return 0;
+                _LOG("Failed to compile pixel shader");
+                return false;
                 break;
         }
 
@@ -78,13 +124,16 @@ namespace tlib
             glDeleteShader( uiPixel );
             glDeleteProgram( uiProg );
 		    printf("Failed to link shader program\n");
-		    return 0;
+		    return false;
 	    }
         
         // Push the program to the list
         m_vList.push_back( _Shader( uiProg, uiVertex, uiPixel ) );
 
-        return uiProg;
+        // Save program id to the program list
+        m_vProgIds[ iType ] = uiProg;
+
+        return true;
     }
 
     // ------------------------------------------------------------------------

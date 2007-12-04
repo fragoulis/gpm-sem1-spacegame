@@ -19,18 +19,17 @@ void BladePoll::init()
     // Read part's position relative to system center
     float vfOffset[3];
     cfg.getFloat("offset", vfOffset, 3);
-    m_vPos.xyz( vfOffset );
+    getPos().xyz( vfOffset );
 
     // Read part's dimensions
     float vfDim[3];
     cfg.getFloat("dim", vfDim, 3);
 
     // Initialize material component
-    setComponent( new OCSimpleMaterial( 
-        Color::black(),
-        Color(vfColor),
-        Color::null()) 
-        );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setAmbient( Color( vfColor ) );
+    cMat->setDiffuse( Color( vfColor ) );
+    setComponent( cMat );
 
     // Initialize visual component
     setComponent( new OCVisualBox( Vector3f( vfDim ) * 0.5f ) );

@@ -19,14 +19,14 @@ void TileObject::setPosFromIndex( const int *ijk, float *vfOffset )
     // The next gives us the position od the barrier and 
     // with some operations becomes simpler
     // [ iTileSize * i - ( iTileSize * iNumOfTiles / 2 ) + iTileSize / 2 ]
-    m_vPos.xyz( 
+    getPos().xyz( 
         float(( ijk[0] - fHalfNumOfTiles + 0.5f ) * iTileSize),
         float(( ijk[1] - fHalfNumOfTiles + 0.5f ) * iTileSize),
         float(( -ijk[2] + fHalfNumOfTiles - 0.5f ) * iTileSize)
         );
 
     if( vfOffset ) {
-        m_vPos.add( vfOffset );
+        getPos().add( vfOffset );
     }
 
 } // end setPosFromIndex()

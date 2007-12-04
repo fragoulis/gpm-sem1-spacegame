@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include "SpotLight.h"
 
 using namespace tlib;
 
@@ -25,6 +26,9 @@ private:
         m_fRotFactor, m_fRotBias;
 
     bool m_bResetSpeed, m_bResetRoll;
+
+    // The ship's spot light
+    SpotLight m_Light;
 
 public:
     /**
@@ -72,6 +76,11 @@ public:
      * Updates all aspects of the spaceship
      */
     void update();
+
+    /**
+     * Applies the spotlight
+     */
+    void applyLight();
 
     /**
      * Returns the laser system associated with the spaceship

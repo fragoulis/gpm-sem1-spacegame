@@ -106,8 +106,8 @@ void TurretMgr::render()
         }
 
          // Get visual component
-        m_vPos.xyz( obj->getPos() );
-        m_qDir.wxyz( obj->getDir() );
+        getPos().xyz( obj->getPos() );
+        getDir().wxyz( obj->getDir() );
 
 #ifdef _SHOW_AXIS
         glPushMatrix();

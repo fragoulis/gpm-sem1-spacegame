@@ -1,3 +1,5 @@
+#include <windows.h>
+#include <gl/gl.h>
 #include "Reactor.h"
 #include "Logger.h"
 #include "Config.h"
@@ -25,7 +27,7 @@ void Reactor::init()
     // Initialize position
     float vfPos[3];
     cfg.getFloat("init_pos", vfPos, 3);
-    m_vPos.xyz( vfPos );
+    getPos().xyz( vfPos );
 
     // Initialize member variables
     cfg.getFloat("rot_factor", &m_fRotFactor );
@@ -47,11 +49,11 @@ void Reactor::init()
     cfg.getFloat("color", vfColor, 4);
 
     // Initialize material component
-    setComponent( new OCSimpleMaterial( 
-        Color::black(),
-        Color(vfColor),
-        Color::null()) 
-        );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setDiffuse( Color( vfColor ) );
+    cMat->setSpecular( Color( 0.6f, 0.6f, 0.6f, 1.0f ) );
+    cMat->setShininess( 60.0f );
+    setComponent( cMat );
 
     // Initialize visual component
     setComponent( new OCVisualVertexArraySphere( fRadius, iStacks, iSlices ) );

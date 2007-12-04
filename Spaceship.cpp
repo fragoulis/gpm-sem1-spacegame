@@ -9,6 +9,7 @@
 #include "SpaceshipVitals.h"
 #include "ParticleSystemMgr.h"
 #include "PSLaser.h"
+#include "LightMgr.h"
 #include "Logger.h"
 #include "Config.h"
 
@@ -32,7 +33,7 @@ void Spaceship::init()
     // Initialize position
     float vfPos[3];
     cfg.getFloat("init_pos", vfPos, 3);
-    m_vPos.xyz( vfPos );
+    getPos().xyz( vfPos );
 
     // Initialize member variables
     cfg.getFloat("max_vel", &m_fMaxVelocity );
@@ -58,9 +59,9 @@ void Spaceship::init()
     setComponent( model );
     
     // Correct the position of the spaceship by adding this offset
-    m_vPos.sub( model->getGXModel().GetBoxCentre().x,
-                model->getGXModel().GetBoxCentre().y,
-                model->getGXModel().GetBoxCentre().z );
+    getPos().sub( model->getGXModel().GetBoxCentre().x,
+                  model->getGXModel().GetBoxCentre().y,
+                  model->getGXModel().GetBoxCentre().z );
 
     // Initialize the rotation component
     OCQuatRotation *cRot = new OCQuatRotation;
@@ -104,7 +105,30 @@ void Spaceship::init()
         fEmitterOffset, 
         vfLaserColor );
 
+    // Read spotilight's cutoff
+    float fCutOff;
+    cfg.getFloat("light_cutoff", &fCutOff);
+
+    // Set light attributes
+    // Although this is safe checking function, here we call it raw
+    // as we are beign deterministic that light0 will always be of
+    // the spotlight's
+    m_Light.findId();
+    m_Light.setCutOff( fCutOff );
+    //m_Light.setExponent( 10.0f );
+    
 } // end setup()
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Spaceship::applyLight()
+{
+    OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
+
+    // Update light's position and direction
+    m_Light.setPos( getPos() );
+    m_Light.setDir( cRot->getView() );
+}
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -132,7 +156,6 @@ void Spaceship::update()
     ((IOCMovement*)getComponent("movement"))->update();
 
     // Update spaceship's rotation
-    //IOCOrientation *cShipOri = (IOCOrientation*)m_Ship.getComponent("orientation");
     OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
     cRot->update();
 

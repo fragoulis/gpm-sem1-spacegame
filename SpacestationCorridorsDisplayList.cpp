@@ -149,7 +149,8 @@ void SpacestationCorridorsDisplayList::buildObject() const
             startX, startY, startZ, 
             // the upper, front, right corner of the tile
             endX, endY, endZ,
-            nRepeat = 0.5f;
+            nRepeat = 4.0f;
+            //nRepeat = 0.5f;
 
         TileArray::const_iterator iter;
         for( iter = Tilemap::Instance().getTileArray().begin(); 
@@ -181,70 +182,54 @@ void SpacestationCorridorsDisplayList::buildObject() const
             {
                 // back face
                 glNormal3f( 0.0f, 0.0f, -1.0f );
-                glTexCoord2f( 0.0f, nRepeat );
-                glVertex3f( startX,   endY, startZ );
-                glTexCoord2f( nRepeat, nRepeat );
-                glVertex3f(   endX,   endY, startZ );
-                glTexCoord2f( nRepeat, 0.0f );
-                glVertex3f(   endX, startY, startZ );
-                glTexCoord2f( 0.0f, 0.0f );
-                glVertex3f( startX, startY, startZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX,   endY, startZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f(   endX,   endY, startZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f(   endX, startY, startZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, startY, startZ );
             } // end of back face
 
             if( oTile->getType() & TW_LEFT )
             {
                 // left face
                 glNormal3f( 1.0f, 0.0f, 0.0f );
-                glTexCoord2f( 0.0f, 0.0f );
-                glVertex3f( startX, startY, startZ );
-                glTexCoord2f( 0.0f, nRepeat );
-                glVertex3f( startX, startY, endZ );
-                glTexCoord2f( nRepeat, nRepeat );
-                glVertex3f( startX,   endY, endZ );
-                glTexCoord2f( nRepeat, 0.0f );
-                glVertex3f( startX,   endY, startZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, startY, startZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX, startY,   endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f( startX,   endY,   endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f( startX,   endY, startZ );
             }
 
             if( oTile->getType() & TW_RIGHT )
             {
                 // right face
                 glNormal3f( -1.0f, 0.0f, 0.0f );
-                glTexCoord2f( 0.0f, nRepeat );
-                glVertex3f( endX, startY, endZ );
-                glTexCoord2f( 0.0f, 0.0f );
-                glVertex3f( endX, startY, startZ );
-                glTexCoord2f( nRepeat, 0.0f );
-                glVertex3f( endX,   endY, startZ );
-                glTexCoord2f( nRepeat, nRepeat );
-                glVertex3f( endX,   endY, endZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( endX, startY,   endZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( endX, startY, startZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f( endX,   endY, startZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f( endX,   endY,   endZ );
             }
 
             if( oTile->getType() & TW_TOP )
             {   
                 // top face
                 glNormal3f( 0.0f, -1.0f, 0.0f );
-                glTexCoord2f( 0.0f, nRepeat );
-                glVertex3f( startX, endY, endZ );
-                glTexCoord2f( nRepeat, nRepeat );
-                glVertex3f(   endX, endY, endZ );
-                glTexCoord2f( nRepeat, 0.0f );
-                glVertex3f(   endX, endY, startZ );
-                glTexCoord2f( 0.0f, 0.0f );
-                glVertex3f( startX, endY, startZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX, endY, endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f(   endX, endY, endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f(   endX, endY, startZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, endY, startZ );
             }
 
             if( oTile->getType() & TW_BOTTOM )
             {    
                 // bottom face
                 glNormal3f( 0.0f, 1.0f, 0.0f );
-                glTexCoord2f( 1.0f, 1.0f );
-                glVertex3f(   endX, startY, endZ );
-                glTexCoord2f( 0.5f, 1.0f );
-                glVertex3f( startX, startY, endZ );
-                glTexCoord2f( 0.50f, 0.5f );
-                glVertex3f( startX, startY, startZ );
-                glTexCoord2f( 1.0f, 0.5f );
-                glVertex3f(   endX, startY, startZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f(   endX, startY, endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f( startX, startY, endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f( startX, startY, startZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f(   endX, startY, startZ );
+                //glTexCoord2f( 1.0f, 1.0f ); glVertex3f(   endX, startY, endZ );
+                //glTexCoord2f( 0.5f, 1.0f ); glVertex3f( startX, startY, endZ );
+                //glTexCoord2f( 0.5f, 0.5f ); glVertex3f( startX, startY, startZ );
+                //glTexCoord2f( 1.0f, 0.5f ); glVertex3f(   endX, startY, startZ );
             }
         } // end for( )
     }

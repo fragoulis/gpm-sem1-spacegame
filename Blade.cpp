@@ -17,7 +17,7 @@ void Blade::init()
     // Read part's position relative to system center
     float vfOffset[3];
     cfg.getFloat("offset", vfOffset, 3);
-    m_vPos.xyz( vfOffset );
+    getPos().xyz( vfOffset );
 
     // Read part's dimensions
     float vfDim[3];
@@ -27,11 +27,10 @@ void Blade::init()
     cfg.getFloat("rot_factor", &m_fRotFactor);
 
     // Initialize material component
-    setComponent( new OCSimpleMaterial( 
-        Color::black(),
-        Color(vfColor),
-        Color::null()) 
-        );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setAmbient( Color( vfColor ) );
+    cMat->setDiffuse( Color( vfColor ) );
+    setComponent( cMat );
 
     // Initialize visual component
     setComponent( new OCVisualBox( Vector3f( vfDim ) * 0.5f ) );
@@ -46,7 +45,7 @@ void Blade::update()
         Vector3f::Back() 
         );
 
-    m_qDir = m_qRotFactor * m_qDir;
+    setDir( m_qRotFactor * getDir() );
 }
 
 void Blade::slowDown() {

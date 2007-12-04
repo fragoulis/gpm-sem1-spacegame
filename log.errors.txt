@@ -1,0 +1,91 @@
+Setting up spacestation...
+Loaded texture textures/robot.jpg[1]
+Setting up spacestation display list...
+Generating display list...
+Generated display list(1)
+Building spacestation object
+Setting up spacestation corridors...
+Setting up spacestation corridors display list...
+Reading filemap mapfile.txt
+Counted 490 tiles
+Adding outlet at [20 20 0]
+Adding forcefield at [20 20 1]
+Adding outlet at [20 20 2]
+Adding door at [20 20 4]
+Adding turret at [20 20 7]
+Initializing laser PS
+Loaded texture textures/laser02.jpg[2]
+Initializing scorch mark PS
+Loaded texture textures/scorch01.jpg[3]
+Adding turret at [20 20 8]
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Adding turret at [20 20 9]
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Adding turret at [20 20 11]
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Adding outlet at [23 20 11]
+Adding turret at [26 20 11]
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Adding forcefield at [29 20 11]
+Adding turret at [32 20 15]
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Adding turret at [32 20 17]
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Adding turret at [32 20 18]
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Adding outlet at [32 17 23]
+Adding blade at [32 15 23]
+Generating display list...
+Generated display list(18)
+Generating display list...
+Generated display list(19)
+Generating display list...
+Generated display list(20)
+Building spacestation corridors object
+Loaded texture textures/padded.jpg[4]
+Setting up spaceship...
+Initializing laser PS
+Texture already loaded textures/laser02.jpg[2]
+Initializing scorch mark PS
+Texture already loaded textures/scorch01.jpg[3]
+Setting up reactor...
+Loaded texture textures/MISC_B02.jpg[5]
+Initializing door renderer...
+Loaded texture textures/door03.jpg[6]
+Generating display list...
+Generated display list(23)
+Initializing forcefield renderer...
+Loaded texture textures/forcefield.jpg[7]
+Loaded texture textures/perlin_noise.jpg[8]
+Generating display list...
+Generated display list(24)
+Initializing outlet renderer...
+Generating display list...
+Generated display list(25)
+Initializing small explosion PS
+Loaded texture textures/particle01.gif[19]
+Initializing smoke PS
+Texture already loaded textures/particle01.gif[19]
+Initializing smoke PS
+Texture already loaded textures/particle01.gif[19]

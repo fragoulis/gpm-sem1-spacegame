@@ -6,8 +6,15 @@ using tlib::OCTimerAnimation;
 class OutletAnimation : public OCTimerAnimation
 {
 private:
-    // The outlet's blinking color
-    Color m_BlinkColor;
+    // The outlet's colors
+    // Color for when the outlet is off
+    Color m_colOff;
+    
+    // Color for when the outlet blinks
+    Color m_colBlink;
+
+    // Color for when the outlet is on[aka done]
+    Color m_colOn;
 
 public:
     /**

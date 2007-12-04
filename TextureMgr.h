@@ -18,7 +18,7 @@ class TextureMgr : public Singleton<TextureMgr>
     friend Singleton<TextureMgr>;
 
 private:
-    // The associative array of cameras
+    // The associative array of textures
     TextureList m_vTextures;
 
     // Always defaults to Image::RGB

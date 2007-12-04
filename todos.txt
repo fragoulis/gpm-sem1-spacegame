@@ -1,27 +1,47 @@
-** NA ginoun oi stl lists dikes mou aples listes
-** Stin ekri3i na mpei kai kapnos
-*** To active flag tou Object na xrisimopoieitai 
-    gia to culling.
-    To health na xrisimopoieitai gia svinetai kai to
-    object apti lista
+*** TO moving texture tou reactor
+*** Na exoun ola ta objects materials apo to config
+** Na kanw to lighting integrate me to map file
+*** Apodosi tou lighting
+** I diaxeirisi twn fwtwn
+*** POU EINAI to global lighting oeo?
 
-*** Object culling    
-***** Na dw giati to kwlo radius tis sphere class den simvadizei
-** Na ftia3w enan collision manager
-* Na ftia3w tin camera na min fevgei ektos.....
+** To shield effect
+** Na valw to diastima LOL
+**** To direction tou skafous ginetai OTI NANAI
+** TO HEALTH KAI REVIVAL tou skafous
+**** NA MH DIAVAZW TO ARXEIO OTAN FTIANXW ENA PARTICLE SYSTEM
+** Na dimourgw ena array me random ari8mous gia ka8e particle system
+   otan dimiourgeite
 
-* Ta particles 8a mporousan na ginoun kai me mirroring
-* Na dior8wsw to position tou ship kai tou model
-* Na metaferw tis mywindow ka myapp se diaforetika arxeia
-* Na ftia3w tin mprostini opsi tou spacestation
+** Na valw life sto reactor
+
+*** Na vrw color kai noise map gia to forcefield
+*** Na metaferw functionality sto base particle system   
+*** Na alla3w tous managers na kanoun aftoi allocate ta object
+    kai na epistrefoun enan pointer se afta
+    
+******** KNOWN BUGS
+*** To prwto particle explosion argei na 3ekinisei
+
+
 * Na ftia3w ta controls se sindiasmo me to gamepad
 * Diakoptis gia to polygon mode kai minima stin o8oni
 * Diakoptis gia to collision detection ( kai antistoixo minima stin o8oni )
 * ta fps stin o8oni
 * na kanw an8rwpini ti vector class kai tin quaternion
 
+** Particles gia thrusters sto skafos
 ** to interface
 ** Stoxastro 
-** Pisw ka8refti
+** Pisw ka8reftis
+* Ta particles 8a mporousan na ginoun kai me mirroring
 
 http://www.tantalon.com/pete/gdc2001roundtablereport.htm
+
+
+
+NOTES:
+FOR THE MULTITEXTUTING [AND THE SINGLE TEXTURING]
+TO WORK, THESE COMPONENTS MUST BE SET BEFORE THE 
+VISUAL COMPONENTS AND THE VISUAL COMPONENTS MUST
+BE INITIALIZED AFTER THEY HAVE BEEN SET!!!!

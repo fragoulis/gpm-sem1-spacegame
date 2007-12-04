@@ -16,10 +16,16 @@ OutletAnimation::OutletAnimation():
     cfg.getInt("blink", &iBlinkInterval );
     setDuration( iBlinkInterval );
 
-    // Read the blink color
+    // Read the outlet's colors
     float vfColor[4];
-    cfg.getFloat("color", vfColor, 4);
-    m_BlinkColor.Assign( vfColor );
+    cfg.getFloat("on_color", vfColor, 4);
+    m_colOn.Assign( vfColor );
+
+    cfg.getFloat("off_color", vfColor, 4);
+    m_colOff.Assign( vfColor );
+
+    cfg.getFloat("blink_color", vfColor, 4);
+    m_colBlink.Assign( vfColor );
 
     // Automaticaly start all outlets
     start();
@@ -33,9 +39,9 @@ void OutletAnimation::OnTimerChange( unsigned int uiCurrentTime,
     // The color goes from red to white etc...
     OCSimpleMaterial *cMat = (OCSimpleMaterial*)getOwner()->getComponent("material");
     if( (float)uiCurrentTime < (float)uiDuration*0.5f ) {
-        cMat->setDiffuse( Color::white() );
+        cMat->setDiffuse( m_colBlink );
     } else {
-        cMat->setDiffuse( m_BlinkColor );
+        cMat->setDiffuse( m_colOff );
     }
         
 } // end onUpdate()
@@ -49,5 +55,5 @@ void OutletAnimation::onStart()
 void OutletAnimation::onStop()
 {
     OCSimpleMaterial *cMat = (OCSimpleMaterial*)getOwner()->getComponent("material");
-    cMat->setDiffuse( Color::green() );
+    cMat->setDiffuse( m_colOn );
 }

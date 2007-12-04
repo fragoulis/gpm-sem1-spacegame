@@ -24,12 +24,12 @@ namespace tlib
             glTranslatef( pos.x(), pos.y(), pos.z() );
 
             // Apply material if component exists
-            IOCMaterial *cMaterial = (IOCMaterial*)m_oOwner->getComponent("material");
+            IOCMaterial *cMaterial = (IOCMaterial*)getOwner()->getComponent("material");
             if( cMaterial )
                 cMaterial->apply();
 
             // Apply texture if component exists
-            IOCTexture *cTexture = (IOCTexture*)m_oOwner->getComponent("texture");
+            IOCTexture *cTexture = (IOCTexture*)getOwner()->getComponent("texture");
             if( cTexture )
                 cTexture->apply();
                 
@@ -42,6 +42,7 @@ namespace tlib
             // Turn of texturing in case texture component turned it on
             if( cTexture )
                 cTexture->reset();
+
         }
         glPopMatrix();
     }

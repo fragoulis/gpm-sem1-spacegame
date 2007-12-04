@@ -3,6 +3,7 @@
 #include "SingleTexture.h"
 #include "SimpleMaterial.h"
 #include "CollisionBBox.h"
+#include "Shader.h"
 #include "Logger.h"
 #include "Config.h"
 
@@ -12,7 +13,7 @@ void Spacestation::init()
     int iNumOfTiles;
     string sTexture;
 
-    m_vPos.xyz( 0.0f, 0.0f, 0.0f );
+    getPos().xyz( 0.0f, 0.0f, 0.0f );
 
     Config cfg("config.txt");
     cfg.loadBlock("spacestation");
@@ -25,12 +26,16 @@ void Spacestation::init()
     float fBBSide = iTileSize * iNumOfTiles * 0.5f;
 
     _LOG("Setting up spacestation...");
-    // Initialize visual component
-    setComponent( new SpacestationDisplayList );
+
     // Initialize material component
     setComponent( new OCSimpleMaterial );
+
     // Initialize presetation component
     setComponent( new OCSingleTexture( sTexture.c_str() ) );
+    
+    // Initialize visual component
+    setComponent( new SpacestationDisplayList );
+
     // Initialize collision component
     setComponent( new OCCollisionBBox( Vector3f(fBBSide,fBBSide,fBBSide) ) );
 }

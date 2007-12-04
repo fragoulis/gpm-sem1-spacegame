@@ -21,10 +21,10 @@ void SpaceshipShield::init( Spaceship *oShip )
     cfg.loadBlock("shield");
 
     // Initialize material component
-    setComponent( new OCSimpleMaterial(
-        Color::black(),
-        Color(1.0f,1.0f,1.0f,0.3f),
-        Color::null()) );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setAmbient( Color::black() );
+    cMat->setDiffuse( Color(1.0f,1.0f,1.0f,0.3f) );
+    setComponent( cMat );
 
     // Read maximum lives and health
     int iMaxLives, iMaxHealth;
@@ -61,5 +61,5 @@ void SpaceshipShield::init( Spaceship *oShip )
 // ----------------------------------------------------------------------------
 void SpaceshipShield::update() 
 {
-    m_vPos = m_oShip->getPos();
+    setPos( m_oShip->getPos() );
 }

@@ -23,18 +23,17 @@ namespace tlib
             TURRET,
             BARRIER, // This could alternatively be the barrier's separately
             OUTLET,
-            REACTOR
+            REACTOR,
+            LIGHT,
+            NUM_OF_OBJECTS
         };
 
-    protected:
+    private:
         // The object's position
         Vector3f m_vPos;
 
         // The object's direction
         Quatf m_qDir;
-
-        // The list of components
-        mutable component_array m_vComponents;
 
         // Flags whether an object should continue to get 
         // rendered and updated
@@ -43,6 +42,8 @@ namespace tlib
         // The type of the object
         ObjectType m_iType;
 
+        // The list of components
+        mutable component_array m_vComponents;
 
     public:
         /**
@@ -76,11 +77,11 @@ namespace tlib
             return m_vComponents[id]; 
         }
 
-
         /**
          * Returns the position
          */
         const Vector3f& getPos() const { return m_vPos; }
+        Vector3f& getPos() { return m_vPos; }
 
         /**
          * Sets the position
@@ -91,6 +92,7 @@ namespace tlib
          * Returns the direction
          */
         const Quatf& getDir() const { return m_qDir; }
+        Quatf& getDir() { return m_qDir; }
 
         /**
          * Sets the direction

@@ -5,28 +5,14 @@
 namespace tlib
 {
 
-    OCShader::OCShader():
-    m_uiProg(0),
-    m_bIsActive(0)
-    {} 
-
-    OCShader::OCShader( const char *vertex, const char *pixel ):
+    OCShader::OCShader( ShaderMgr::ShaderProgram iType ):
     m_bIsActive(0)
     {
-        init( vertex, pixel );
+        m_uiProg = ShaderMgr::Instance().getProgram( iType );
     }
 
     OCShader::~OCShader()
     {}
-
-    // ------------------------------------------------------------------------
-    void OCShader::init( const char *vertex, const char *pixel )
-    {
-        m_uiProg = ShaderMgr::Instance().addProgram( vertex, pixel );
-        if( !m_uiProg ) {
-            _LOG("Shader program not loaded!");
-        }
-    }
 
     // ------------------------------------------------------------------------
     void OCShader::begin()
@@ -35,6 +21,8 @@ namespace tlib
         {
             glUseProgram( m_uiProg );
             m_bIsActive = true;
+
+            //glUniform1f( getUniform("invRadius"), fInvRadius );
         }
     }
 
