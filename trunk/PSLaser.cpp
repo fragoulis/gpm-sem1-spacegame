@@ -211,8 +211,8 @@ void PSLaser::onCollisionWithObjects( Particle *particle,
                                       const Vector3f &vColDir,
                                       Object *oObj )
 {
-    particle->bounce( vColDir, 0.5f );
-    particle->setLifeSpan(0.1f);
+    particle->bounce( vColDir, 0.3f );
+    particle->setLifeSpan(0.3f);
 
     // Call collision response for the object
     IOCCollisionResponse *cColRes = 

@@ -6,33 +6,21 @@ namespace tlib
 {
 
     OCSimpleMaterial::OCSimpleMaterial(): 
-        m_Ambient(Color::black()),
-	    m_Diffuse(Color::white())
+        m_Ambient(Color(0.2f,0.2f,0.2f,1.0f)),
+	    m_Diffuse(Color(0.8f,0.8f,0.8f,1.0f)),
+        m_Specular(Color::black()),
+        m_Emission(Color::black()),
+        m_fShininess(0.0f)
     {}
-    OCSimpleMaterial::OCSimpleMaterial( const Color &ambient, 
-                                        const Color &diffuse, 
-                                        const Color &emission ):
-        m_Ambient(ambient),
-        m_Diffuse(diffuse),
-        m_Emission(emission)
-    {}
-
-    // ------------------------------------------------------------------------
-    void OCSimpleMaterial::create( const Color &ambient, 
-                                   const Color &diffuse, 
-                                   const Color &emission) 
-    {
-	    setAmbient(ambient);
-	    setDiffuse(diffuse);
-	    setEmission(emission);
-    }
 
     // ------------------------------------------------------------------------
     void OCSimpleMaterial::apply() const 
     {
-        glMaterialfv( GL_FRONT, GL_AMBIENT, m_Ambient.rgba() );
-        glMaterialfv( GL_FRONT, GL_DIFFUSE, m_Diffuse.rgba() );
-        glMaterialfv( GL_FRONT, GL_EMISSION, m_Emission.rgba() );
+        glMaterialfv( GL_FRONT,   GL_AMBIENT,   m_Ambient.rgba() );
+        glMaterialfv( GL_FRONT,   GL_DIFFUSE,   m_Diffuse.rgba() );
+        glMaterialfv( GL_FRONT,  GL_EMISSION,  m_Emission.rgba() );
+        glMaterialfv( GL_FRONT,  GL_SPECULAR,  m_Specular.rgba() );
+        glMaterialf(  GL_FRONT, GL_SHININESS,       m_fShininess );
     }
 
 } // end of namespace tlib

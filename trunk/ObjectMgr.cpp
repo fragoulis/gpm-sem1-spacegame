@@ -60,10 +60,11 @@ namespace tlib
     // ----------------------------------------------------------------------------
     void ObjectMgr::render()
     {
+        m_Ship.applyLight();
         ((IOCVisual*)m_Station.getComponent("visual"))->render();
-        ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
-        ((IOCVisual*)m_Ship.getComponent("visual"))->render();
-        m_Reactor.render();
+        //m_Reactor.render();
+        //((IOCVisual*)m_Ship.getComponent("visual"))->render();
+        //((IOCVisual*)m_Corridors.getComponent("visual"))->render();
 
         //glEnable( GL_BLEND );
         //glBlendFunc( GL_SRC_ALPHA, GL_ONE );
@@ -89,12 +90,6 @@ namespace tlib
         IOCCollisionResponse *cShipRes = 
             (IOCCollisionResponse*)m_Ship.getComponent("collisionresponse");
 
-        // Save the shield's collision components
-        OCCollisionDynamicBSphere *cShieldCol = 
-            (OCCollisionDynamicBSphere*)m_Shield.getComponent("collision");
-        IOCCollisionResponse *cShieldRes = 
-            (IOCCollisionResponse*)m_Shield.getComponent("collisionresponse");
-
         // This variables will help us determine some of the collision
         // details
         static bool 
@@ -114,12 +109,12 @@ namespace tlib
                 (OCCollisionDynamicBBox*)camTP->getComponent("collision");
             if( cCamCol->readTile() ) {
                 // Check spaceship with corridors and objects
-                cCamCol->checkCollision();
+                cCamCol->checkCollisionWithTile();
             }
             // This check helps us make sure that the camera will never 
             // go outside the corridor walls
             else if( Tilemap::Instance().getTile( camTP->getPrevPos() ) ) {
-                    camTP->setPos( camTP->getPrevPos() );
+                camTP->setPos( camTP->getPrevPos() );
             }
         }
         else if( cShipCol->check( (Object*)&m_Station, vColDir ) )
@@ -245,7 +240,6 @@ namespace tlib
         }
         blade->setDir( qCorrectRotation );
         
-
         // Push the blade to the manager
         BladeMgr::add(blade);
         // Save it as this tile's occupant

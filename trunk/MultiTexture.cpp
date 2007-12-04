@@ -35,6 +35,9 @@ namespace tlib
     // ------------------------------------------------------------------------
     void OCMultiTexture::apply() const 
     {
+        // Enable texturing for pipeline texturing
+        glEnable( GL_TEXTURE_2D );
+
         // Apply all textures one by one
         unsigned int i;
         for( i=0; i<m_vList.size(); ++i )
@@ -52,10 +55,6 @@ namespace tlib
                 _ASSERT(m_vNames[i].c_str());
                 // Get the location of the texture in the shader an update it
                 glUniform1i( cShader->getUniform( m_vNames[i].c_str() ), i );
-            }
-            else {
-                // Just enable texturing for pipeline texturing
-                glEnable( GL_TEXTURE_2D );
             }
         }
     }

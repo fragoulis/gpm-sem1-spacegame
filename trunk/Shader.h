@@ -9,7 +9,7 @@ namespace tlib
     {
     private:
         // The shader program id
-        GLuint m_uiProg;
+        unsigned m_uiProg;
 
         // Whether the shader program is currently in use
         bool m_bIsActive;
@@ -18,8 +18,7 @@ namespace tlib
         /**
          * Constructor
          */
-        OCShader();
-        OCShader( const char *vertex, const char *pixel );
+        OCShader( ShaderMgr::ShaderProgram iType );
 
         /**
          * Destructor
@@ -40,10 +39,10 @@ namespace tlib
             return string("shader"); 
         }
 
-        /** 
-         * Creates the shader
+        /**
+         * Returns the program id
          */
-        void init( const char *vertex, const char *pixel );
+        unsigned getProgId() const { return m_uiProg; }
 
         /**
          * Starts the use of this program
@@ -64,7 +63,7 @@ namespace tlib
          * Returns the location of a variable inside the 
          * shader
          */
-        GLuint getUniform( const char *var ) {
+        unsigned getUniform( const char *var ) {
             return ShaderMgr::Instance().getUniform( m_uiProg, var );
         }
 

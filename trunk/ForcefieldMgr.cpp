@@ -35,11 +35,10 @@ void ForcefieldMgr::init()
     cfg.getFloat("color", vfColor, 4);
 
     // Initialize material component
-    setComponent( new OCSimpleMaterial( 
-        Color::black(),
-        Color(vfColor),
-        Color::null()) 
-        );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setAmbient( Color( vfColor ) );
+    cMat->setDiffuse( Color( vfColor ) );
+    setComponent( cMat );
 
     // Read textures for the forcefield
     string sColorMap, sNoiseMap;
@@ -64,7 +63,7 @@ void ForcefieldMgr::init()
     cVBox->init( Vector3f( vfBBox ) * 0.5f );
 
     // Initialize shader object
-    setComponent( new OCShader( sVertex.c_str(), sPixel.c_str() ) );
+    setComponent( new OCShader( ShaderMgr::FORCEFIELD_DOUBLE_TEX ) );
 }
 
 // ----------------------------------------------------------------------------
@@ -149,8 +148,8 @@ void ForcefieldMgr::render()
         cMat->apply();
 
         // Draw the forcefield
-        m_vPos.xyz( obj->getPos() );
-        m_qDir.wxyz( obj->getDir() );
+        getPos().xyz( obj->getPos() );
+        getDir().wxyz( obj->getDir() );
         cBox->render();
 
     } // end for( )

@@ -18,7 +18,7 @@ Outlet::Outlet(): m_pBarrier(0)
 
     // Correct outlet's position by rotating it 90 degrees
     // about the Y-axis
-    m_qDir.toRotation( (float)M_PI_2, Vector3f::Up() );
+    getDir().toRotation( (float)M_PI_2, Vector3f::Up() );
 
     // Initialize collision component
     setComponent( new OCCollisionBBox( Vector3f( vfBBox ) ) );
@@ -27,8 +27,10 @@ Outlet::Outlet(): m_pBarrier(0)
     setComponent( new OutletAnimation );
 
     // Initialize material component
-    //setComponent( new OCSimpleMaterial(Color::black(),Color::red(),Color::null()) );
-    setComponent( new OCSimpleMaterial );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setSpecular( Color( 0.5f, 0.5f, 0.5f, 1.0f ) );
+    cMat->setShininess( 80.0f );
+    setComponent( cMat );
 
     // Initialize collision response component
     setComponent( new OutletCollisionResponse );

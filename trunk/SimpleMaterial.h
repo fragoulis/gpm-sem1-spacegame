@@ -8,23 +8,26 @@ namespace tlib
     class OCSimpleMaterial : public IOCMaterial
     {
     private:
-        // ambient material
+        // Ambient color
         Color m_Ambient;
 
-        // diffuse material
+        // Diffuse color
         Color m_Diffuse;
 
-        // emission material
+        // Emission color
         Color m_Emission;
+
+        // Specular color
+        Color m_Specular;
+
+        // Specular shininess
+        float m_fShininess;
 
     public:
         /**
          * Constructors
          */
         OCSimpleMaterial();
-        OCSimpleMaterial( const Color &ambient, 
-                          const Color &diffuse, 
-                          const Color &emission );
 
         /**
          * Destructor
@@ -38,12 +41,6 @@ namespace tlib
             return string("simplematerial"); 
         }
 
-        /**
-         * Creates the material
-         */
-        void create( const Color &ambient, 
-                     const Color &diffuse, 
-                     const Color &emission );
         /**
          * Applies the material
          */
@@ -61,12 +58,19 @@ namespace tlib
         const Color& getEmission() const { return m_Emission; }
         Color& getEmission() { return m_Emission; }
 
+        const Color& getSpecualar() const { return m_Specular; }
+        Color& getSpecualar() { return m_Specular; }
+
+        float getShininess() const { return m_fShininess; }
+
         /**
          * Assignment methods for diffuse, ambient and emission
          */
         void setAmbient( const Color &ambient ) { m_Ambient = ambient; }
         void setDiffuse( const Color &diffuse ) { m_Diffuse = diffuse; }
         void setEmission( const Color &emission ) { m_Emission = emission; }
+        void setSpecular( const Color &specular ) { m_Specular = specular; }
+        void setShininess( float fShininess ) { m_fShininess = fShininess; }
 
     }; // end of OCSimpleMaterial class
 

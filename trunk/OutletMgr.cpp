@@ -6,6 +6,9 @@
 #include "Material.h"
 #include "Animation.h"
 #include "ObjectMgr.h"
+//#include "MultiTexture.h"
+//#include "SingleTexture.h"
+#include "Shader.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
@@ -21,6 +24,13 @@ void OutletMgr::init()
     Config cfg("config.txt");
     cfg.loadBlock("outlet");
 
+    //OCMultiTexture *cMTex = new OCMultiTexture( 2 );
+    //cMTex->set( 0, "textures/metal-texture02.jpg" );
+    //cMTex->set( 1, "textures/particle01.gif" );
+    //setComponent( cMTex );
+
+    //setComponent( new OCSingleTexture( "textures/metal-texture02.jpg" ) );
+
     // Get the outlet's bounding box which incidentaly is the same
     // as its [half] dimensions
     float fvDim[3];
@@ -28,7 +38,12 @@ void OutletMgr::init()
     
     // Initialize visual component
     // We will use this single component to draw all power outlets
-    setComponent( new OCVisualBox( Vector3f( fvDim ) ) );
+    OCVisualBox *cVBox = new OCVisualBox;
+    setComponent( cVBox );
+    cVBox->init( Vector3f( fvDim ) );
+
+    // Initialize shader object
+    setComponent( new OCShader( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX ) );
 }
 
 // ----------------------------------------------------------------------------
@@ -57,8 +72,8 @@ void OutletMgr::render()
         cMat->apply();
 
         // Draw the door's panels
-        m_vPos.xyz( obj->getPos() );
-        m_qDir.wxyz( obj->getDir() );
+        getPos().xyz( obj->getPos() );
+        getDir().wxyz( obj->getDir() );
         cBox->render();
 
     } // end for( )

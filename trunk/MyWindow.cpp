@@ -12,6 +12,8 @@
 // Components
 #include "Movement.h"
 #include "SpaceshipKeyboard.h"
+#include "Visual.h"
+#include "Shader.h"
 // Singletons
 #include "CameraMgr.h"
 #include "ObjectMgr.h"
@@ -20,13 +22,16 @@
 #include "Logger.h"
 #include "TextureMgr.h"
 #include "ShaderMgr.h"
+#include "LightMgr.h"
+#include "PointLight.h"
 
 using namespace std;
 using namespace tlib;
 
 GLuint program;
-GLuint tplane, plane;
-GLuint tex1, tex2;
+GLuint gridlist;
+const int LIGHTS = 3;
+PointLight g_lights[LIGHTS];
 
 MyWindow::MyWindow() 
 {   
@@ -44,28 +49,24 @@ void MyWindow::OnCreate()
     glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
     //// enable backface culling
     glEnable(GL_CULL_FACE);
-    glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
+    glShadeModel(GL_SMOOTH);
 
     //// ----SETUP SOME DEFAULT GLOBAL LIGHTING -------
-    glEnable( GL_LIGHTING );
-    glEnable( GL_LIGHT0 );
-    float _light[][4] = {
-        { 0.0f, 0.0f, 0.0f, 1.0f },
-        { 1.0f, 1.0f, 1.0f, 1.0f },
-        { 15.0f, 15.0f, 690.0f, 1.0f }
-    };
-    glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
-    //
+    //glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
+    glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
+
     //// Low ambient
-    Config cfg("config.txt");
-    float gAmbient[4];
-    cfg.loadBlock("global");
-    cfg.getFloat("light", gAmbient, 4);
-    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gAmbient);
+    //Config cfg("config.txt");
+    //float gAmbient[4];
+    //cfg.loadBlock("global");
+    //cfg.getFloat("light", gAmbient, 4);
+    //glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gAmbient);
 
     //// Open log file
     Logger::Instance().open( Logger::ERROR_LOG, true );
+
+    ShaderMgr::Instance().init();
 
     ObjectMgr::Instance().init();
     m_DoorMgr.init();
@@ -78,11 +79,27 @@ void MyWindow::OnCreate()
     camStalker->init( (Object*)&ObjectMgr::Instance().getShip() );
     CameraMgr::Instance().activate("stalker");
 
+    //gridlist = makeGrid( 10, 4 );
+    //gridlist = makeGrid( 1, 40 );
+
     // First person
     //FPCamera *camStalker = CameraMgr::Instance().add<TPCamera>("stalker");
     //cCamOri = (IOCOrientation*)camStalker->getComponent("orientation");
     //camStalker->setPos( Vector3f(-40,40,0) );
     //cCamOri->lookAt( m_Ship.getPos() );
+
+    Color ambient( .2f, .2f, .2f, 1.0f );
+    for( int l=0; l<LIGHTS; ++l ) {
+        g_lights[l].findId();
+        g_lights[l].setConstantAttenuation(0.0f);
+        g_lights[l].setLinearAttenuation(0.05f);
+        //g_lights[l].setAmbient( ambient );
+        g_lights[1].turnOn();
+    }
+    
+    //program = ShaderMgr::Instance().addProgram("sample.vert","sample.frag");
+    //if( !program )
+    //    cout << "Program not loaded!!!" << endl;
 }
 
 void MyWindow::OnDisplay() 
@@ -96,21 +113,36 @@ void MyWindow::OnDisplay()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     float ratio = float(Width()) / float(Height());
-    gluPerspective( 80, ratio, 0.9f, 1000.0f );
+    gluPerspective( 80, ratio, 0.9f, 700.0f );
     // reset modelview matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glViewport(0,0,Width(),Height());
-    glEnable( GL_LIGHTING );
 
     CameraMgr::Instance().apply();
-
+    g_lights[0].setPos( ObjectMgr::Instance().getShip().getPos() );
+    g_lights[1].setPos( Vector3f( 17.0f, 31.0f, 640.0f ) );
+    g_lights[2].setPos( Vector3f( 40.0f, 40.0f, 0.0f ) );
+    for( int l=0; l<LIGHTS; ++l ) {
+        ((IOCVisual*)g_lights[l].getComponent("visual"))->render();
+    }
+   
     // Render spacestation
-    m_DoorMgr.render();
-    m_BladeMgr.render();
-    m_OutletMgr.render();
-    m_TurretMgr.render();
     ObjectMgr::Instance().render();
+
+    ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX );
+        ((IOCVisual*)ObjectMgr::Instance().getCorridors().getComponent("visual"))->render();
+        m_DoorMgr.render(); 
+        ((IOCVisual*)ObjectMgr::Instance().getReactor().getComponent("visual"))->render();
+    ShaderMgr::Instance().end();
+
+    ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_NO_TEX );
+        ((IOCVisual*)ObjectMgr::Instance().getShip().getComponent("visual"))->render();
+        m_OutletMgr.render();
+        m_BladeMgr.render();
+        m_TurretMgr.render();
+    ShaderMgr::Instance().end();
+
     // Draw forcefields at the end because of the transparency
     // What if we do it in shaders???? 
     PSManager::Instance().render();
@@ -121,52 +153,16 @@ void MyWindow::OnDisplay()
     SwapBuffers();
 }
 
-GLuint MyWindow::compilePlane(bool texture)
-{
-    GLuint id = glGenLists(1);
-    glNewList(id, GL_COMPILE);
-        glBegin(GL_QUADS);
-            glNormal3f(0,0,1);
-            //glTexCoord2f(0,0);
-            if(texture){
-                glMultiTexCoord2f( GL_TEXTURE0_ARB, 0.0f, 0.0f );
-                glMultiTexCoord2f( GL_TEXTURE1_ARB, 0.0f, 0.0f );
-            }
-            glVertex2f(0,0);
-            //glTexCoord2f(1,0);
-            if(texture){
-                glMultiTexCoord2f( GL_TEXTURE0_ARB, 1.0f, 0.0f );
-                glMultiTexCoord2f( GL_TEXTURE1_ARB, 1.0f, 0.0f );
-            }
-            glVertex2f(10,0);
-            //glTexCoord2f(1,1);
-            if(texture){
-                glMultiTexCoord2f( GL_TEXTURE0_ARB, 1.0f, 1.0f );
-                glMultiTexCoord2f( GL_TEXTURE1_ARB, 1.0f, 1.0f );
-            }
-            glVertex2f(10,10);
-            //glTexCoord2f(0,1);
-            if(texture){
-                glMultiTexCoord2f( GL_TEXTURE0_ARB, 0.0f, 1.0f );
-                glMultiTexCoord2f( GL_TEXTURE1_ARB, 0.0f, 1.0f );
-            }
-            glVertex2f(0,10);
-        glEnd();
-    glEndList();
-
-    return id;
-}
-
 void MyWindow::OnIdle() 
 {
 	// Update spaceship and its shield
     ObjectMgr::Instance().update();
 
-    //// Update third-person camera
+    // Update third-person camera
     TPCamera *camTP = (TPCamera*)CameraMgr::Instance().get("stalker");
     camTP->update();
 
-    //// Update barriers, defence guns and outlets
+    // Update barriers, defence guns and outlets
     m_DoorMgr.update();
     m_BladeMgr.update();
     m_ForcefieldMgr.update();
@@ -186,7 +182,7 @@ void MyWindow::OnResize(int w, int h) {
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     float ratio = float(w) / float(h);
-    gluPerspective( 60, ratio, 0.9f, 1000.0f );
+    gluPerspective( 80, ratio, 0.9f, 1000.0f );
 	glMatrixMode(GL_MODELVIEW);
 	glViewport(0,0,w,h);
 }
@@ -208,6 +204,7 @@ void MyWindow::OnDestroy()
     CameraMgr::Destroy();
     Logger::Destroy();
     ShaderMgr::Destroy();
+    LightMgr::Destroy();
 
     //glDeleteLists(tplane,1);
     //glDeleteLists(plane,1);
@@ -232,6 +229,8 @@ void MyWindow::OnKeyboard(int key, bool down)
 
 void MyWindow::drawInterface()
 {
+    glDisable( GL_LIGHTING );
+
     // ----------------------------------------------
     // setup projection matrix
     glMatrixMode(GL_PROJECTION);
@@ -239,10 +238,53 @@ void MyWindow::drawInterface()
     gluOrtho2D( 0, Width(), 0, Height() );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glDisable( GL_LIGHTING );
 
     // Draw health status
     glColor3f( 1.0f, 1.0f, 0.0f );
     glRasterPos2i( 10, 10 );
     Printf( "Health: %i", ObjectMgr::Instance().getShip().getHealth() );
+
+    glEnable( GL_LIGHTING );
+}
+
+GLuint MyWindow::makeGrid( int quads, float size )
+{
+    int id = glGenLists(1);
+
+    glNewList(id,GL_COMPILE);
+    for(int i=0; i<quads; ++i)
+    {
+        for( int k=0; k<quads; ++k)
+        {
+            glPushMatrix();
+            glTranslatef( float(i*size), float(k*size), 0.0f );
+            glBegin(GL_QUADS);
+                glNormal3f(0,0,1);
+                glTexCoord2f(0,0); glVertex2f( 0,    0);
+                glTexCoord2f(1,0); glVertex2f( size, 0);
+                glTexCoord2f(1,1); glVertex2f( size, size );
+                glTexCoord2f(0,1); glVertex2f( 0,    size );
+            glEnd();
+            glPopMatrix();
+        }
+    }
+    glEndList();
+
+     //glUseProgram(program);
+    //glPushMatrix();
+    //    //glEnable(GL_TEXTURE_2D);
+    //    //glBindTexture( GL_TEXTURE_2D, 4 );
+    //    //glUniform1i( ShaderMgr::Instance().getUniform(program,"colorMap"), 0 );
+    //    //glRotatef( 90, 1.0f, 0.0f, 0.0f );
+    //    glTranslatef( 0,0,720 );
+    //    GLfloat mat_diffuse[] = {0.0f, 1.0f, 0.0f, 1.0f};
+    //    GLfloat mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    //    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat_diffuse);
+    //    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    //    glMaterialf(GL_FRONT, GL_SHININESS, 5.0f);
+    //    glCallList(gridlist);
+    //glPopMatrix();
+    //glUseProgram(0);
+
+    return id;
 }

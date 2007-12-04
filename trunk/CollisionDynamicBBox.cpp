@@ -26,6 +26,22 @@ namespace tlib
     }
 
     // ------------------------------------------------------------------------
+    void OCCollisionDynamicBBox::checkCollisionWithTile() const
+    {
+        // The resulting collision vector
+        Vector3f vCollDir;
+
+        // Get the owner object's response component
+        IOCCollisionResponse *cOwnerRes = 
+            (IOCCollisionResponse*)m_oOwner->getComponent("collisionresponse");
+
+        // Check collision with the spacestation corridors
+        if( checkWithTile( vCollDir ) ) {
+            cOwnerRes->respond( vCollDir );
+        }
+    }
+
+    // ------------------------------------------------------------------------
     void OCCollisionDynamicBBox::checkCollision() const
     {
         // The resulting collision vector
@@ -39,7 +55,7 @@ namespace tlib
         if( checkWithTile( vCollDir ) ) {
             cOwnerRes->respond( vCollDir );
         }
-
+        else
         // Check with tile's occupier object
         if( checkWithObject( vCollDir ) ) {
             // Respond to collision

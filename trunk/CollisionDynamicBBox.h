@@ -74,6 +74,12 @@ namespace tlib
          */
         void checkCollision() const;
 
+        /**
+         * The save as checCollision() except it detects 
+         * collisions only with tiles
+         */
+        void checkCollisionWithTile() const;
+
     private:
         /**
          * Initializes member variables from the configuration file

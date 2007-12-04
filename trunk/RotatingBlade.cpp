@@ -55,10 +55,10 @@ void RotatingBlade::render()
     glPushMatrix();
     {
         // Position system
-        glTranslatef( m_vPos.x(), m_vPos.y(), m_vPos.z() );
+        glTranslatef( getPos().x(), getPos().y(), getPos().z() );
         // Rotate system
         float vfRotMatrix[16];
-        m_qDir.toMatrix(vfRotMatrix);
+        getDir().toMatrix(vfRotMatrix);
         glMultMatrixf(vfRotMatrix);
 
         // Draw system poll

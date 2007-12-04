@@ -45,6 +45,7 @@ namespace tlib
         Spaceship& getShip() { return m_Ship; }
         const SpaceshipShield& getShield() const { return m_Shield; }
         const Reactor& getReactor() const { return m_Reactor; }
+        const SpacestationCorridors& getCorridors() const { return m_Corridors; }
 
         /**
          * 

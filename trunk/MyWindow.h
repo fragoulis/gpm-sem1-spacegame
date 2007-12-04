@@ -35,5 +35,5 @@ public:
     void OnDestroy();
 	void OnKeyboard(int key, bool down);
     void drawInterface();
-    GLuint compilePlane(bool);
+    GLuint makeGrid( int , float );
 };

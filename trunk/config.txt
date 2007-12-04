@@ -1,0 +1,168 @@
+.display
+width       1024
+height      768
+fovy        80
+near_plane  0.9
+far_plane   1000
+
+.global
+light           0.3,0.3,0.3,1.0
+cull_distance   500
+
+.spaceship
+lives           5
+hits            1
+model           models/ship.3ds
+scale           1
+init_pos        20,10,740
+max_vel         70
+vel_factor      100
+laser_color     0,1,0,1
+laser_offset    4
+light_cutoff    10
+
+.shield
+lives       5
+hits        500
+radius      6
+stacks      20
+slices      20
+
+.tpcamera
+offset          0,11,19
+viewpoint       0,0,-120
+rotation_bias   0.04
+position_bias   0.06
+bbox            3,3,3
+
+.reactor
+init_pos    0,0,0
+color       1,1,1,1
+texture     textures/MISC_B02.jpg
+rot_factor  10
+hits        5
+radius      20
+stacks      20
+slices      20
+
+.spacestation
+tiles       40
+tile_size   35
+mapfile     mapfile.txt
+texture     textures/robot.jpg
+
+.corridor
+texture     textures/padded.jpg
+ambient     0,0,0,1
+diffuse     1,1,1,1
+specular    0.2,0.2,0.2,1
+shininess   30
+
+.outlet
+bbox        0.5,3,2
+offset      -17,0,0
+blink       100
+on_color    0,1,0,1
+off_color   1,0,0,1
+blink_color 1,1,1,1
+
+.panel_color
+primary     1,1,1,1
+secondary   1,0,0,1
+
+.door
+bbox        35,35,4
+
+.door_panel
+half_dim    8.75,17.5,1
+texture     textures/door03.jpg 
+velocity    10
+left_panel  -1,0,0
+right_panel 1,0,0
+up_panel    0,1,0
+down_panel  0,-1,0
+
+.blade_system
+bbox        35,35,4
+velocity    10
+
+.blade_poll
+color       0.1,0.1,0.1,1
+offset      0,8.75,-1
+dim         1,17.5,1
+
+.blade_base
+color       0.1,0.1,0.1,1
+offset      0,1,-1
+radius      1
+stacks      10
+slices      10
+
+.blade
+color       1,0.5,0.5,1
+offset      0,0,0
+dim         3,30,0.2
+rot_factor  15
+
+.forcefield
+bbox            35,35,0.1
+color           1.0,0.75,0.5,1.0
+alpha           0.5
+anim_time       1
+vertex_shader   shaders/warp.vert
+pixel_shader    shaders/warp.frag
+color_map       textures/forcefield.jpg
+noise_map       textures/perlin_noise.jpg
+warp_step       0.006
+
+.turret
+radius          4    
+hit_range       150 
+offset          0,16,0
+rot_factor      2
+model           models/turret.3ds
+scale           0.1
+hits            5
+laser_color     1,0,0,1
+laser_offset    12
+
+.laser
+size            2
+max_particles   20
+texture         textures/laser02.jpg
+velocity        200
+release_time    0.1
+release_count   1
+lifespan        2
+
+.scorch_marks
+start_color     0,0,0,1
+end_color       0,0,0,0
+size            4
+max_particles   30
+texture         textures/scorch01.jpg
+lifespan        5
+
+.small_explosion
+sys_lifespan    0.5
+size            0.75
+max_particles   200
+lifespan        3,6
+velocity        200,300
+release_time    0.05
+release_count   50
+texture         textures/particle01.gif
+start_color     1,1,0,1
+end_color       1,0,0,0
+
+.explosion_smoke
+sys_lifespan    0.75
+size            1.75
+texture         textures/particle01.gif
+max_particles   50
+lifespan        5,10
+velocity        50,60
+release_time    0.05
+release_count   5
+start_color     1,1,1,1
+end_color       1,1,1,0

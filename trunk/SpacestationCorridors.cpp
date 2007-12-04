@@ -1,7 +1,9 @@
 #include "SpacestationCorridors.h"
 #include "SpacestationCorridorsDisplayList.h"
 #include "SingleTexture.h"
+//#include "MultiTexture.h"
 #include "SimpleMaterial.h"
+#include "Shader.h"
 #include "Logger.h"
 #include "Config.h"
 
@@ -11,7 +13,7 @@ void SpacestationCorridors::init()
 {
     _LOG("Setting up spacestation corridors...");
 
-    m_vPos.xyz( 0.0f, 0.0f, 0.0f );
+    getPos().xyz( 0.0f, 0.0f, 0.0f );
 
     // Read texture filename from configuration file
     string sTexture;
@@ -21,8 +23,33 @@ void SpacestationCorridors::init()
 
     // Initialize display list component
     setComponent( new SpacestationCorridorsDisplayList );     
+    
+    // Read corridor color attributes
+    float vfAmbient[4], vfDiffuse[4], vfSpecular[4], fShine;
+    cfg.getFloat("ambient",     vfAmbient,  4);
+    cfg.getFloat("diffuse",     vfDiffuse,  4);
+    cfg.getFloat("specular",    vfSpecular, 4);
+    cfg.getFloat("shininess",   &fShine);
+
     // Initialize material component
-    setComponent( new OCSimpleMaterial );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setAmbient  ( Color( vfAmbient ) );
+    cMat->setDiffuse  ( Color( vfDiffuse ) );
+    cMat->setSpecular ( Color( vfSpecular ) );
+    cMat->setShininess( fShine );
+    setComponent( cMat );
+    
     // Initialize texture component
-    setComponent( new OCSingleTexture( sTexture.c_str() ) );
+    OCSingleTexture *cTex = new OCSingleTexture( sTexture.c_str() );
+    cTex->setName("colorMap");
+    setComponent( cTex );
+    //OCMultiTexture *cTex = new OCMultiTexture(2);
+    //cTex->set(0, sTexture.c_str());
+    //cTex->setName(0, "colorMap");
+    //cTex->set(1, "textures/padded_normal.jpg");
+    //cTex->setName(1, "normalMap");
+    //setComponent( cTex );
+
+    // Initialize shader object
+    setComponent( new OCShader( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX ) );
 }

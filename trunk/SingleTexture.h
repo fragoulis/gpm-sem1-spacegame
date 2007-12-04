@@ -1,6 +1,4 @@
 #pragma once
-#include <windows.h>
-#include <gl/gl.h>
 #include "texture.h"
 
 namespace tlib
@@ -9,7 +7,11 @@ namespace tlib
     class OCSingleTexture : public IOCTexture
     {
     private:
+        // The texture id
         unsigned int m_uiTexId;
+
+        // The texture name
+        string m_sName;
 
     public:
         /**
@@ -31,6 +33,13 @@ namespace tlib
         }
 
         /**
+         * Sets the texture's name for use in shaders
+         */
+        void setName( const char *sName ) {
+            m_sName = sName;
+        }
+
+        /**
          * Loads the texture into memory
          */
         bool load( const char *filename );
@@ -38,18 +47,12 @@ namespace tlib
         /**
          * Applies the texture
          */
-        void apply() const 
-        {
-            glEnable( GL_TEXTURE_2D );
-            glBindTexture( GL_TEXTURE_2D, m_uiTexId );
-        }
+        void apply() const;
 
         /**
          * Disables the texture
          */
-        void reset() const {
-            glDisable( GL_TEXTURE_2D );
-        }
+        void reset() const;
 
     }; // end of OCSingleTexture class
 

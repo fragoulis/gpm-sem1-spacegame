@@ -4,8 +4,7 @@
 #include "Config.h"
 using namespace tlib;
 
-Forcefield::Forcefield():
-m_fAlpha(1.0f)
+Forcefield::Forcefield()
 {
     // Read the bouding box for the forcefield and 
     // pass it to the parent constructor
@@ -14,6 +13,9 @@ m_fAlpha(1.0f)
 
     // Read to transparent factor
     cfg.getFloat("anim_time", &m_fToTransparentFactor);
+
+    // Read initial aplha value
+    cfg.getFloat("alpha", &m_fAlpha);
 
     // Read the bouding box of the forcefield
     float vfBBox[3];

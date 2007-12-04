@@ -24,25 +24,25 @@ void DoorPanel::init( PanelId pid )
     switch( pid ) {
         case Left:
             sPanel = "left_panel";
-            m_vPos.xyz( -fvDim[0], 0.0f, fvDim[2] );
+            getPos().xyz( -fvDim[0], 0.0f, fvDim[2] );
             break; 
 
         case Right:  
             sPanel = "right_panel"; 
-            m_vPos.xyz( fvDim[0], 0.0f, fvDim[2] );
-            m_qDir.toRotation( (float)M_PI, Vector3f::Right() );
+            getPos().xyz( fvDim[0], 0.0f, fvDim[2] );
+            getDir().toRotation( (float)M_PI, Vector3f::Right() );
             break;
 
         case Top:
             sPanel = "up_panel";
-            m_vPos.xyz( 0.0f, fvDim[0], -fvDim[2] );
-            m_qDir.toRotation( (float)M_PI_2, Vector3f::Front() );
+            getPos().xyz( 0.0f, fvDim[0], -fvDim[2] );
+            getDir().toRotation( (float)M_PI_2, Vector3f::Front() );
             break;
 
         case Bottom: 
             sPanel = "down_panel";  
-            m_vPos.xyz( 0.0f, -fvDim[0], -fvDim[2] );
-            m_qDir.toRotation( 3.0f * (float)M_PI_2, Vector3f::Front() );
+            getPos().xyz( 0.0f, -fvDim[0], -fvDim[2] );
+            getDir().toRotation( 3.0f * (float)M_PI_2, Vector3f::Front() );
             break;
     } // end switch( )
 
