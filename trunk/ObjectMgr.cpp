@@ -80,11 +80,12 @@ namespace tlib
             m_TurretMgr.render();
         ShaderMgr::Instance().end();
 
-        ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
+        //((IOCVisual*)m_Corridors.getComponent("visual"))->render();
         //ShaderMgr::Instance().begin( ShaderMgr::SPOT_LIGHT_SINGLE_TEX );
         //    ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
         //ShaderMgr::Instance().end();
         ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX );
+            ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
             m_DoorMgr.render(); 
         ShaderMgr::Instance().end();
 
