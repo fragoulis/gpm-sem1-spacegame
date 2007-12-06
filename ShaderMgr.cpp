@@ -9,10 +9,9 @@ namespace tlib
     const int ShaderMgr::INVALID_FILENAME  = -1;
     const int ShaderMgr::COMPILE_FAILED    = -2;
 
-    ShaderMgr::ShaderMgr()
-    {
-        //memset( m_vProgIds, 0, NUM_OF_SHADERS*sizeof(unsigned int) );
-    }
+    ShaderMgr::ShaderMgr():
+    m_uiActiveProg(0)
+    {}
 
     ShaderMgr::~ShaderMgr()
     {
@@ -33,12 +32,15 @@ namespace tlib
     void ShaderMgr::begin( ShaderProgram iType )
     {
         _ASSERT((iType>=0)&&(iType<NUM_OF_SHADERS));
-        glUseProgram( m_vProgIds[ iType ] );
+        m_uiActiveProg = m_vProgIds[ iType ];
+        glUseProgram( m_uiActiveProg );
+        
     }
 
     // ------------------------------------------------------------------------
     void ShaderMgr::end() {
         glUseProgram(0);
+        m_uiActiveProg = 0;
     }
 
     // ------------------------------------------------------------------------
@@ -68,6 +70,26 @@ namespace tlib
                          "shaders/point_spot_no_tex.vert", 
                          "shaders/point_spot_no_tex.frag" ) ) {
             _LOG("POINT_AND_SPOT_LIGHT_NO_TEX shader program!");
+        }
+        if( !addProgram( BUMP_POINT_LIGHT, 
+                         "shaders/bump_point_light.vert", 
+                         "shaders/bump_point_light.frag" ) ) {
+            _LOG("BUMP_POINT_LIGHT shader program!");
+        }
+        if( !addProgram( POINT_AND_SPOT_SINGLE_MOV_TEX, 
+                         "shaders/point_spot_single_mov_tex.vert", 
+                         "shaders/point_spot_single_mov_tex.frag" ) ) {
+            _LOG("POINT_AND_SPOT_SINGLE_MOV_TEX shader program!");
+        }
+        if( !addProgram( HIT_GLOW, 
+                         "shaders/hit_glow.vert", 
+                         "shaders/hit_glow.frag" ) ) {
+            _LOG("HIT_GLOW shader program!");
+        }
+        if( !addProgram( GLOW_MOV_TEXT, 
+                         "shaders/glow_mov_tex.vert", 
+                         "shaders/glow_mov_tex.frag" ) ) {
+            _LOG("GLOW_MOV_TEXT shader program!");
         }
     }
 
@@ -123,7 +145,7 @@ namespace tlib
             glDeleteShader( uiVertex );
             glDeleteShader( uiPixel );
             glDeleteProgram( uiProg );
-		    printf("Failed to link shader program\n");
+		    _LOG("Failed to link shader program");
 		    return false;
 	    }
         
@@ -224,5 +246,53 @@ namespace tlib
 
         return i;
     }
+
+    // ------------------------------------------------------------------------
+    int ShaderMgr::getUniform( const char *name ) 
+    {
+        if( !m_uiActiveProg || !name ) return 0;
+
+        int i = glGetUniformLocation( m_uiActiveProg, name );
+        if( i < 0 )
+	        printf("GetUniform: uniform not found (%s)\n", name);
+
+        return i;
+    }
+
+    // ------------------------------------------------------------------------
+    void ShaderMgr::printShaderInfoLog(ShaderProgram iType)
+	{
+	    int infologLength = 0;
+	    int charsWritten  = 0;
+	    char *infoLog;
+
+		glGetShaderiv(m_vProgIds[ iType ], GL_INFO_LOG_LENGTH,&infologLength);
+
+	    if (infologLength > 0)
+	    {
+	        infoLog = (char *)malloc(infologLength);
+	        glGetShaderInfoLog(m_vProgIds[ iType ], infologLength, &charsWritten, infoLog);
+			printf("%s\n",infoLog);
+	        free(infoLog);
+	    }
+	}
+
+    // ------------------------------------------------------------------------
+	void ShaderMgr::printProgramInfoLog(ShaderProgram iType)
+	{
+	    int infologLength = 0;
+	    int charsWritten  = 0;
+	    char *infoLog;
+
+		glGetProgramiv(m_vProgIds[ iType ], GL_INFO_LOG_LENGTH,&infologLength);
+
+	    if (infologLength > 0)
+	    {
+	        infoLog = (char *)malloc(infologLength);
+	        glGetProgramInfoLog(m_vProgIds[ iType ], infologLength, &charsWritten, infoLog);
+			printf("%s\n",infoLog);
+	        free(infoLog);
+	    }
+	}
 
 } // end of namspace tlib

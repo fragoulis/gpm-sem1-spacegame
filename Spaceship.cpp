@@ -110,10 +110,9 @@ void Spaceship::init()
     cfg.getFloat("light_cutoff", &fCutOff);
 
     // Set light attributes
-    // Although this is safe checking function, here we call it raw
-    // as we are beign deterministic that light0 will always be of
+    // We are beign deterministic that light0 will always be of
     // the spotlight's
-    m_Light.findId();
+    m_Light.setId(0);
     m_Light.setCutOff( fCutOff );
     //m_Light.setExponent( 10.0f );
     

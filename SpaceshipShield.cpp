@@ -1,3 +1,4 @@
+#include <GL/GLee.h>
 #include "SpaceshipShield.h"
 #include "Spaceship.h"
 #include "SimpleMaterial.h"
@@ -5,6 +6,7 @@
 #include "CollisionDynamicBSphere.h"
 #include "SpaceshipShieldCollisionResponse.h"
 #include "SpaceshipShieldVitals.h"
+#include "ShaderMgr.h"
 #include "Config.h"
 using namespace tlib;
 
@@ -20,10 +22,15 @@ void SpaceshipShield::init( Spaceship *oShip )
     Config cfg("config.txt");
     cfg.loadBlock("shield");
 
+    // Read animation time
+    float fDuration;
+    cfg.getFloat("anim_time", &fDuration);
+    m_Timer.setDuration(fDuration);
+
     // Initialize material component
     OCSimpleMaterial *cMat = new OCSimpleMaterial;
     cMat->setAmbient( Color::black() );
-    cMat->setDiffuse( Color(1.0f,1.0f,1.0f,0.3f) );
+    cMat->setDiffuse( Color::white() );
     setComponent( cMat );
 
     // Read maximum lives and health
@@ -62,4 +69,38 @@ void SpaceshipShield::init( Spaceship *oShip )
 void SpaceshipShield::update() 
 {
     setPos( m_oShip->getPos() );
+
+    if( m_Timer.isRunning() )
+        if( m_Timer.hasExpired() ) 
+            m_Timer.stop();
+}
+
+// ----------------------------------------------------------------------------
+void SpaceshipShield::render() const
+{
+    if( !m_Timer.isRunning() ) return;
+
+    // User shield rendering program
+    ShaderMgr::Instance().begin( ShaderMgr::HIT_GLOW );
+    {   
+        // Pass the collision point with the laser
+        //glUniform3fv( ShaderMgr::Instance().getUniform("collPoint"), 
+        //              3, m_vCollPoint.xyz() );
+
+        // Pass a timer value to animation the effect
+        glUniform1f( ShaderMgr::Instance().getUniform("timer"), 
+                     (float)m_Timer.elapsedTime() );
+        
+        // Enable blending
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+        {
+            // Draw the shield
+            ((IOCVisual*)getComponent("visual"))->render();
+        }
+        glDisable( GL_BLEND );
+    }
+    ShaderMgr::Instance().end();
+
+    //ShaderMgr::Instance().printProgramInfoLog(ShaderMgr::HIT_GLOW);
 }

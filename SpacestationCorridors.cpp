@@ -1,7 +1,7 @@
 #include "SpacestationCorridors.h"
 #include "SpacestationCorridorsDisplayList.h"
 #include "SingleTexture.h"
-//#include "MultiTexture.h"
+#include "MultiTexture.h"
 #include "SimpleMaterial.h"
 #include "Shader.h"
 #include "Logger.h"

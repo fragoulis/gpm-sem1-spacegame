@@ -152,6 +152,110 @@ void SpacestationCorridorsDisplayList::buildObject() const
             nRepeat = 4.0f;
             //nRepeat = 0.5f;
 
+        TileAssocArray::const_iterator iter;
+        for( iter = Tilemap::Instance().getTileAssocArray().begin(); 
+             iter != Tilemap::Instance().getTileAssocArray().end(); 
+             ++iter )
+        {
+            // Shorthand tile
+            Tile3d *oTile = iter->second;
+
+            // Assign a starting point
+            startX = -halfFace + iTileSize * oTile->i();
+            startY = -halfFace + iTileSize * oTile->j();
+            startZ =  halfFace - iTileSize * oTile->k();
+            endX = startX + iTileSize;
+            endY = startY + iTileSize;
+            endZ = startZ - iTileSize;
+
+            if( oTile->getType() & TW_FRONT )
+            {
+                // front face
+                glNormal3f( 0.0f, 0.0f, 1.0f );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, startY, endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f(   endX, startY, endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f(   endX,   endY, endZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX,   endY, endZ );
+            } // end of front face
+
+            if( oTile->getType() & TW_BACK )
+            {
+                // back face
+                glNormal3f( 0.0f, 0.0f, -1.0f );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX,   endY, startZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f(   endX,   endY, startZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f(   endX, startY, startZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, startY, startZ );
+            } // end of back face
+
+            if( oTile->getType() & TW_LEFT )
+            {
+                // left face
+                glNormal3f( 1.0f, 0.0f, 0.0f );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, startY, startZ );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX, startY,   endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f( startX,   endY,   endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f( startX,   endY, startZ );
+            }
+
+            if( oTile->getType() & TW_RIGHT )
+            {
+                // right face
+                glNormal3f( -1.0f, 0.0f, 0.0f );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( endX, startY,   endZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( endX, startY, startZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f( endX,   endY, startZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f( endX,   endY,   endZ );
+            }
+
+            if( oTile->getType() & TW_TOP )
+            {   
+                // top face
+                glNormal3f( 0.0f, -1.0f, 0.0f );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f( startX, endY, endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f(   endX, endY, endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f(   endX, endY, startZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f( startX, endY, startZ );
+            }
+
+            if( oTile->getType() & TW_BOTTOM )
+            {    
+                // bottom face
+                glNormal3f( 0.0f, 1.0f, 0.0f );
+                glTexCoord2f(    0.0f, nRepeat ); glVertex3f(   endX, startY, endZ );
+                glTexCoord2f( nRepeat, nRepeat ); glVertex3f( startX, startY, endZ );
+                glTexCoord2f( nRepeat,    0.0f ); glVertex3f( startX, startY, startZ );
+                glTexCoord2f(    0.0f,    0.0f ); glVertex3f(   endX, startY, startZ );
+                //glTexCoord2f( 1.0f, 1.0f ); glVertex3f(   endX, startY, endZ );
+                //glTexCoord2f( 0.5f, 1.0f ); glVertex3f( startX, startY, endZ );
+                //glTexCoord2f( 0.5f, 0.5f ); glVertex3f( startX, startY, startZ );
+                //glTexCoord2f( 1.0f, 0.5f ); glVertex3f(   endX, startY, startZ );
+            }
+        } // end for( )
+    }
+    glEnd();
+
+} // end buildObject()
+
+/*void SpacestationCorridorsDisplayList::buildObject() const 
+{
+    _LOG("Building spacestation corridors object");
+
+    const int iTileSize = Tilemap::Instance().getTileSize();
+    const float halfFace = (float)(iTileSize * 
+                                   Tilemap::Instance().getNumOfTiles()) * 0.5f;
+
+    // Draw the dummy corridor paths
+    glBegin(GL_QUADS);
+    {
+        float 
+            // the lower, back, left corner of the tile
+            startX, startY, startZ, 
+            // the upper, front, right corner of the tile
+            endX, endY, endZ,
+            nRepeat = 4.0f;
+            //nRepeat = 0.5f;
+
         TileArray::const_iterator iter;
         for( iter = Tilemap::Instance().getTileArray().begin(); 
              iter != Tilemap::Instance().getTileArray().end(); 
@@ -235,4 +339,4 @@ void SpacestationCorridorsDisplayList::buildObject() const
     }
     glEnd();
 
-} // end buildObject()
+} // end buildObject()*/

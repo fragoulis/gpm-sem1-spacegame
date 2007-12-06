@@ -5,15 +5,10 @@
 #include <ctime>
 using tlib::Logger;
 
-// This will save us some time
-extern const double M_CLOCKS_PER_SEC = 1.0 / CLOCKS_PER_SEC;
-
 ParticleSystem::ParticleSystem():
 m_iType(Any),
 m_Particles(0),
-m_dLifeSpan(0.0),
 m_uiListId(0),
-m_bIsExpired(true),
 m_oOwner(0)
 {}
 
@@ -31,34 +26,10 @@ ParticleSystem::~ParticleSystem()
 }
 
 // ----------------------------------------------------------------------------
-float ParticleSystem::m_vfRandom[500];
-
-// ----------------------------------------------------------------------------
 void ParticleSystem::start() 
 { 
     m_Emitter.start();
-    m_bIsExpired = false;
-    m_lInitTime = clock();
-}
-
-// ----------------------------------------------------------------------------
-bool ParticleSystem::hasExpired()
-{
-    // If life span time is negligible force no expiration
-    if( m_dLifeSpan < 1e-3 ) return false;
-    
-    // If system has already expired return
-    if( m_bIsExpired ) return true;
-
-    // Check expiration time
-    long curTime = clock();
-    if( m_dLifeSpan < (double)(curTime - m_lInitTime)*M_CLOCKS_PER_SEC )
-    {
-        // Turn expiration flag on
-        m_bIsExpired = true;
-    }
-    
-    return m_bIsExpired;
+    m_Timer.start();
 }
 
 // ----------------------------------------------------------------------------
@@ -84,7 +55,9 @@ void ParticleSystem::init( float fParticleSize )
 // ----------------------------------------------------------------------------
 void ParticleSystem::setTexture( const std::string sTexture )
 {
+    // Set the texture format to alpha
     TextureMgr::Instance().setFormat( Image::ALPHA );
+    // Generate the texture using the texture manager and save the id
     m_uiTexId = TextureMgr::Instance().getTexture( sTexture.c_str() );
 }
 
@@ -106,10 +79,6 @@ void ParticleSystem::spawn()
 
         // Push it to the alive list
         m_Emitter.getPAlive().push_back( obj );
-
-        // Set init time for its internal clock
-        //obj->setInitTime( clock() + long((*iter)->getLifeSpan() * CLOCKS_PER_SEC) );
-        obj->start();
 
         // Remove it from the dead list
         m_Emitter.getPDead().pop_front();
@@ -138,10 +107,4 @@ void ParticleSystem::kill( ParticleList &toKill )
 
     // Empty kill list
     toKill.clear();
-}
-
-// ----------------------------------------------------------------------------
-void ParticleSystem::genNumbers()
-{ 
-    // Generate 500 floats 
 }

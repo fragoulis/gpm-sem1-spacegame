@@ -33,14 +33,15 @@ void PSScorchMarks::init()
     m_Particles = new Particle[iNumOfParticles];
 
     // Read particle size and lifespan
-    float fSize, fLifeSpan;
+    float fSize;
+    int iLife;
     cfg.getFloat("size", &fSize);
-    cfg.getFloat("lifespan", &fLifeSpan);
+    cfg.getInt("lifespan", &iLife);
 
     // At first, mark all particles as dead
     for( int i=0; i<iNumOfParticles; ++i ) {
         m_Particles[i].setSize( fSize );
-        m_Particles[i].setLifeSpan( (double)fLifeSpan );
+        m_Particles[i].setStartLife( iLife );
         m_Emitter.getPDead().push_back( &m_Particles[i] );
     }
 
@@ -63,15 +64,21 @@ void PSScorchMarks::update()
 {
     // Here we save the particles to be killed after the next update
     ParticleList toKill;
+    Particle *obj;
     ParticleList::const_iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
          ++iter )
     {
+        obj = *iter;
+
+        // Update the object's energy
+        obj->updateLife();
+
         // Check if the particle has expired
-        if( (*iter)->hasExpired() )
+        if( obj->getLife() < 0 )
         {
-            toKill.push_back( *iter );
+            toKill.push_back( obj );
             continue;
         }
 
@@ -100,27 +107,27 @@ void PSScorchMarks::render() const
     glBindTexture( GL_TEXTURE_2D, m_uiTexId );
 
     // Render all alive particles
+    Particle *obj;
     ParticleList::const_iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
          ++iter )
     {
+        obj = *iter;
         // Set color
-        float rgba[] = { 0.0f, 0.0f, 0.0f, (*iter)->getEnergy() };
+        float rgba[] = { 0.0f, 0.0f, 0.0f, obj->getLifeRatio() };
         glColor4fv( rgba );
 
+        const Vector3f& vPos = obj->getPos();
         glPushMatrix();
         {
-            // Translate particle
-            glTranslatef( (*iter)->getPos().x(),
-                          (*iter)->getPos().y(),
-                          (*iter)->getPos().z() );
+            glTranslatef( vPos.x(), vPos.y(), vPos.z() );
 
             // Rotate particle so that it faces the correct direction
-            glRotatef( (float)(*iter)->getRot().w(), 
-                       (float)(*iter)->getRot().x(),
-                       (float)(*iter)->getRot().y(), 
-                       (float)(*iter)->getRot().z() );
+            glRotatef( (float)obj->getRot().w(), 
+                       (float)obj->getRot().x(),
+                       (float)obj->getRot().y(), 
+                       (float)obj->getRot().z() );
 
             // Draw particle
             glCallList( m_uiListId );
@@ -178,4 +185,5 @@ void PSScorchMarks::onSpawn( Particle *particle )
 
     particle->setPos( vPos );
     particle->setRot( qRot );
+    particle->resetLife();
 }

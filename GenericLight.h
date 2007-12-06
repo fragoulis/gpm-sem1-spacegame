@@ -1,7 +1,6 @@
 #pragma once
-#include "Object.h"
+#include "TileObject.h"
 #include "Color.h"
-using tlib::Object;
 using tlib::Vector3f;
 
 /** 
@@ -9,7 +8,7 @@ using tlib::Vector3f;
  * It is used my the Light Manager to easily identify used/unused 
  * light sources and allocate them
  */
-class GenericLight : public Object
+class GenericLight : public TileObject
 {
 public:
     // The types of lights
@@ -30,6 +29,13 @@ private:
     // Flag that shows whether a light is used or not
     bool m_bIsOn;
     
+    // The w-component
+    // Here we save the w-component of the light's position.
+    // If the light is a directional light, we set this 0, 
+    // otherwise is 1.
+    float m_fW;
+
+protected:
     // Holds the constant attenuation for this light source
     float m_fConstantAttenuation;
 
@@ -43,12 +49,6 @@ private:
     Color m_Ambient;
     Color m_Diffuse;
     Color m_Specular;
-
-    // The w-component
-    // Here we save the w-component of the light's position.
-    // If the light is a directional light, we set this 0, 
-    // otherwise is 1.
-    float m_fW;
 
 public:
     /**
@@ -116,15 +116,13 @@ public:
     void setQuadraticAttenuation( float fQuadraticAttenuation );
 
     /**
-     * Calls the light manager and tries to find an available 
-     * light id.
-     * Returns false, if there it was unsuccessfull.
-     */
-    bool findId();
-
-    /**
      * Resets the light's attributes
      */
     virtual void reset();
+
+    /**
+     * Applies the position of the light
+     */
+    void apply() const;
 
 }; // end of GenericLight class

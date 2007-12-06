@@ -4,9 +4,9 @@
 using tlib::Object;
 using tlib::OCVitalsHealth;
 
-void SpaceshipCollisionResponse::respond( const Vector3f &vCollVector ) const
+void SpaceshipCollisionResponse::respond() const
 {
-    IOCCollisionResponse::respond( vCollVector );
+    IOCCollisionResponse::respond();
     OCVitalsHealth *cVitals = (OCVitalsHealth*)getOwner()->getComponent("vitals");
     cVitals->hit( 1 );
 }

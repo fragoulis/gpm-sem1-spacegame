@@ -14,14 +14,11 @@ class Particle
 {
 private:
     // Pointers to the previous and the next particle
-    Particle *m_pPrev, *m_pNext;
+    //Particle *m_pPrev, *m_pNext;
 
     // The particle's position
     Vector3f m_vPos;
     Vector3f m_vPrevPos;
-
-    // The particle's direction
-    //Vector3f m_vDir;
 
     // Particle's velocity
     float m_fVelocity;
@@ -34,99 +31,93 @@ private:
     // The size of the particle
     float m_fSize;
 
-    // The particle's life is seconds
-    // Default: 0.0 [never dies]
-    double m_dLifeSpan;
-    // Holds the initialization time
-    long m_lInitTime;
-
-    // Particle's Energy
-    // Scope: [0.0f, 1.0f]
-    // Default: 1.0f
-    float m_fEnergy;
+    // Particle's life
+    int m_iLife;
+    int m_iStartLife;
 
 public:
     /**
-     * Constructor
-     */
-    Particle();
-
-    /**
      * Getter/Setter for the position
      */
-    const Vector3f& getPos() const { 
-        return m_vPos; 
-    }
-
+    const Vector3f& getPos() const { return m_vPos; }
     void setPos( const Vector3f &vPos ) { 
         m_vPos = vPos; 
     }
 
+    /**
+     * Previous position accessor
+     */
     const Vector3f& getPrevPos() const { 
         return m_vPrevPos; 
     }
 
-    void start();
-
-    //const Vector3f& getDir() const {
-    //    return m_vDir;
-    //}
-
+    /**
+     * Changes the direction for the particle
+     */
     void setDir( const Vector3f &vDir ) {
-        //m_vDir = vDir;
         m_vVelocity = vDir * m_fVelocity;
     }
-    //void setVelocity( const Vector3f &vVelocity ) {
-    //    m_vVelocity = vVelocity;
-    //}
+
+    /**
+     * Sets the scalar velocity of the particle
+     */
     void setVelocity( float fVelocity ) {
         m_fVelocity = fVelocity;
     }
+
+    /**
+     * Sets the direction velocity of the particle
+     */
     void setVelocity( const Vector3f &vVel ) {
         m_vVelocity = vVel;
     }
+    /**
+     * Directional velocity accessor
+     */
     const Vector3f& getVelocity() const {
         return m_vVelocity;
     }
 
-
-    void updatePos() { 
+    /**
+     * Update the particle's position and energy
+     */
+    void update() { 
+        // Save the current position
         m_vPrevPos = m_vPos;
+        // Find new position
         m_vPos += m_vVelocity * IOCMovement::DeltaTime();
     }
 
+    /**
+     * Size getter/setter
+     */
     void setSize( float fSize ) { m_fSize = fSize; }
     float getSize() const { return m_fSize; }
 
-    void setLifeSpan( double dLifeSpan ) { 
-        m_dLifeSpan = dLifeSpan; 
+    /**
+     * Particle life getter/setter
+     */
+    void updateLife() { m_iLife--; }
+    int getLife() const { return m_iLife; }
+    void setLife( int iLife ) {
+        m_iLife = iLife;
     }
-    double getLifeSpan() const { return m_dLifeSpan; }
-
-    void setInitTime( long lInitTime ) {
-        m_lInitTime = lInitTime;
+    void setStartLife( int iStartLife ) {
+        m_iStartLife = iStartLife;
+        m_iLife = iStartLife;
     }
+    float getLifeRatio() const { 
+        return (float)m_iLife / m_iStartLife;
+    }
+    void resetLife() { m_iLife = m_iStartLife; }
 
-    long getInitTime() const { return m_lInitTime; }
-
-    float getEnergy() const { return m_fEnergy; }
-
+    /**
+     * Rotation getter/setter
+     */
     void setRot( const Quati &qRot ) {
         m_qRot = qRot;
     }
     const Quati& getRot() const { return m_qRot; }
-
-    void setPrev( Particle *particle ) {
-        m_pPrev = particle;
-    }
-    Particle* getPrev() { return m_pPrev; }
-
-    void setNext( Particle *particle ) {
-        m_pNext = particle;
-    }
-    Particle* getNext() { return m_pNext; }
-
-    bool hasExpired();
 
     void bounce( const Vector3f &vColDir, float speed );
 

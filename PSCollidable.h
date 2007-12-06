@@ -44,7 +44,7 @@ protected:
     virtual void onCollisionWithTiles( 
         Particle *particle, 
         const Vector3f &vCollDir,
-        const Vector3f &vColPoint ) = 0;
+        const Vector3f &vCollPoint ) = 0;
 
     /**
      * 
@@ -52,6 +52,7 @@ protected:
     virtual void onCollisionWithObjects(
         Particle *particle, 
         const Vector3f &vCollDir,
+        const Vector3f &vCollPoint,
         Object *obj ) = 0;
 
     /**
@@ -77,9 +78,11 @@ private:
      * 
      */
     bool checkCollisionWithObject(
-        Particle *particle, 
-        Object *oObj,
-        Vector3f &vCollDir );
+        Particle *particle,
+        Vector3f &vCollDir,
+        Vector3f &vCollPoint,
+        Object *oObj
+        );
 
     /**
      * 
@@ -103,5 +106,6 @@ private:
         Particle *particle,
         const Vector3f& vPos, 
         float fRadius,
-        Vector3f& vCollDir ) const;
+        Vector3f& vCollDir,
+        Vector3f& vCollPoint ) const;
 };

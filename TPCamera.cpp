@@ -99,8 +99,7 @@ void TPCamera::update()
 
     // Recalculate the position
     m_vPosOffset.selfRotate( qRes );
-    setPos( getPos() + 
-            ( m_oTarget->getPos() + m_vPosOffset - getPos() ) * m_fPositionBias );
+    getPos() += ( m_oTarget->getPos() + m_vPosOffset - getPos() ) * m_fPositionBias;
 
     // Reset the rotations of the orientation component
     cTarOri->resetAngles();
