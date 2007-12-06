@@ -17,6 +17,10 @@ namespace tlib
             POINT_AND_SPOT_LIGHT_SINGLE_TEX,
             POINT_AND_SPOT_LIGHT_NO_TEX,
             FORCEFIELD_DOUBLE_TEX,
+            BUMP_POINT_LIGHT,
+            POINT_AND_SPOT_SINGLE_MOV_TEX,
+            HIT_GLOW,
+            GLOW_MOV_TEXT,
             NUM_OF_SHADERS
         };
 
@@ -41,6 +45,9 @@ namespace tlib
 
         // The list of programmes
         unsigned int m_vProgIds[NUM_OF_SHADERS];
+
+        // The program id in use
+        unsigned int m_uiActiveProg;
 
         // A list of shaders and programs
         ShaderList m_vList;
@@ -67,6 +74,7 @@ namespace tlib
          * Get index of a uniform variable
          */
         int getUniform( unsigned uiProg, const char *name );
+        int getUniform( const char *name );
 
         /**
          * Starts the use of a program
@@ -77,6 +85,9 @@ namespace tlib
          * Stops the use of a program
          */
         void end();
+
+        void printShaderInfoLog(ShaderProgram iType);
+	    void printProgramInfoLog(ShaderProgram iType);
 
     private:
         /**

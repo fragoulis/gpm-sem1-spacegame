@@ -5,7 +5,16 @@
 #include "PSSmoke.h"
 
 ParticleSystemMgr::ParticleSystemMgr()
-{}
+{
+    // Preallocate 3 explosion particle systems
+    const Vector3f vPos;
+    addSmallExplosion( vPos );
+    addSmallExplosion( vPos );
+    addSmallExplosion( vPos );
+    addSmoke( vPos );
+    addSmoke( vPos );
+    addSmoke( vPos );
+}
 
 ParticleSystemMgr::~ParticleSystemMgr()
 {
@@ -24,14 +33,16 @@ ParticleSystemMgr::~ParticleSystemMgr()
 ParticleSystem* ParticleSystemMgr::checkForSameType( int iType )
 {
     // Search for an unused/expired system
+    ParticleSystem *list;
     PSList::iterator iter;
     for( iter = m_vPSList.begin(); 
          iter != m_vPSList.end(); 
          ++iter )
     {
-        if( (*iter)->isExpired() )
-            if( (*iter)->isType( iType ) )
-                return *iter;
+        list = *iter;
+        if( !list->getTimer().isRunning() )
+            if( list->isType( iType ) )
+                return list;
     }
 
     return 0;
@@ -133,23 +144,19 @@ void ParticleSystemMgr::update()
         ParticleSystem *ps = *iter;
 
         // If a particle system has expired
-        if( ps->hasExpired() ) 
+        if( ps->getTimer().hasExpired() ) 
         {
-            if( !ps->getEmitter().getPAlive().size() ) {
-                //toKill.push_back( ps );
-                continue;
-            } else {
+            ps->getTimer().stop();
+            if( ps->getEmitter().getPAlive().size() ) {
                 // Turn of its emitter
                 ps->getEmitter().stop();
-            }
+            } 
+            else 
+                continue;
         }
 
         ps->update();
     }
-
-    //for( iter = toKill.begin(); iter != toKill.end(); ++iter ) {
-    //     remove( *iter );
-    //}
 
 } // end update()
 

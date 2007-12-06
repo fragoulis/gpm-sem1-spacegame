@@ -1,10 +1,21 @@
 #pragma once
 #include "Singleton.h"
+#include <vector>
+using std::vector;
 
 // The maximum number of lights opengl can hold
-static const int MAX_LIGHTS = 8;
+static const int MAX_LIGHTS = 7;
 
 class GenericLight;
+typedef vector<GenericLight*> LightList;
+
+/**
+ * 
+ */
+struct _DistItem {
+    float Md;
+    int index;
+};
 
 /**
  * This class manages the light sources on the scene.
@@ -25,11 +36,39 @@ private:
     // The array of lights
     GenericLight *m_vLights[MAX_LIGHTS];
 
+    // A list of all the lights in the scene
+    LightList m_vList;
+
+    // Array of distances between the light's and the spaceship
+    // We also need an extra index to connect the distance to a
+    // light in the light vector container, that is why
+    // we group them into a struct.
+    _DistItem *m_DistItems;
+
 public:
     /**
-     * 
+     * Initializes the light manager
      */
-    bool initLight( GenericLight *light );
+    void init();
+
+    /**
+     * Adds a light to the list
+     */
+    void add( GenericLight *light ) {
+        m_vList.push_back( light );
+    }
+
+    /**
+     * Renders all lights
+     */
+    void render() const;
+
+    /**
+     * Updates the lights' status.
+     * Checks the spaceship's position and tries to keep 
+     * only the light's close to the spaceship lit
+     */
+    void update();
 
 private:
     /**
@@ -42,4 +81,4 @@ private:
      */
     ~LightMgr();
 
-};
+}; // end of LightMgr class

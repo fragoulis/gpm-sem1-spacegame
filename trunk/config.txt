@@ -1,13 +1,17 @@
 .display
-width       1024
-height      768
+dimensions  1024,768
 fovy        80
-near_plane  0.9
-far_plane   1000
+planes      0.9,1000
+fullscreen  0
+
+.keys
+polygon_mode    l
+collision       c
+godmode         g
 
 .global
-light           0.3,0.3,0.3,1.0
-cull_distance   500
+light           0.2,0.2,0.2,1.0
+cull_distance   400
 
 .spaceship
 lives           5
@@ -27,6 +31,7 @@ hits        500
 radius      6
 stacks      20
 slices      20
+anim_time   2
 
 .tpcamera
 offset          0,11,19
@@ -65,6 +70,18 @@ blink       100
 on_color    0,1,0,1
 off_color   1,0,0,1
 blink_color 1,1,1,1
+specular    0.5,0.5,0.5,1.0
+shininess   80
+
+.point_light 
+offset          0,16.5,0
+radius          1.5
+detail          7
+constant_att    0
+linear_att      0.05
+ambient         0.5,0.5,0,1
+diffuse         0.7,0.7,0.7,1
+emissive        0.9,0.9,0.5,1
 
 .panel_color
 primary     1,1,1,1
@@ -113,7 +130,7 @@ vertex_shader   shaders/warp.vert
 pixel_shader    shaders/warp.frag
 color_map       textures/forcefield.jpg
 noise_map       textures/perlin_noise.jpg
-warp_step       0.006
+warp_step       0.005
 
 .turret
 radius          4    
@@ -133,7 +150,7 @@ texture         textures/laser02.jpg
 velocity        200
 release_time    0.1
 release_count   1
-lifespan        2
+lifespan        125
 
 .scorch_marks
 start_color     0,0,0,1
@@ -141,13 +158,13 @@ end_color       0,0,0,0
 size            4
 max_particles   30
 texture         textures/scorch01.jpg
-lifespan        5
+lifespan        500
 
 .small_explosion
-sys_lifespan    0.5
+sys_lifespan    0.50
 size            0.75
 max_particles   200
-lifespan        3,6
+lifespan        20,40
 velocity        200,300
 release_time    0.05
 release_count   50
@@ -156,11 +173,11 @@ start_color     1,1,0,1
 end_color       1,0,0,0
 
 .explosion_smoke
-sys_lifespan    0.75
+sys_lifespan    0.80
 size            1.75
 texture         textures/particle01.gif
 max_particles   50
-lifespan        5,10
+lifespan        50,130
 velocity        50,60
 release_time    0.05
 release_count   5

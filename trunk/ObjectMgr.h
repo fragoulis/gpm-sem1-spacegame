@@ -7,6 +7,12 @@ using std::list;
 #include "Reactor.h"
 #include "Spacestation.h"
 #include "SpacestationCorridors.h"
+// Object managers
+#include "DoorMgr.h"
+#include "BladeMgr.h"
+#include "ForcefieldMgr.h"
+#include "OutletMgr.h"
+#include "TurretMgr.h"
 
 // Forward declarations
 class Tile3d;
@@ -37,6 +43,14 @@ namespace tlib
         Spacestation            m_Station;
         SpacestationCorridors   m_Corridors;
 
+        // These are managers for the barriers, the power outlets 
+        // and the defence guns
+        DoorMgr         m_DoorMgr;
+        BladeMgr        m_BladeMgr;
+        ForcefieldMgr   m_ForcefieldMgr;
+        OutletMgr       m_OutletMgr;
+        TurretMgr       m_TurretMgr;
+
     public:
         /**
          * Accessors for the unique objects
@@ -61,6 +75,11 @@ namespace tlib
          * 
          */
         void checkCollision();
+
+        /**
+         * 
+         */
+        void addLight( Tile3d *oTile );
 
         /**
          * 

@@ -12,7 +12,8 @@ class PSSmoke : public ParticleSystem
 {
 private:
     // The particle's limits
-    float m_fSize[2], m_fLifeSpan[2], m_fVelocity[2];
+    float m_fSize[2], m_fVelocity[2];
+    int m_iLifeSpan[2];
 
     // The color of the smoke particles
     Color m_Color;

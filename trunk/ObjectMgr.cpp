@@ -1,18 +1,13 @@
-#include <windows.h>
-#include <gl/gl.h>
+#include <GL/GLee.h>
 #include "ObjectMgr.h"
 #include "Tile3d.h"
 // Objects
-#include "DoorMgr.h"
 #include "Door.h"
-#include "BladeMgr.h"
 #include "RotatingBlade.h"
-#include "ForcefieldMgr.h"
 #include "Forcefield.h"
-#include "OutletMgr.h"
 #include "Outlet.h"
-#include "TurretMgr.h"
 #include "Turret.h"
+#include "PointLight.h"
 // Components
 #include "Visual.h"
 #include "LinearMovement.h"
@@ -21,7 +16,10 @@
 #include "CollisionResponse.h"
 // Singletons
 #include "CameraMgr.h"
+#include "LightMgr.h"
 #include "Tilemap.h"
+#include "ShaderMgr.h"
+#include "ParticleSystemMgr.h"
 // Util
 #include "Config.h"
 #include "Logger.h"
@@ -48,6 +46,11 @@ namespace tlib
         m_Ship.init();
         m_Shield.init( &m_Ship );
         m_Reactor.init();
+
+        m_DoorMgr.init();
+        m_ForcefieldMgr.init();
+        m_OutletMgr.init();
+        m_TurretMgr.init( (Object*)&m_Ship );
     }
 
     // ----------------------------------------------------------------------------
@@ -55,6 +58,13 @@ namespace tlib
     {
         m_Ship.update();
         m_Shield.update();
+
+        // Update barriers, defence guns and outlets
+        m_DoorMgr.update();
+        m_BladeMgr.update();
+        m_ForcefieldMgr.update();
+        m_TurretMgr.update();
+        m_OutletMgr.update();
     }
 
     // ----------------------------------------------------------------------------
@@ -62,14 +72,35 @@ namespace tlib
     {
         m_Ship.applyLight();
         ((IOCVisual*)m_Station.getComponent("visual"))->render();
-        //m_Reactor.render();
-        //((IOCVisual*)m_Ship.getComponent("visual"))->render();
-        //((IOCVisual*)m_Corridors.getComponent("visual"))->render();
+        ((IOCVisual*)m_Ship.getComponent("visual"))->render();
 
-        //glEnable( GL_BLEND );
-        //glBlendFunc( GL_SRC_ALPHA, GL_ONE );
-        //((IOCVisual*)m_Shield.getComponent("visual"))->render();
-        //glDisable( GL_BLEND );
+        ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_NO_TEX );
+            m_OutletMgr.render();
+            m_BladeMgr.render();
+            m_TurretMgr.render();
+        ShaderMgr::Instance().end();
+
+        ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
+        //ShaderMgr::Instance().begin( ShaderMgr::SPOT_LIGHT_SINGLE_TEX );
+        //    ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
+        //ShaderMgr::Instance().end();
+        ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX );
+            m_DoorMgr.render(); 
+        ShaderMgr::Instance().end();
+
+        if( !isCulled( (Object*)&m_Reactor ) )
+        {
+            static float fReactorTimer = 0.0f;
+            ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_SINGLE_MOV_TEX );
+                glUniform1f( ShaderMgr::Instance().getUniform("timer"), fReactorTimer );
+                ((IOCVisual*)m_Reactor.getComponent("visual"))->render();
+            ShaderMgr::Instance().end();
+            fReactorTimer += IOCMovement::DeltaTime();
+        }
+
+        m_ForcefieldMgr.render();
+        PSManager::Instance().render();
+        m_Shield.render();
     }
 
     // ----------------------------------------------------------------------------
@@ -140,14 +171,17 @@ namespace tlib
                     }
                 }
 
-                if( !bInStation )
-                    cShipRes->respond( vColDir );
+                if( !bInStation ) {
+                    cShipRes->setCollDir( vColDir );
+                    cShipRes->respond();
+                }
             } // end if( !bIsInside )...
             else {
                 bInReactor = true;
                 // Check spaceship with the reactor
                 if( cShipCol->check( (Object*)&m_Reactor, vColDir ) ) {
-                    cShipRes->respond( vColDir );
+                    cShipRes->setCollDir( vColDir );
+                    cShipRes->respond();
                 }
             }
 
@@ -157,6 +191,42 @@ namespace tlib
         }
 
     } // end checkCollision()
+
+    // ----------------------------------------------------------------------------
+    void ObjectMgr::addLight( Tile3d *oTile )
+    {
+        _LOG("Adding light at [" + toStr<int>(oTile->i()) + " "
+                                 + toStr<int>(oTile->j()) + " "
+                                 + toStr<int>(oTile->k()) + "]" );
+
+        // Allocate pointlight object
+        PointLight *light= new PointLight;
+
+        float vfOffset[3];
+        Config cfg("config.txt");
+        cfg.loadBlock("point_light");
+        cfg.getFloat("offset", vfOffset, 3);
+
+        // Store new position offset
+        float vfNewOffset[3] = { vfOffset[0], vfOffset[1], vfOffset[2] };
+
+        switch( oTile->getType() ) {
+            case TW_Y_ALIGNED: 
+                vfNewOffset[0] = vfOffset[1];
+                vfNewOffset[1] = vfOffset[2];
+                break;
+        }
+
+        // Set its position vector
+        light->setPosFromIndex( oTile->ijk(), vfNewOffset );
+
+        // Save it as this tile's occupant
+        oTile->setOccupant( (Object*)light );
+
+        // Push the light to the manager
+        LightMgr::Instance().add( (GenericLight*)light );
+
+    } // end addDoor()
 
     // ----------------------------------------------------------------------------
     void ObjectMgr::addDoor( Tile3d *oTile )

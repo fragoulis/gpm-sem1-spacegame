@@ -42,8 +42,8 @@ bool PSCollidable::readPrevTile( Particle *particle )
 // ----------------------------------------------------------------------------
 void PSCollidable::checkCollision( Particle *particle )
 {
-    // The collision direction
-    Vector3f vColDir;
+    // The collision direction and point
+    Vector3f vColDir, vCollPoint;;
     // The object to check against
     Object *objToCheck;
 
@@ -58,10 +58,11 @@ void PSCollidable::checkCollision( Particle *particle )
         if( objToCheck )
         {
             if( checkCollisionWithObject( particle, 
-                                          objToCheck, 
-                                          vColDir ) ) 
+                                          vColDir,
+                                          vCollPoint,
+                                          objToCheck ) ) 
             {
-                onCollisionWithObjects( particle, vColDir, objToCheck );
+                onCollisionWithObjects( particle, vColDir, vCollPoint, objToCheck );
                 return;
             }
         }
@@ -70,14 +71,12 @@ void PSCollidable::checkCollision( Particle *particle )
     // If particle is just outside a corridor
     else if( readPrevTile( particle ) )
     {
-        Vector3f vColPoint;
-
         // Check the collision with the corridor walls
         if( checkCollisionWithTiles( particle->getPos(), 
                                      vColDir,
-                                     vColPoint ) ) 
+                                     vCollPoint ) ) 
         {   
-            onCollisionWithTiles( particle, vColDir, vColPoint );
+            onCollisionWithTiles( particle, vColDir, vCollPoint );
             return;
         }
     }
@@ -98,9 +97,12 @@ void PSCollidable::checkCollision( Particle *particle )
         }
         
         // Check either with ship or shield
-        if( checkCollisionWithObject( particle, objToCheck, vColDir ) )
+        if( checkCollisionWithObject( particle, 
+                                      vColDir,
+                                      vCollPoint,
+                                      objToCheck ) )
         {   
-            onCollisionWithObjects( particle, vColDir, objToCheck );
+            onCollisionWithObjects( particle, vColDir, vCollPoint, objToCheck );
             return;
         }
     }
@@ -110,10 +112,11 @@ void PSCollidable::checkCollision( Particle *particle )
     // else did not hit
     objToCheck = (Object*)&ObjectMgr::Instance().getReactor();
     if( checkCollisionWithObject( particle, 
-                                  objToCheck, 
-                                  vColDir ) )
+                                  vColDir,
+                                  vCollPoint,
+                                  objToCheck ) )
     {   
-        onCollisionWithObjects( particle, vColDir, objToCheck );
+        onCollisionWithObjects( particle, vColDir, vCollPoint, objToCheck );
     }
 
 } // end checkCollision()
@@ -200,16 +203,16 @@ bool PSCollidable::checkCollisionWithTiles( const Vector3f &vPos,
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 bool PSCollidable::checkCollisionWithObject( Particle *particle,
-                                             Object *oObj,
-                                             Vector3f &vCollDir )
+                                             Vector3f &vCollDir,
+                                             Vector3f &vCollPoint,
+                                             Object *oObj )
 {
     // Get object's collision component
     IComponent *cCom = oObj->getComponent("collision");
     IOCCollision *cObjCol = (IOCCollision*)cCom;
-    _ASSERT(cObjCol!=0);
+    //_ASSERT(cObjCol!=0);
     // If object has is not collidable return false
-    //if( !cObjCol )
-    //    return false;
+    if( !cObjCol ) return false;
 
     // Switch between the differect kinds of collision
     if( cObjCol->getType() == IOCCollision::BBox ) {
@@ -224,7 +227,8 @@ bool PSCollidable::checkCollisionWithObject( Particle *particle,
             particle, 
             oObj->getPos(), 
             ((OCCollisionBSphere*)cObjCol)->getRadius(),
-            vCollDir );
+            vCollDir,
+            vCollPoint );
     }
 
     return false;
@@ -315,9 +319,10 @@ bool PSCollidable::checkWithBox(
 // ------------------------------------------------------------------------
 bool PSCollidable::checkWithSphere( 
     Particle *particle,
-    const Vector3f& vPos, 
+    const Vector3f& vPos,
     float fRadius,
-    Vector3f& vCollDir ) const
+    Vector3f& vCollDir,
+    Vector3f& vCollPoint ) const
 {
     // Sace the difference of the objects' positions
     const Vector3f& vDiffPos = particle->getPos() - vPos;
@@ -348,6 +353,9 @@ bool PSCollidable::checkWithSphere(
                 // amount of penetration as well
                 //vCollDir.mul( fOverlapX, fOverlapY, fOverlapZ );
                 //std::cout << vCollDir << std::endl;
+                
+                // Find collision point
+                vCollPoint = (vCollDir * fRadius - vPos) * -1;
 
                 // Collision detected
                 return true;

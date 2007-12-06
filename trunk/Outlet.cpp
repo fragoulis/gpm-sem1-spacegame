@@ -9,6 +9,9 @@ using namespace tlib;
 
 Outlet::Outlet(): m_pBarrier(0)
 {
+    // Set object's type
+    setType( OUTLET );
+
     Config cfg("config.txt");
     cfg.loadBlock("outlet");
 
@@ -26,10 +29,15 @@ Outlet::Outlet(): m_pBarrier(0)
     // Initialize animation component
     setComponent( new OutletAnimation );
 
+    // Read specular component
+    float vfSpecular[4], fShininess;
+    cfg.getFloat("spcular",   vfSpecular, 4);
+    cfg.getFloat("shininess", &fShininess );
+
     // Initialize material component
     OCSimpleMaterial *cMat = new OCSimpleMaterial;
-    cMat->setSpecular( Color( 0.5f, 0.5f, 0.5f, 1.0f ) );
-    cMat->setShininess( 80.0f );
+    cMat->setSpecular( Color( vfSpecular ) );
+    cMat->setShininess( fShininess );
     setComponent( cMat );
 
     // Initialize collision response component

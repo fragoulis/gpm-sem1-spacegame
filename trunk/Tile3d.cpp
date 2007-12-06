@@ -20,6 +20,7 @@ void Tile3d::addObject( int objType )
     switch( objType )
     {
     case OBJ_LIGHT: 
+        ObjectMgr::Instance().addLight( this );
         break;
 
     case OBJ_DOOR: 

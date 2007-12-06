@@ -38,11 +38,13 @@ void PSSmoke::init( const Vector3f &vSysPos )
     // Read particles' velocity, size and lifespan limits
     float fSize;
     cfg.getFloat("size", &fSize);
-    cfg.getFloat("lifespan", m_fLifeSpan, 2);
     cfg.getFloat("velocity", m_fVelocity, 2);
+    cfg.getInt("lifespan", m_iLifeSpan, 2);
 
     // Read system's lifespan
-    cfg.getDouble("sys_lifespan", &m_dLifeSpan);
+    double dLifeSpan;
+    cfg.getDouble("sys_lifespan", &dLifeSpan);
+    m_Timer.setDuration(dLifeSpan);
 
     // Read particle number
     int iNumOfParticles;
@@ -70,9 +72,13 @@ void PSSmoke::update()
 {
     // Only create new particles if emitter is active
     if( m_Emitter.isOn() ) {
-        // If time is not right don't do anything
-        if( m_Emitter.checkRelease() ) {
+        // If time expired spawn
+        if( m_Emitter.getTimer().hasExpired() ) {
+            m_Emitter.getTimer().stop();
+
             spawn();
+            // Start the timer again for the new spawn
+            m_Emitter.getTimer().start();
         }
     }
 
@@ -86,15 +92,18 @@ void PSSmoke::update()
     {
         obj = *iter;
 
+        // Update the object's energy
+        obj->updateLife();
+
         // Check if the particle has expired
-        if( obj->hasExpired() )
+        if( obj->getLife() < 0 )
         {
             toKill.push_back( obj );
             continue;
         }
 
         // Update particles' positions
-        obj->updatePos();
+        obj->update();
 
     } // end for( ... )
     
@@ -122,16 +131,18 @@ void PSSmoke::render() const
 
     // Render all alive particles
     float matrix[16];
+    Particle *obj;
     ParticleList::const_iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
          ++iter )
     {
+        obj = *iter;
         // Set color
-        float rgba[] = { 1.0f, 1.0f, 1.0f, (*iter)->getEnergy() };
+        float rgba[] = { 1.0f, 1.0f, 1.0f, obj->getLifeRatio() };
         glColor4fv( rgba );
 
-        const Vector3f& vPos = (*iter)->getPos();
+        const Vector3f& vPos = obj->getPos();
         glPushMatrix();
         {
             glTranslatef( vPos.x(), vPos.y(), vPos.z() );
@@ -170,7 +181,7 @@ void PSSmoke::render() const
 // ----------------------------------------------------------------------------
 void PSSmoke::onSpawn( Particle *particle ) 
 {
-    particle->setLifeSpan( tlib::randFloat( m_fLifeSpan[0], m_fLifeSpan[1] ) );
+    particle->setStartLife( tlib::randInt( m_iLifeSpan[0], m_iLifeSpan[1] ) );
     particle->setPos( m_vPos );
     Vector3f vDir( tlib::randFloat(-1,1), tlib::randFloat(-1,1), tlib::randFloat(-1,1) );
     vDir.normalize();

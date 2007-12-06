@@ -1,14 +1,8 @@
 #pragma once
 #pragma comment( lib, "glee" )
-#include <GL/GLee.h>
 #include "GX/GXBase.h"
 
-// Object managers
-#include "DoorMgr.h"
-#include "BladeMgr.h"
-#include "ForcefieldMgr.h"
-#include "OutletMgr.h"
-#include "TurretMgr.h"
+
 
 using namespace gxbase;
 
@@ -17,14 +11,7 @@ using namespace gxbase;
 
 class MyWindow :public GLWindowEx {
 private:
-	// Here we declare our individual managers
-    // These are managers for the barriers, the power outlets 
-    // and the defence guns
-    DoorMgr         m_DoorMgr;
-    BladeMgr        m_BladeMgr;
-    ForcefieldMgr   m_ForcefieldMgr;
-    OutletMgr       m_OutletMgr;
-    TurretMgr       m_TurretMgr;
+    float m_fFovY, m_fPlanes[2];
 
 public:
 	MyWindow();

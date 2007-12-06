@@ -21,7 +21,7 @@ private:
     // The velocity of the laser bolts
     // This variable hold the default lifespan of the particles
     // and is used to initialize the particles in every spawn
-    double m_dLifeSpan;
+    float m_fLifeSpan;
 
     // The color of the laser bolts
     Color m_Color;
@@ -60,16 +60,17 @@ private:
      */
     void onCollisionWithTiles( 
         Particle *particle, 
-        const Vector3f &vColDir,
-        const Vector3f &vColPoint );
+        const Vector3f &vCollDir,
+        const Vector3f &vCollPoint );
 
     /**
      * 
      */
     void onCollisionWithObjects( 
         Particle *particle, 
-        const Vector3f &vColDir, 
-        Object *obj );
+        const Vector3f &vCollDir,
+        const Vector3f &vCollPoint,
+        Object *oObj );
 
     /**
      * Resets the position of a particle and gives a random direction and 

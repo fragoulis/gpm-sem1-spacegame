@@ -3,7 +3,9 @@
 using namespace std;
 
 #include "Vector3.h"
+#include "Timer.h"
 using tlib::Vector3f;
+using tlib::Timer;
 
 class Particle;
 
@@ -25,20 +27,14 @@ private:
     // Default: False
     bool m_bIsOn;
 
-    // The interval between particle releases in seconds.
-    // A release time of null means that the emitter will spawn particles
-    // every frame
-    // Default: 0.0
-    double m_dReleaseTime;
-
-    // Holds the time passed between spawns
-    long m_lInitTime;
-
     // The array of alive[updatable] particles
     ParticleList m_vPAlive;
 
     // The array of dead particles
     ParticleList m_vPDead;
+
+    // Particle emitter's timer
+    Timer m_Timer;
 
 public:
     /**
@@ -63,13 +59,22 @@ public:
     bool isOn() const { return m_bIsOn; }
 
     /**
-     *
+     * Timer accessor
+     */
+    const Timer& getTimer() const { return m_Timer; }
+    Timer& getTimer() { return m_Timer; }
+
+    /**
+     * Initializes the emitter
      */
     void init( double dReleaseTime, int iReleaseCount ) {
-        m_dReleaseTime = dReleaseTime;
+        m_Timer.setDuration(dReleaseTime);
         m_iReleaseCount = iReleaseCount;
     }
 
+    /**
+     * Release count accessor
+     */
     int getReleaseCount() const { return m_iReleaseCount; }
 
     /**
@@ -87,10 +92,5 @@ public:
     ParticleList& getPDead() {
         return m_vPDead;
     }
-
-    /**
-     * Checks the time intervals between releases
-     */
-    bool checkRelease();
 
 }; // end of ParticleEmitter class

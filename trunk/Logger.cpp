@@ -29,6 +29,7 @@ namespace tlib
      */
     void Logger::open( const char *filename, bool clear )
     {
+#ifdef _DEBUG
         if( clear )
         {
             m_fsLog.open( filename );
@@ -37,6 +38,7 @@ namespace tlib
             m_fsLog.open( filename, ios_base::app  );
             log( "\nStarting..." );
         }
+#endif
     }
 
 } // end of namespace tlib

@@ -11,6 +11,9 @@ using namespace tlib;
 
 void Turret::init()
 {
+    // Set object's type
+    setType( TURRET );
+
     Config cfg("config.txt");
     cfg.loadBlock("turret");
 

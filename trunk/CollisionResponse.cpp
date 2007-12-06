@@ -3,9 +3,9 @@
 
 namespace tlib
 {
-    void IOCCollisionResponse::respond( const Vector3f &vCollVector ) const
+    void IOCCollisionResponse::respond() const
     {
-        m_oOwner->setPos( m_oOwner->getPos() + vCollVector );
+        m_oOwner->setPos( m_oOwner->getPos() + m_vCollDir );
     }
 
 } // end of namespace tlib

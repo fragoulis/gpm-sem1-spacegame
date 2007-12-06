@@ -43,7 +43,8 @@ namespace tlib
 
         // Check collision with the spacestation corridors
         if( checkWithTile( vCollDir ) ) {
-            cOwnerRes->respond( vCollDir );
+            cOwnerRes->setCollDir( vCollDir );
+            cOwnerRes->respond();
         }
 
         // Check with tile's occupier object
@@ -54,9 +55,13 @@ namespace tlib
             IOCCollisionResponse *cObjRes = 
                 (IOCCollisionResponse*)oOcc->getComponent("collisionresponse");
 
-            cOwnerRes->respond( vCollDir );
-            if( cObjRes )
-                cObjRes->respond( vCollDir );
+            cOwnerRes->setCollDir( vCollDir );
+            cOwnerRes->respond();
+
+            if( cObjRes ) {
+                cObjRes->setCollDir( vCollDir );
+                cObjRes->respond();
+            }
         }
     }
 

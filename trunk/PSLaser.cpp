@@ -52,13 +52,14 @@ void PSLaser::init( Object *oOwner,
 
     // Read particle size, velocity and lifespan
     float fSize, fVelocity;
-    cfg.getFloat("size", &fSize);
+    int iLife;
+    cfg.getFloat("size",     &fSize);
     cfg.getFloat("velocity", &fVelocity);
-    cfg.getDouble("lifespan", &m_dLifeSpan);
+    cfg.getInt("lifespan",   &iLife);
 
     // At first, mark all particles as dead
     for( int i=0; i<iNumOfParticles; ++i ) {
-        m_Particles[i].setLifeSpan( m_dLifeSpan );
+        m_Particles[i].setStartLife( iLife );
         m_Particles[i].setVelocity( fVelocity );
         m_Particles[i].setSize( fSize );
         m_Emitter.getPDead().push_back( &m_Particles[i] );
@@ -84,9 +85,12 @@ void PSLaser::init( Object *oOwner,
 void PSLaser::update()
 {
     // Only create new particles if emitter is active
-    if( m_Emitter.isOn() ) {
+    if( m_Emitter.isOn() ) 
+    {
         // If time is not right don't do anything
-        if( m_Emitter.checkRelease() ) {
+        if( m_Emitter.getTimer().hasExpired() ) {
+            m_Emitter.getTimer().stop();
+
             // Get owner's orientation component
             OCOrientation2D * cOri = 
                 (OCOrientation2D*)m_oOwner->getComponent("orientation");
@@ -95,6 +99,9 @@ void PSLaser::update()
             m_vDir = cOri->getView();
             m_vPos = m_oOwner->getPos() + m_vDir * m_fOffset;
             spawn();
+
+            // Restart emitter's timer
+            m_Emitter.getTimer().start();
         }
     }
 
@@ -108,15 +115,19 @@ void PSLaser::update()
     {
         obj = *iter;
 
+        // Update the object's energy
+        obj->updateLife();
+
         // Check if the particle has expired
-        if( obj->hasExpired() )
+        if( obj->getLife() < 0 )
         {
+            // Particle has expired
             toKill.push_back( obj );
             continue;
         }
 
-        // Update particles' positions
-        obj->updatePos();
+        // Update particles' position
+        obj->update();
 
         // Check for collisions
         checkCollision( obj );
@@ -149,6 +160,7 @@ void PSLaser::render() const
     glBindTexture( GL_TEXTURE_2D, m_uiTexId );
         
     // Render all alive particles
+    float matrix[16];
     ParticleList::const_iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
@@ -161,9 +173,9 @@ void PSLaser::render() const
             glPushMatrix();
             {
                 // Render as billboard
-                float matrix[16];
                 glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-                matrix[0] = matrix[5] = matrix[10] = matrix[11] = 1.0f;
+                //matrix[0] = matrix[5] = matrix[10] = matrix[11] = 1.0f;
+                matrix[0] = matrix[5] = matrix[10] = 1.0f;
                 matrix[1] = matrix[2] = matrix[3] = matrix[4] =
                 matrix[6] = matrix[7] = matrix[8] = matrix[9] = 0.0f;
                 glLoadMatrixf(matrix);
@@ -192,33 +204,37 @@ void PSLaser::render() const
 
 // ----------------------------------------------------------------------------
 void PSLaser::onCollisionWithTiles( Particle *particle, 
-                                    const Vector3f &vColDir,
-                                    const Vector3f &vColPoint )
+                                    const Vector3f &vCollDir,
+                                    const Vector3f &vCollPoint )
 {
-    particle->bounce( vColDir, 0.5f );
-    particle->setLifeSpan(0.4f);
+    particle->bounce( vCollDir, 0.5f );
+    particle->setLife( particle->getLife()/5 );
 
     // Set the scorch mark's direction
-    m_Marks->setDir( vColDir );
+    m_Marks->setDir( vCollDir );
 
     // Create a scorch mark on the point of collision
-    m_Marks->setPos( vColPoint );
+    m_Marks->setPos( vCollPoint );
     m_Marks->spawn();
 }
 
 // ----------------------------------------------------------------------------
 void PSLaser::onCollisionWithObjects( Particle *particle, 
-                                      const Vector3f &vColDir,
+                                      const Vector3f &vCollDir,
+                                      const Vector3f &vCollPoint,
                                       Object *oObj )
 {
-    particle->bounce( vColDir, 0.3f );
-    particle->setLifeSpan(0.3f);
+    particle->bounce( vCollDir, 0.3f );
+    particle->setLife( particle->getLife()/5 );
 
     // Call collision response for the object
     IOCCollisionResponse *cColRes = 
         (IOCCollisionResponse*)oObj->getComponent("collisionresponse");
-    if( cColRes )
-        cColRes->respond( vColDir );
+    if( cColRes ) {
+        cColRes->setCollDir( vCollDir );
+        cColRes->setCollPoint( vCollPoint );
+        cColRes->respond();
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -226,5 +242,5 @@ void PSLaser::onSpawn( Particle *particle )
 {
     particle->setPos( m_vPos );
     particle->setDir( m_vDir );
-    particle->setLifeSpan( m_dLifeSpan );
+    particle->resetLife();
 }

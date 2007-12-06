@@ -3,7 +3,7 @@
 using tlib::Config;
 
 Tilemap::Tilemap():
-m_TileList(0)
+m_TileArray(0)
 {
     // Read tile size and number of tiles per side from the configuration file
     Config cfg("config.txt");
@@ -15,10 +15,10 @@ m_TileList(0)
 
 Tilemap::~Tilemap()
 {
-    if( m_TileList )
-        delete [] m_TileList;
-    m_TileList = 0;
-    m_TileArray.clear();
+    if( m_TileArray )
+        delete [] m_TileArray;
+    m_TileArray = 0;
+    m_TileMap.clear();
 }
 
 // ----------------------------------------------------------------------------
@@ -26,8 +26,10 @@ void Tilemap::create( int iNumOfTiles ) {
     _ASSERT(iNumOfTiles>0);
 
     // Make sure that this is only initialized once
-    if( !m_TileList )
-        m_TileList = new Tile3d[ iNumOfTiles ];
+    if( !m_TileArray ) {
+        m_TileArray = new Tile3d[ iNumOfTiles ];
+        m_iTileArraySize = iNumOfTiles;
+    }
 }
 
 // ----------------------------------------------------------------------------

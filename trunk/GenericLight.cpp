@@ -30,9 +30,11 @@ void GenericLight::reset()
 }
 
 // ----------------------------------------------------------------------------
-bool GenericLight::findId()
+void GenericLight::apply() const
 {
-    return LightMgr::Instance().initLight( this );
+    // Update the light's position
+    float vfPos[] = { getPos().x(), getPos().y(), getPos().z(), m_fW };
+    glLightfv( GL_LIGHT0+m_iLightId, GL_POSITION, vfPos );
 }
 
 // ----------------------------------------------------------------------------

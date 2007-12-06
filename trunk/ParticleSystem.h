@@ -24,11 +24,6 @@ protected:
     // The particle system's emitter
     ParticleEmitter m_Emitter;
 
-    // This shows for how long should a particle system emit for, before
-    // it becomes inactive
-    // Default: 0.0 [Never stops]
-    double m_dLifeSpan;
-
     // The opengl's texture id
     // This is only used by systems with textures
     unsigned int m_uiTexId;
@@ -36,20 +31,14 @@ protected:
     // The particle's display list id
     unsigned int m_uiListId;
 
-    // An array of random numbers
-    static float m_vfRandom[500];
-
     // Every particle system can have an owner object,
     // most likely the one its emitting from
     Object *m_oOwner;
 
+    // The particle system's timer
+    Timer m_Timer;
+
 private:
-    // Holds the initialization time
-    long m_lInitTime;
-
-    // Flags whether the particle system has expired or not
-    bool m_bIsExpired;
-
     // The particle system's type
     // Default: 0[Any]
     PSType m_iType;
@@ -66,7 +55,7 @@ public:
     virtual ~ParticleSystem();
 
     /**
-     * Getter for the emitter object
+     * Particle emitter accessor
      */
     const ParticleEmitter& getEmitter() const { 
         return m_Emitter; 
@@ -76,9 +65,10 @@ public:
     }
 
     /**
-     * Return whether the particle system has expired or not
+     * Timer accessor
      */
-    bool isExpired() const { return m_bIsExpired; }
+    const Timer& getTimer() const { return m_Timer; }
+    Timer& getTimer() { return m_Timer; }
 
     /**
      * Returns true if the particle system is of the same type 
@@ -104,11 +94,6 @@ public:
      * Starts the particle system
      */
     void start();
-
-    /**
-     * Check whether the particle has expired, therefore is not to be used
-     */
-    bool hasExpired();
 
     /**
      * Spawns a iRealaseCount number of particles
@@ -145,12 +130,5 @@ protected:
      * Is called for every particle that is created
      */
     virtual void onSpawn( Particle *particle ) = 0;
-
-private:
-    /**
-     * Generates an array of random numbers to be used
-     * for the particle spawning
-     */
-    void genNumbers();
 
 }; // end of ParticleSystem class
