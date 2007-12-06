@@ -199,8 +199,9 @@ void MyWindow::drawInterface()
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    double ratio = double(Width()) / double(Height());
-    gluOrtho2D( -ratio, ratio, -1.0, 1.0 );
+    float fWidth = float(Width()) / float(Height());
+    float fHeight = 1.0f;
+    gluOrtho2D( -fWidth, fWidth, -fHeight, fHeight );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
@@ -220,71 +221,107 @@ void MyWindow::drawInterface()
     };
 
 
-    glPointSize(3.0f);
+    glPointSize(5.0f);
     glPushMatrix();
     {
+        const float fSide = 0.35f;
         // Translate and rotate the minimap to our likes
         // [bottom-right corner]
-        glTranslatef( 1.04f, -0.77f, 0.0f );
-        glRotatef( 40, 1.0f, 0.0f, 0.0f );
-        glRotatef( 30, 0.0f, 1.0f, 0.0f );
-        
-        glBegin(GL_POINTS);
-        {
-            // Translate the spaceship dor according to the real
-            // spaceship's world coordinates
-            const Vector3f& vShip = ObjectMgr::Instance().getShip().getPos() * fSizeRatio;
-            glColor4fv( vfColors[SPACESHIP] );
-            glVertex3f( vShip.x(), vShip.y(), vShip.z() );
+        glTranslatef( fWidth-fSide, -fHeight+fSide, 0.0f );
 
-            // Draw all objects in the tilemap
-            for( int index=0; index<Tilemap::Instance().getArraySize(); ++index )
-            {
-                Tile3d *oTile = Tilemap::Instance().getTileByIndex( index );
-                Object *oOcc = oTile->getOccupant();
-                if( oOcc )
-                {
-                    if( oOcc->getType() == Object::LIGHT || 
-                        oOcc->getType() == Object::OUTLET ) continue;
-
-                    // Determine the type of the object in order to color the
-                    // dor accordingly
-                    int iColorIndex;
-                    switch( oOcc->getType() ) {
-                        case Object::BARRIER: iColorIndex = BARRIER; break;
-                        case Object::TURRET: iColorIndex = TURRET; break;
-                    }
-                    glColor4fv( vfColors[iColorIndex] );
-
-                    // Position point
-                    const Vector3f& vPos = oTile->getOccupant()->getPos() * fSizeRatio;
-                    glVertex3f( vPos.x(), vPos.y(), vPos.z() );
-
-                } // end if( oOcc ) ...
-
-            } // end for( ... )
-        }
-        glEnd();
-
-        // Save current polygon display mode state and turn on wireframe
-        int viPolygonMode[2];
-        glGetIntegerv( GL_POLYGON_MODE, viPolygonMode );
-        glPolygonMode(GL_FRONT,GL_LINE);
+        // Draw the minimap background
         glPushMatrix();
         {
-            // Make spacestation fSizeRatio times smaller
-            glScalef( fSizeRatio, fSizeRatio, fSizeRatio );
-            ((IOCVisual*)ObjectMgr::Instance().getCorridors().getComponent("visual"))->render();
+            glTranslatef( 0.0f, 0.0f, 0.0f );
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, TextureMgr::Instance().getTexture("textures/minimap.jpg"));
+            glEnable(GL_BLEND);
+            glBegin(GL_QUADS);
+            {
+                glColor4f( 1.0f, 1.0f, 1.0f, 0.6f );
+                glTexCoord2f(0,0); glVertex2f( -fSide, -fSide );
+                glTexCoord2f(1,0); glVertex2f(  fSide, -fSide );
+                glTexCoord2f(1,1); glVertex2f(  fSide,  fSide );
+                glTexCoord2f(0,1); glVertex2f( -fSide,  fSide );
+            }
+            glEnd();
+            glDisable(GL_BLEND);
+            glDisable(GL_TEXTURE_2D);
         }
         glPopMatrix();
-        // Restore polygon display modes
-        glPolygonMode(GL_FRONT,viPolygonMode[0]);
+
+        glPushMatrix();
+        {
+            // Change depth func in order to always draw the minimap and the 
+            // individual points on top of everything
+            int iDepthFunc;
+            glGetIntegerv(GL_DEPTH_FUNC, &iDepthFunc);
+            glDepthFunc(GL_ALWAYS);
+
+            // Correct the minimap position
+            glTranslatef( 0.04f, -0.09f, 0.0f );
+            glRotatef( 40, 1.0f, 0.0f, 0.0f );
+            glRotatef( 30, 0.0f, 1.0f, 0.0f );
+            glBegin(GL_POINTS);
+            {
+                // Translate the spaceship dor according to the real
+                // spaceship's world coordinates
+                const Vector3f& vShip = ObjectMgr::Instance().getShip().getPos() * fSizeRatio;
+                glColor4fv( vfColors[SPACESHIP] );
+                glVertex3f( vShip.x(), vShip.y(), vShip.z() );
+
+                // Draw all objects in the tilemap
+                for( int index=0; index<Tilemap::Instance().getArraySize(); ++index )
+                {
+                    Tile3d *oTile = Tilemap::Instance().getTileByIndex( index );
+                    Object *oOcc = oTile->getOccupant();
+                    if( oOcc )
+                    {
+                        if( oOcc->getType() == Object::LIGHT || 
+                            oOcc->getType() == Object::OUTLET ) continue;
+
+                        // Determine the type of the object in order to color the
+                        // dor accordingly
+                        int iColorIndex;
+                        switch( oOcc->getType() ) {
+                            case Object::BARRIER: iColorIndex = BARRIER; break;
+                            case Object::TURRET: iColorIndex = TURRET; break;
+                        }
+                        glColor4fv( vfColors[iColorIndex] );
+
+                        // Position point
+                        const Vector3f& vPos = oTile->getOccupant()->getPos() * fSizeRatio;
+                        glVertex3f( vPos.x(), vPos.y(), vPos.z() );
+
+                    } // end if( oOcc ) ...
+
+                } // end for( ... )
+            }
+            glEnd();
+
+            // Save current polygon display mode state and turn on wireframe
+            int viPolygonMode[2];
+            glGetIntegerv( GL_POLYGON_MODE, viPolygonMode );
+            glPolygonMode(GL_FRONT,GL_LINE);
+            glPushMatrix();
+            {
+                // Make spacestation fSizeRatio times smaller
+                glScalef( fSizeRatio, fSizeRatio, fSizeRatio );
+                ((IOCVisual*)ObjectMgr::Instance().getCorridors().getComponent("visual"))->render();
+            }
+            glPopMatrix();
+            // Restore polygon display modes
+            glPolygonMode(GL_FRONT,viPolygonMode[0]);
+            // Restore depth test function
+            glDepthFunc(iDepthFunc);
+        }
+        glPopMatrix();
     }
     glPopMatrix();
 
     // Draw health status
     glColor3f( 1.0f, 1.0f, 0.0f );
-    glRasterPos3f( -1.5f, -0.9f, -0.1f );
+    glRasterPos3f( 1.00f, 0.0f, 0.0f );
     Printf( "Health: %i", ObjectMgr::Instance().getShip().getHealth() );
     
     glEnable( GL_LIGHTING );
