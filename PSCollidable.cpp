@@ -210,7 +210,7 @@ bool PSCollidable::checkCollisionWithObject( Particle *particle,
     // Get object's collision component
     IComponent *cCom = oObj->getComponent("collision");
     IOCCollision *cObjCol = (IOCCollision*)cCom;
-    //_ASSERT(cObjCol!=0);
+
     // If object has is not collidable return false
     if( !cObjCol ) return false;
 

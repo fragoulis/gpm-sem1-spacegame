@@ -65,6 +65,22 @@ namespace tlib
     }
 
     // ------------------------------------------------------------------------
+    void Config::getBool( const string &sKey, 
+                          bool *out, 
+                          const int nCount )
+    {
+        _get<bool>( sKey, out, nCount );
+    }
+
+    // ------------------------------------------------------------------------
+    void Config::getChar( const string &sKey, 
+                          char *out, 
+                          const int nCount )
+    {
+        _get<char>( sKey, out, nCount );
+    }
+
+    // ------------------------------------------------------------------------
     void Config::getFloat( const string &sKey, 
                            float *out, 
                            const int nCount )

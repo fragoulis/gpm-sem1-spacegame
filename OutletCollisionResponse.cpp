@@ -4,7 +4,7 @@
 #include "Animation.h"
 using tlib::IOCAnimation;
 
-void OutletCollisionResponse::respond() const
+void OutletCollisionResponse::respond()
 {
     Outlet *oOwner = (Outlet*)m_oOwner;
 

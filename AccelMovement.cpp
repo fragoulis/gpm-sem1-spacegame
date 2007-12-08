@@ -5,14 +5,14 @@
 namespace tlib 
 {
     OCAccelMovement::OCAccelMovement():  
-      m_fAccel(0.0f)
+    m_fAccel(0.0f)
     {}
 
     OCAccelMovement::OCAccelMovement( float fAcc, 
                                       float fVel, 
                                       const Vector3f& vDir ):
-      m_fAccel(fAcc),
-      OCLinearMovement( fVel, vDir )
+    OCLinearMovement( fVel, vDir ),
+    m_fAccel(fAcc)
     {}
 
     // ----------------------------------------------------------------------------
@@ -20,7 +20,7 @@ namespace tlib
     {
         // Retrieve object's position
         const Vector3f& vPos = getOwner()->getPos();
-        const double dDeltaTime = Clock::Instance().getDeltaTime();
+        const float dDeltaTime = Clock::Instance().getDeltaTime();
         // Update the velocity
         m_fVelocity += m_fAccel * dDeltaTime;
 

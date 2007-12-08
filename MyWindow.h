@@ -2,8 +2,6 @@
 #pragma comment( lib, "glee" )
 #include "GX/GXBase.h"
 
-
-
 using namespace gxbase;
 
 // this is a simple example: it creates one window,
@@ -11,7 +9,20 @@ using namespace gxbase;
 
 class MyWindow :public GLWindowEx {
 private:
-    float m_fFovY, m_fPlanes[2];
+    enum AppControlFlags {
+        FULLSCREEN,
+        CAMERA,
+        RECORD,
+        COLLISION,
+        WIREFRAME,
+        GOD_MODE,
+        NUM_OF_CONTROLS
+    };
+    char *AppControlLabel[NUM_OF_CONTROLS];
+    char AppControlKey[NUM_OF_CONTROLS];
+    bool AppControl[NUM_OF_CONTROLS];
+
+    float m_fFovY, m_fPlanes[2], m_fDimRatio;
 
 public:
 	MyWindow();

@@ -14,8 +14,8 @@ private:
     // A vector to hold the collision point between the shield a laser
     Vector3f m_vCollPoint;
 
-    // An animation timer
-    Timer *m_Timer;
+    // Animation timers
+    Timer *m_NoiseTimer, *m_GlowTimer;
 
 public:
     /**
@@ -39,8 +39,8 @@ public:
     void render() const;
 
     /**
-     * Returns a base pointer of the spaceship
+     * Spaceship accessor
      */
-    const Spaceship* getShip() const { return (Spaceship*)m_oShip; }
-    Spaceship* getShip() { return (Spaceship*)m_oShip; }
+    const Object* getShip() const { return (Object*)m_oShip; }
+    Object* getShip() { return (Object*)m_oShip; }
 };

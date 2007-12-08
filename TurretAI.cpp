@@ -35,7 +35,7 @@ void TurretAI::update( Object *oOwner )
 
     // Check if the spaceship target is closer than the 
     // predefined distance set
-    if( fDistance < m_fRange )
+    if( fDistance < m_fRange && m_oTarget->isActive() )
     {
         OCQuatRotation *cOri = 
             (OCQuatRotation*)oOwner->getComponent("orientation");

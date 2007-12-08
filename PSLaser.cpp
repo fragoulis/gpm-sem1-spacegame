@@ -79,6 +79,11 @@ void PSLaser::init( Object *oOwner,
 
     // Initialize the scorch marks' particle system
     m_Marks = PSManager::Instance().addScorchMark();
+    
+    // This line is important, although laser's particle system time
+    // is always 0[unlimited], we must explicitly start it, in order
+    // to emit particles[lasers bolts]
+    m_Timer->start();
 
 } // end init()
 
@@ -86,21 +91,21 @@ void PSLaser::init( Object *oOwner,
 void PSLaser::update()
 {
     // Only create new particles if emitter is active
-    if( m_Emitter.isOn() ) 
+    if( m_Emitter.isOn() )
     {
         // If time is not right don't do anything
-        if( !m_Emitter.getTimer()->isRunning() ) {
-
+        if( !m_Emitter.getTimer()->isRunning() ) 
+        {
             // Get owner's orientation component
             OCOrientation2D * cOri = 
                 (OCOrientation2D*)m_oOwner->getComponent("orientation");
+            
             // We pass the object's position plus a small correction 
             // plus the position offset times the object's view vector
             m_vDir = cOri->getView();
             m_vPos = m_oOwner->getPos() + m_vDir * m_fOffset;
             spawn();
 
-            // Restart emitter's timer
             m_Emitter.getTimer()->start();
         }
     }

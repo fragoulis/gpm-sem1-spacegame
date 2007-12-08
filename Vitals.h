@@ -6,11 +6,21 @@ namespace tlib
 
     class IOCVitals : public IComponent
     {
+    protected:
+        // Boolean value that indicates whether we should
+        // keep checking this object's vitals
+        bool m_bHasEnded; 
+
     public:
+        /**
+         * Construtor
+         */
+        IOCVitals();
+
         /**
          * Destructor
          */
-        virtual ~IOCVitals(){}
+        virtual ~IOCVitals();
         
         /**
          * Returns the component's family ID
@@ -20,9 +30,19 @@ namespace tlib
         }
 
         /**
+         * Accessors
+         */
+        bool hasEnded() const { return m_bHasEnded; }
+
+        /**
+         * Retunrs whether this object is alive
+         */
+        virtual bool isAlive() const = 0;
+
+        /**
          * Updates and checks the vitals of an object
          */
-        virtual bool update() = 0;
+        virtual void update() = 0;
 
         /**
          * This is called on an object's death

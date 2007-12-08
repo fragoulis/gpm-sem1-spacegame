@@ -3,22 +3,19 @@
 using tlib::IOCCollisionResponse;
 using tlib::Vector3f;
 
-class OutletCollisionResponse : public IOCCollisionResponse
+class ReactorCollisionResponse : public IOCCollisionResponse
 {
-private:
-
-
 public:
     /**
      * Destructor
      */
-    virtual ~OutletCollisionResponse() {}
+    virtual ~ReactorCollisionResponse() {}
 
     /**
      * Returns the unique component ID
      */
     const string componentID() const { 
-        return string("outletcollisionresponse"); 
+        return string("reactorcollisionresponse"); 
     }
 
     /**

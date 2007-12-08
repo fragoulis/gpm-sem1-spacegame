@@ -7,6 +7,7 @@ using namespace tlib;
 // Forward declarations
 class Tile3d;
 class PSLaser;
+class SpaceshipShield;
 
 /**
  * This is our Spaceship object
@@ -14,8 +15,6 @@ class PSLaser;
 class Spaceship : public Object
 {
 private:
-    PSLaser *m_Laser;
-
     float
         // The spaceship's maximum velocity [Config]
         m_fMaxVelocity, 
@@ -27,8 +26,14 @@ private:
 
     bool m_bResetSpeed, m_bResetRoll;
 
+    // Pointer to the ship's shield
+    SpaceshipShield *m_oShield;
+
     // The ship's spot light
     SpotLight m_Light;
+
+    // Ship's laser system
+    PSLaser *m_Laser;
 
 public:
     /**
@@ -69,12 +74,11 @@ public:
      */
     void fire();
     void ceaseFire();
-    //void record();
 
     /**
-     * Returns the health of the ship with a number between 0 and 100
+     * Returns the ship's health and lives remaining
      */
-    int getHealth();
+    void getVitals( int &iHeatlhRatio, int &iLives, int &iMaxLives );
 
     /**
      * Updates all aspects of the spaceship
@@ -87,8 +91,11 @@ public:
     void applyLight();
 
     /**
-     * Returns the laser system associated with the spaceship
+     * Accessords
      */
     PSLaser *getLaser() { return m_Laser; }
+    const Object* getShield() const { return (Object*)m_oShield; }
+    Object* getShield() { return (Object*)m_oShield; }
+    void setShield( SpaceshipShield *oShield ) { m_oShield = oShield; }
 
 }; // end Spaceship class

@@ -2,12 +2,15 @@
 #include "Object.h"
 using namespace tlib;
 
+class Timer;
+
 /**
  * This is our Reactor object
  */
 class Reactor : public Object
 {
 private:
+    Timer *m_AnimTimer, *m_GlowTimer;
     float m_fRotFactor;
 
 public:
@@ -15,6 +18,11 @@ public:
      * Constructor
      */
     Reactor();
+
+    /**
+     * Accessors
+     */
+    Timer* getGlowTimer() { return m_GlowTimer; }
 
     /**
      * Initializes the spaceship by reading the configuration file
@@ -28,5 +36,10 @@ public:
      * Renders the reactor core object
      */
     void render();
+
+    /**
+     * Updates the reactor
+     */
+    void update();
 
 }; // end Reactor class

@@ -5,11 +5,12 @@
 #include "VisualVertexArraySphere.h"
 #include "CollisionDynamicBSphere.h"
 #include "SpaceshipShieldCollisionResponse.h"
-#include "SpaceshipShieldVitals.h"
+//#include "SpaceshipShieldVitals.h"
 #include "Clock.h"
 #include "Timer.h"
 #include "ShaderMgr.h"
 #include "Config.h"
+#include "MultiTexture.h"
 using namespace tlib;
 
 // ----------------------------------------------------------------------------
@@ -20,30 +21,29 @@ void SpaceshipShield::init( Spaceship *oShip )
 
     // Assign the spaceship pointer
     m_oShip = oShip;
+    m_oShip->setShield( this );
 
     Config cfg("config.txt");
     cfg.loadBlock("shield");
 
     // Read animation time
-    float fDuration;
-    cfg.getFloat("anim_time", &fDuration);
-    m_Timer->setDuration(fDuration);
+    float fNoiseDuration, fGlowDuration;
+    cfg.getFloat("noise_time", &fNoiseDuration);
+    cfg.getFloat("glow_time", &fGlowDuration);
+
+    // Request a timer from the application clock
+    m_NoiseTimer = Clock::Instance().GetTimer();
+    m_NoiseTimer->setDuration(fNoiseDuration);
+    m_NoiseTimer->start();
+
+    m_GlowTimer = Clock::Instance().GetTimer();
+    m_GlowTimer->setDuration(fGlowDuration);
 
     // Initialize material component
     OCSimpleMaterial *cMat = new OCSimpleMaterial;
     cMat->setAmbient( Color::black() );
     cMat->setDiffuse( Color::white() );
     setComponent( cMat );
-
-    // Read maximum lives and health
-    int iMaxLives, iMaxHealth;
-    cfg.getInt("lives", &iMaxLives);
-    cfg.getInt("hits", &iMaxHealth);
-
-    // Read shield's life
-
-    // Initialize health component
-    setComponent( new SpaceshipShieldVitals( iMaxLives, iMaxHealth ) );
 
     // Read shield's radius
     float fRadius;
@@ -57,6 +57,18 @@ void SpaceshipShield::init( Spaceship *oShip )
     int iSlices;
     cfg.getInt("slices", &iSlices);
 
+    // Read textures
+    string sColorMap, sNoiseMap;
+    cfg.getString("color_map", sColorMap);
+    cfg.getString("noise_map", sNoiseMap);
+
+    OCMultiTexture *cTex = new OCMultiTexture(2);
+    cTex->set(0, sColorMap.c_str());
+    cTex->setName(0, "colorMap");
+    cTex->set(1, sNoiseMap.c_str());
+    cTex->setName(1, "noiseMap");
+    setComponent( cTex );
+
     // Initialize visual component
     setComponent( new OCVisualVertexArraySphere( fRadius, iStacks, iSlices ) );
 
@@ -65,9 +77,6 @@ void SpaceshipShield::init( Spaceship *oShip )
 
     // Initialize collision response component
     setComponent( new SpaceshipShieldCollisionResponse );
-
-    // Request a timer from the application clock
-    m_Timer = Clock::Instance().GetTimer();
 }
 
 // ----------------------------------------------------------------------------
@@ -79,18 +88,21 @@ void SpaceshipShield::update()
 // ----------------------------------------------------------------------------
 void SpaceshipShield::render() const
 {
-    if( !m_Timer->isRunning() ) return;
+    if( !isActive() ) return;
 
     // User shield rendering program
     ShaderMgr::Instance().begin( ShaderMgr::HIT_GLOW );
     {   
-        // Pass the collision point with the laser
-        //glUniform3fv( ShaderMgr::Instance().getUniform("collPoint"), 
-        //              3, m_vCollPoint.xyz() );
+        ((IOCTexture*)getComponent("texture"))->apply();
 
-        // Pass a timer value to animation the effect
-        glUniform1f( ShaderMgr::Instance().getUniform("timer"), 
-                     (float)m_Timer->getElapsedTime() );
+        glUniform1f( ShaderMgr::Instance().getUniform("noise_timer"), 
+                     (float)m_NoiseTimer->getElapsedTime() );
+
+        float glowTimer = 1.0f;
+        if( m_GlowTimer->isRunning() ) {
+            glowTimer = (float)m_GlowTimer->getElapsedTime();
+        }
+        glUniform1f( ShaderMgr::Instance().getUniform("glow_timer"), glowTimer );
         
         // Enable blending
         glEnable( GL_BLEND );
@@ -100,6 +112,8 @@ void SpaceshipShield::render() const
             ((IOCVisual*)getComponent("visual"))->render();
         }
         glDisable( GL_BLEND );
+
+        ((IOCTexture*)getComponent("texture"))->reset();
     }
     ShaderMgr::Instance().end();
 
@@ -108,6 +122,6 @@ void SpaceshipShield::render() const
 
 // ----------------------------------------------------------------------------
 void SpaceshipShield::setCollPoint( const Vector3f& vCollPoint ) {
-    m_Timer->restart();
+    m_GlowTimer->restart();
     m_vCollPoint = vCollPoint;
 }

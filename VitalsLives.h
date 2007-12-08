@@ -31,15 +31,16 @@ namespace tlib
         }
 
         /**
-         * Returns the number of remaining lives
+         * Accessors
          */
         int getLives() const { return m_iLives; }
+        int getMaxLives() const { return m_iMaxLives; }
 
         /**
          * Checks the health status and takes care of the object's
          * death
          */
-        virtual bool update();
+        void update();
 
         /**
          * This is called on an object's death
@@ -52,10 +53,18 @@ namespace tlib
         virtual void onRevive() = 0;
 
         /**
+         * This is called when an dying object
+         * is out of lives
+         */
+        virtual void onEndOfLives() = 0 ;
+
+        /**
          * Reduces the lives of the object and call onKill callback
          */
         void kill() {
             --m_iLives;
+            if( m_iLives < 0 ) m_iLives = 0;
+
             onKill();
         }
 

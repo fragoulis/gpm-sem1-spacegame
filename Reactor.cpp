@@ -1,5 +1,4 @@
-#include <windows.h>
-#include <gl/gl.h>
+#include "gl/glee.h"
 #include "Reactor.h"
 #include "Logger.h"
 #include "Config.h"
@@ -8,7 +7,11 @@
 #include "SingleTexture.h"
 #include "VisualVertexArraySphere.h"
 #include "CollisionBSphere.h"
+#include "ReactorCollisionResponse.h"
+#include "ReactorVitals.h"
+#include "ShaderMgr.h"
 #include "Clock.h"
+#include "Timer.h"
 
 using namespace tlib;
 
@@ -20,6 +23,12 @@ void Reactor::init()
 
     // Set object's type
     setType( REACTOR );
+
+    m_AnimTimer = Clock::Instance().GetTimer();
+    m_AnimTimer->start();
+    m_GlowTimer = Clock::Instance().GetTimer();
+    m_GlowTimer->setDuration(1.0);
+    m_GlowTimer->setScale(0.2f);
 
     Config cfg("config.txt");
     cfg.loadBlock("reactor");
@@ -69,45 +78,36 @@ void Reactor::init()
     setComponent( new OCCollisionBSphere( fRadius ) );
 
     // Initialize collision response component
-    //setComponent( new ReactorCollisionResponse );
+    setComponent( new ReactorCollisionResponse );
+
+    // Read health
+    int iHealth;
+    cfg.getInt("hits", &iHealth);
+
+    // Initialize health component
+    setComponent( new ReactorVitals( iHealth ) );
 
 } // end setup()
 
+// ----------------------------------------------------------------------------
 void Reactor::render()
-{ // Render reactor
-    IOCVisual *cVisual = (IOCVisual*)getComponent("visual");
-    _ASSERT(cVisual!=0); 
- 
-    // Modify texture matrix to simulate a texture rotation
-    glMatrixMode(GL_TEXTURE);
-    glLoadIdentity();
-    static float fAngle = 0.0f;
+{ 
+    ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_SINGLE_MOV_TEX );
+    {
+        glUniform1f( ShaderMgr::Instance().getUniform("timer"), 
+                     (float)m_AnimTimer->getElapsedTime() );
 
-    // Rotate matrix
-    glRotatef( fAngle, 0.0f, 0.0f, 1.0f );
+        glUniform1f( ShaderMgr::Instance().getUniform("glow_timer"), 
+                     (float)m_GlowTimer->getElapsedTime() );
 
-    // Increase step
-    fAngle += m_fRotFactor * Clock::Instance().getDeltaTime();
+        ((IOCVisual*)getComponent("visual"))->render();
+    }
+    ShaderMgr::Instance().end();    
+}
 
-    // Reload modelview matrix
-    glMatrixMode(GL_MODELVIEW);
-
-    // Render the reactor
-
-    glPushMatrix();
-        /*float matrix[16];
-        glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-        matrix[0] = matrix[5] = matrix[10] = matrix[11] = 1.0f;
-        matrix[1] = matrix[2] = matrix[3] = matrix[4] = 0.0f;
-        matrix[6] = matrix[7] = matrix[8] = matrix[9] = 0.0f;
-        glLoadMatrixf(matrix);*/
-
-        //glScalef(5.0f,5.0f,5.0f);
-        cVisual->render();
-    glPopMatrix();
-    
-    // Reset texture matrix
-    glMatrixMode(GL_TEXTURE);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
+// ----------------------------------------------------------------------------
+void Reactor::update()
+{
+    // Update and check health status
+	((IOCVitals*)getComponent("vitals"))->update();
 }
