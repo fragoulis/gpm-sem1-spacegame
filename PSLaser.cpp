@@ -7,6 +7,7 @@
 #include "Orientation2d.h"
 #include "PSScorchMarks.h"
 #include "Tile3d.h"
+#include "Timer.h"
 #include "Config.h"
 #include "Logger.h"
 using tlib::Config;
@@ -88,8 +89,7 @@ void PSLaser::update()
     if( m_Emitter.isOn() ) 
     {
         // If time is not right don't do anything
-        if( m_Emitter.getTimer().hasExpired() ) {
-            m_Emitter.getTimer().stop();
+        if( !m_Emitter.getTimer()->isRunning() ) {
 
             // Get owner's orientation component
             OCOrientation2D * cOri = 
@@ -101,7 +101,7 @@ void PSLaser::update()
             spawn();
 
             // Restart emitter's timer
-            m_Emitter.getTimer().start();
+            m_Emitter.getTimer()->start();
         }
     }
 

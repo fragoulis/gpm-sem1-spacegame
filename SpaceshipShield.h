@@ -1,9 +1,8 @@
 #pragma once
 #include "TileObject.h"
-#include "Timer.h"
 using tlib::Vector3f;
-using tlib::Timer;
 
+class Timer;
 class Spaceship;
 
 class SpaceshipShield : public TileObject
@@ -16,7 +15,7 @@ private:
     Vector3f m_vCollPoint;
 
     // An animation timer
-    Timer m_Timer;
+    Timer *m_Timer;
 
 public:
     /**
@@ -27,10 +26,7 @@ public:
     /**
      * Collision's point setter
      */
-    void setCollPoint( const Vector3f& vCollPoint ) {
-        m_Timer.restart();
-        m_vCollPoint = vCollPoint;
-    }
+    void setCollPoint( const Vector3f& vCollPoint );
 
     /**
      * Updates the shield's position

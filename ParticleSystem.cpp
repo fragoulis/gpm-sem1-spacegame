@@ -2,7 +2,8 @@
 #include "Particle.h"
 #include "TextureMgr.h"
 #include "Logger.h"
-#include <ctime>
+#include "Clock.h"
+#include "Timer.h"
 using tlib::Logger;
 
 ParticleSystem::ParticleSystem():
@@ -10,7 +11,10 @@ m_iType(Any),
 m_Particles(0),
 m_uiListId(0),
 m_oOwner(0)
-{}
+{
+    // Request a timer from the application clock
+    m_Timer = Clock::Instance().GetTimer();
+}
 
 ParticleSystem::~ParticleSystem()
 {
@@ -29,7 +33,7 @@ ParticleSystem::~ParticleSystem()
 void ParticleSystem::start() 
 { 
     m_Emitter.start();
-    m_Timer.start();
+    m_Timer->start();
 }
 
 // ----------------------------------------------------------------------------

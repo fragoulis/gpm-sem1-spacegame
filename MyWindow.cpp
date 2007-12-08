@@ -25,6 +25,11 @@
 #include "LightMgr.h"
 #include "PointLight.h"
 
+#include "Clock.h"
+#include "Recorder.h"
+#include "ClockTimeSource.h"
+#include "FileTimeSource.h"
+
 using namespace std;
 using namespace tlib;
 
@@ -43,23 +48,27 @@ MyWindow::MyWindow()
 void MyWindow::OnCreate() 
 {
     GLWindowEx::OnCreate();
+    // Start the application clock
+    Clock::Instance().Start( new ClockTimeSource );
 
     Config cfg("config.txt");
     cfg.loadBlock("display");
-    
+
+    // Read fullscreen flag
     int iFullScreen;
     cfg.getInt("fullscreen", &iFullScreen);
     if( iFullScreen )
         SetFullscreen();
 
+    // Setup misc items
     SetFont( 30, "Times" );
     SetCursor( CRNone );
 
     cfg.getFloat("planes", m_fPlanes, 2);
     cfg.getFloat("fovy", &m_fFovY);
 
+    // Misn opengl items
     glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
-    //// enable backface culling
     glEnable        (GL_CULL_FACE);
     glEnable        (GL_DEPTH_TEST);
     glShadeModel    (GL_SMOOTH);
@@ -69,20 +78,26 @@ void MyWindow::OnCreate()
     //glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
     //glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
 
-    //// Low ambient
+    // Set recording's mode destination file
     cfg.loadBlock("global");
+    string sOutputFile;
+    cfg.getString("record_output", sOutputFile);
+    Recorder::Instance().setFile( sOutputFile.c_str() );
 
+    // Setup ambient lighting
     float gAmbient[4];
     cfg.getFloat("light", gAmbient, 4);
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gAmbient);
 
-    //// Open log file
+    // Open log file
     Logger::Instance().open( Logger::ERROR_LOG, true );
 
+    // Initialize object's
     ShaderMgr::Instance().init();
     ObjectMgr::Instance().init();
     LightMgr::Instance().init();
 
+    // Setup the two cameras
     // Third person
     TPCamera *camStalker = CameraMgr::Instance().add<TPCamera>("stalker");
     camStalker->init( (Object*)&ObjectMgr::Instance().getShip() );
@@ -95,29 +110,18 @@ void MyWindow::OnCreate()
     //cCamOri->lookAt( m_Ship.getPos() );
 }
 
-void MyWindow::OnDisplay() 
+void MyWindow::OnDisplay()
 {
-    // save time passed between frames
-    IOCMovement::DeltaTime( (float)App::GetDeltaTime() );
+    Clock::Instance().FrameStep();   
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    // ----------------------------------------------
-    // setup projection matrix
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    float ratio = float(Width()) / float(Height());
-    gluPerspective( m_fFovY, ratio, m_fPlanes[0], m_fPlanes[1] );
-    // reset modelview matrix
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glViewport(0,0,Width(),Height());
-
+    OnResize(Width(), Height());
+   
+    // Apply camera
     CameraMgr::Instance().apply();
    
     // Render spacestation
     LightMgr::Instance().render();
     ObjectMgr::Instance().render();
-
     drawInterface();
 
     SwapBuffers();
@@ -142,12 +146,16 @@ void MyWindow::OnIdle()
 }
 
 void MyWindow::OnResize(int w, int h) {
-	glMatrixMode(GL_PROJECTION);
+    // Setup projection matrix
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     float ratio = float(w) / float(h);
-    gluPerspective( 80, ratio, 0.9f, 1000.0f );
-	glMatrixMode(GL_MODELVIEW);
-	glViewport(0,0,w,h);
+    gluPerspective( m_fFovY, ratio, m_fPlanes[0], m_fPlanes[1] );
+
+    // Setup modelview matrix
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glViewport(0,0,w,h);
 }
 
 void MyWindow::OnDestroy() 
@@ -161,13 +169,15 @@ void MyWindow::OnDestroy()
     Logger::Destroy();
     ShaderMgr::Destroy();
     LightMgr::Destroy();
+    Clock::Destroy();
+    Recorder::Destroy();
 }
 
 void MyWindow::OnKeyboard(int key, bool down)
 {
     // Here we'll add, GOD MODE, CAMERA TOGGLE, RECORD MODE
 	key = tolower(key);
-    if( key == 'q' || key == 27 ) Close();
+	if( key == 'q' || key == 27 ) Close();
 
     if( key == 'l' && !down ) {
         static bool bIsLines = true;
@@ -199,32 +209,34 @@ void MyWindow::drawInterface()
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    float fWidth = float(Width()) / float(Height());
-    float fHeight = 1.0f;
-    gluOrtho2D( -fWidth, fWidth, -fHeight, fHeight );
+    const float fWidth = float(Width()) / float(Height());
+    const float fHeight = 1.0f;
+    gluOrtho2D( -(double)fWidth, (double)fWidth, -(double)fHeight, (double)fHeight );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
     // Only update the minimap every N frames. Render on a frame bufffer[texture]
     // and reapply every N frames??
-    float fStationHalfSize = Tilemap::Instance().getTileSize() * 
-                             Tilemap::Instance().getNumOfTiles() * 0.5f;
-    float fSizeRatio = 0.0005f;
     
-    enum MiniColors { SPACESHIP, BARRIER, TURRET, REACTOR };
-    float vfColors[][4] =
+    enum MiniColors { SPACESTATION, SPACESHIP, BARRIER, TURRET, REACTOR };
+    const float vfColors[][4] =
     {
+        { 0.0f, 1.0f, 0.0f, 1.0f }, // Spacestation
         { 0.0f, 1.0f, 0.0f, 1.0f }, // Spaceship
         { 0.0f, 1.0f, 1.0f, 1.0f }, // Barrier
         { 1.0f, 0.0f, 0.0f, 1.0f }, // Turret
         { 1.0f, 1.0f, 1.0f, 1.0f }  // Reactor?
     };
 
-
     glPointSize(5.0f);
     glPushMatrix();
     {
-        const float fSide = 0.35f;
+        const float fSizeRatio = 0.0005f;
+        float fStationHalfSize = Tilemap::Instance().getTileSize() * 
+                                 Tilemap::Instance().getNumOfTiles() * 0.5f;
+        const float fSide = fStationHalfSize * fSizeRatio;
+        //glScissor( Width()-int(fStationHalfSize*0.5f), 0, Width(), Height() );
+        //glEnable(GL_SCISSOR_TEST);
         // Translate and rotate the minimap to our likes
         // [bottom-right corner]
         glTranslatef( fWidth-fSide, -fHeight+fSide, 0.0f );
@@ -232,13 +244,13 @@ void MyWindow::drawInterface()
         // Draw the minimap background
         glPushMatrix();
         {
-            glTranslatef( 0.0f, 0.0f, 0.0f );
             glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, TextureMgr::Instance().getTexture("textures/minimap.jpg"));
+            static GLuint uiMinimap = TextureMgr::Instance().getTexture("textures/minimap2.jpg");
+            glBindTexture(GL_TEXTURE_2D, uiMinimap );
             glEnable(GL_BLEND);
             glBegin(GL_QUADS);
             {
-                glColor4f( 1.0f, 1.0f, 1.0f, 0.6f );
+                glColor4f( 1.0f, 1.0f, 1.0f, 0.7f );
                 glTexCoord2f(0,0); glVertex2f( -fSide, -fSide );
                 glTexCoord2f(1,0); glVertex2f(  fSide, -fSide );
                 glTexCoord2f(1,1); glVertex2f(  fSide,  fSide );
@@ -262,16 +274,35 @@ void MyWindow::drawInterface()
             glTranslatef( 0.04f, -0.09f, 0.0f );
             glRotatef( 40, 1.0f, 0.0f, 0.0f );
             glRotatef( 30, 0.0f, 1.0f, 0.0f );
+
+            // Save current polygon display mode state and turn on wireframe
+            int viPolygonMode[2];
+            glGetIntegerv( GL_POLYGON_MODE, viPolygonMode );
+            glPolygonMode(GL_FRONT,GL_LINE);
+            // Render small spacestation corridors
+            glPushMatrix();
+            {
+                // Make spacestation fSizeRatio times smaller
+                glColor4fv( vfColors[SPACESTATION] );
+                glScalef( fSizeRatio, fSizeRatio, fSizeRatio );
+                ((IOCVisual*)ObjectMgr::Instance().getCorridors().getComponent("visual"))->render();
+            }
+            glPopMatrix();
+            // Restore polygon display modes
+            glPolygonMode(GL_FRONT,viPolygonMode[0]);
+
+            // Render object as small points
             glBegin(GL_POINTS);
             {
-                // Translate the spaceship dor according to the real
+                // Translate the spaceship point according to the real
                 // spaceship's world coordinates
                 const Vector3f& vShip = ObjectMgr::Instance().getShip().getPos() * fSizeRatio;
                 glColor4fv( vfColors[SPACESHIP] );
                 glVertex3f( vShip.x(), vShip.y(), vShip.z() );
 
                 // Draw all objects in the tilemap
-                for( int index=0; index<Tilemap::Instance().getArraySize(); ++index )
+                const int iArraySize = Tilemap::Instance().getArraySize();
+                for( int index=0; index<iArraySize; ++index )
                 {
                     Tile3d *oTile = Tilemap::Instance().getTileByIndex( index );
                     Object *oOcc = oTile->getOccupant();
@@ -284,8 +315,8 @@ void MyWindow::drawInterface()
                         // dor accordingly
                         int iColorIndex;
                         switch( oOcc->getType() ) {
-                            case Object::BARRIER: iColorIndex = BARRIER; break;
-                            case Object::TURRET: iColorIndex = TURRET; break;
+                            case Object::BARRIER:   iColorIndex = BARRIER; break;
+                            case Object::TURRET:    iColorIndex = TURRET; break;
                         }
                         glColor4fv( vfColors[iColorIndex] );
 
@@ -299,29 +330,18 @@ void MyWindow::drawInterface()
             }
             glEnd();
 
-            // Save current polygon display mode state and turn on wireframe
-            int viPolygonMode[2];
-            glGetIntegerv( GL_POLYGON_MODE, viPolygonMode );
-            glPolygonMode(GL_FRONT,GL_LINE);
-            glPushMatrix();
-            {
-                // Make spacestation fSizeRatio times smaller
-                glScalef( fSizeRatio, fSizeRatio, fSizeRatio );
-                ((IOCVisual*)ObjectMgr::Instance().getCorridors().getComponent("visual"))->render();
-            }
-            glPopMatrix();
-            // Restore polygon display modes
-            glPolygonMode(GL_FRONT,viPolygonMode[0]);
             // Restore depth test function
             glDepthFunc(iDepthFunc);
         }
         glPopMatrix();
+        // Disable scissor testing
+        //glDisable(GL_SCISSOR_TEST);
     }
     glPopMatrix();
 
     // Draw health status
     glColor3f( 1.0f, 1.0f, 0.0f );
-    glRasterPos3f( 1.00f, 0.0f, 0.0f );
+    glRasterPos3f( 1.0f, 0.0f, 0.0f );
     Printf( "Health: %i", ObjectMgr::Instance().getShip().getHealth() );
     
     glEnable( GL_LIGHTING );

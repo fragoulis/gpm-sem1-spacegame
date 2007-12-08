@@ -20,6 +20,11 @@ namespace tlib
             return string("controller"); 
         }
 
+		/**
+         * Executes after capturing user's input user input
+         */
+        virtual void update() = 0;
+
     }; // end of IOCController class
 
 } // end of namespace tlib

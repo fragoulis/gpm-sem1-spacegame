@@ -3,6 +3,7 @@
 #include "PSScorchMarks.h"
 #include "PSSmallExplosion.h"
 #include "PSSmoke.h"
+#include "Timer.h"
 
 ParticleSystemMgr::ParticleSystemMgr()
 {
@@ -40,7 +41,7 @@ ParticleSystem* ParticleSystemMgr::checkForSameType( int iType )
          ++iter )
     {
         list = *iter;
-        if( !list->getTimer().isRunning() )
+        if( !list->getTimer()->isRunning() )
             if( list->isType( iType ) )
                 return list;
     }
@@ -144,9 +145,8 @@ void ParticleSystemMgr::update()
         ParticleSystem *ps = *iter;
 
         // If a particle system has expired
-        if( ps->getTimer().hasExpired() ) 
+        if( !ps->getTimer()->isRunning() ) 
         {
-            ps->getTimer().stop();
             if( ps->getEmitter().getPAlive().size() ) {
                 // Turn of its emitter
                 ps->getEmitter().stop();

@@ -22,13 +22,8 @@ namespace tlib
     // ------------------------------------------------------------------------
     void OCCollisionDynamicBSphere::_readConfig()
     {
-        Config cfg("config.txt");
-        cfg.loadBlock("spacestation");
-
-        int iNumOfTiles;
-        cfg.getInt("tile_size"  ,&m_iTileSize);
-        cfg.getInt("tiles"      ,&iNumOfTiles);
-        m_iHalfNumOfTiles = (int)(iNumOfTiles * 0.5f);
+        m_iTileSize = Tilemap::Instance().getTileSize();
+        m_iHalfNumOfTiles = int(Tilemap::Instance().getNumOfTiles() * 0.5f);
     }
 
     // ------------------------------------------------------------------------

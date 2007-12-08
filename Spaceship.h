@@ -47,6 +47,7 @@ public:
     /**
      * Control the spaceship's speed
      */
+	void speed( float fAxis );
     void speedUp();
     void speedDown();
     void resetSpeed();
@@ -54,6 +55,9 @@ public:
     /**
      * Control the spaceship's movement
      */
+	void move( float fVert, float fHoriz );
+	void resetMove();
+
     void moveRight();
     void moveLeft();
     void moveUp();

@@ -1,10 +1,8 @@
-
 #pragma once
+#include "GXJoystick.h"
+using tlib::OCGXJoystick;
 
-#include "keyboard.h"
-using tlib::OCKeyboard;
-
-class SpaceshipKeyboard : public OCKeyboard
+class SpaceshipJoystick : public OCGXJoystick
 {
 public:
     /**

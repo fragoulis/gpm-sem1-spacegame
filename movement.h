@@ -1,8 +1,6 @@
-
 #pragma once
-
-#include "component.h"
-#include "vector3.h"
+#include "Component.h"
+#include "Vector3.h"
 
 namespace tlib 
 {
@@ -13,9 +11,6 @@ namespace tlib
         // The direction vector
         // This vector determines to which direction the object will move
         Vector3f m_vDir;
-
-    private:
-        static float m_fDeltaTime;
 
     public:
         /**
@@ -39,22 +34,12 @@ namespace tlib
          * Returns the direction vector
          */
         const Vector3f& getDir() const { return m_vDir; }
-	Vector3f& getDir() { return m_vDir; }
+        Vector3f& getDir() { return m_vDir; }
         
         /**
          * Sets the direction vector
          */
         void setDir( const Vector3f& vDir ) { m_vDir = vDir; }
-
-        /**
-         * Returns the delta time
-         */
-        static float DeltaTime() { return m_fDeltaTime; }
-
-        /**
-         * Sets the delta time
-         */
-        static void DeltaTime( float dt ) { m_fDeltaTime = dt; }
 
     }; // end of IOCMovement class
 

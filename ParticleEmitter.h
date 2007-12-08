@@ -1,12 +1,10 @@
 #pragma once
 #include <list>
+#include "Vector3.h"
+using tlib::Vector3f;
 using namespace std;
 
-#include "Vector3.h"
-#include "Timer.h"
-using tlib::Vector3f;
-using tlib::Timer;
-
+class Timer;
 class Particle;
 
 // Particle list typedef
@@ -34,7 +32,7 @@ private:
     ParticleList m_vPDead;
 
     // Particle emitter's timer
-    Timer m_Timer;
+    Timer *m_Timer;
 
 public:
     /**
@@ -61,16 +59,12 @@ public:
     /**
      * Timer accessor
      */
-    const Timer& getTimer() const { return m_Timer; }
-    Timer& getTimer() { return m_Timer; }
+    Timer* getTimer() { return m_Timer; }
 
     /**
      * Initializes the emitter
      */
-    void init( double dReleaseTime, int iReleaseCount ) {
-        m_Timer.setDuration(dReleaseTime);
-        m_iReleaseCount = iReleaseCount;
-    }
+    void init( double dReleaseTime, int iReleaseCount );
 
     /**
      * Release count accessor

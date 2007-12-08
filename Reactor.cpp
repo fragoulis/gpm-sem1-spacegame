@@ -8,7 +8,7 @@
 #include "SingleTexture.h"
 #include "VisualVertexArraySphere.h"
 #include "CollisionBSphere.h"
-#include "Movement.h"
+#include "Clock.h"
 
 using namespace tlib;
 
@@ -87,7 +87,7 @@ void Reactor::render()
     glRotatef( fAngle, 0.0f, 0.0f, 1.0f );
 
     // Increase step
-    fAngle += m_fRotFactor * IOCMovement::DeltaTime();
+    fAngle += m_fRotFactor * Clock::Instance().getDeltaTime();
 
     // Reload modelview matrix
     glMatrixMode(GL_MODELVIEW);

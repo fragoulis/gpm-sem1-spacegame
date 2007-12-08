@@ -1,4 +1,4 @@
-#include <GL/GLee.h>
+#include "gl/glee.h"
 #include "ObjectMgr.h"
 #include "Tile3d.h"
 // Objects
@@ -20,6 +20,7 @@
 #include "Tilemap.h"
 #include "ShaderMgr.h"
 #include "ParticleSystemMgr.h"
+#include "Clock.h"
 // Util
 #include "Config.h"
 #include "Logger.h"
@@ -81,9 +82,6 @@ namespace tlib
         ShaderMgr::Instance().end();
 
         //((IOCVisual*)m_Corridors.getComponent("visual"))->render();
-        //ShaderMgr::Instance().begin( ShaderMgr::SPOT_LIGHT_SINGLE_TEX );
-        //    ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
-        //ShaderMgr::Instance().end();
         ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX );
             ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
             m_DoorMgr.render(); 
@@ -91,12 +89,15 @@ namespace tlib
 
         if( !isCulled( (Object*)&m_Reactor ) )
         {
-            static float fReactorTimer = 0.0f;
+            
             ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_SINGLE_MOV_TEX );
+            {
+                static float fReactorTimer = 0.0f;
                 glUniform1f( ShaderMgr::Instance().getUniform("timer"), fReactorTimer );
                 ((IOCVisual*)m_Reactor.getComponent("visual"))->render();
-            ShaderMgr::Instance().end();
-            fReactorTimer += IOCMovement::DeltaTime();
+                fReactorTimer += Clock::Instance().getDeltaTime();
+            }
+            ShaderMgr::Instance().end();            
         }
 
         m_ForcefieldMgr.render();

@@ -1,6 +1,6 @@
-
-#include "linearmovement.h"
-#include "object.h"
+#include "LinearMovement.h"
+#include "Object.h"
+#include "Clock.h"
 
 namespace tlib 
 {
@@ -22,8 +22,8 @@ namespace tlib
         const Vector3f& vPos = getOwner()->getPos();
 
         // Calculate new position
-        Vector3f vNewPos = vPos + 
-                           m_vDir * m_fVelocity * IOCMovement::DeltaTime();
+        const Vector3f vNewPos = 
+            vPos + m_vDir * m_fVelocity * Clock::Instance().getDeltaTime();
 
         // Update position
         getOwner()->setPos( vNewPos );

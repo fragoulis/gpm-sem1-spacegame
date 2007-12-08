@@ -58,24 +58,26 @@ namespace tlib
             cOwnerRes->respond();
         }
         else
-        // Check with tile's occupier object
-        if( checkWithObject( vCollDir ) ) {
-            // Respond to collision
-            cOwnerRes->setCollDir( vCollDir );
-            cOwnerRes->respond();
+        {
+            // Check with tile's occupier object
+            if( checkWithObject( vCollDir ) ) {
+                // Respond to collision
+                cOwnerRes->setCollDir( vCollDir );
+                cOwnerRes->respond();
 
-            // Get the other object's response component
-            // Note: that not all object's have response components
-            Object *oOcc = m_CurTile->getOccupant();
-            IOCCollisionResponse *cObjRes = 
-                (IOCCollisionResponse*)oOcc->getComponent("collisionresponse");
+                // Get the other object's response component
+                // Note: that not all object's have response components
+                Object *oOcc = m_CurTile->getOccupant();
+                IOCCollisionResponse *cObjRes = 
+                    (IOCCollisionResponse*)oOcc->getComponent("collisionresponse");
 
-            if( cObjRes ) {
-                cObjRes->setCollDir( vCollDir );
-                cObjRes->respond();
-            }
-        }
-    }
+                if( cObjRes ) {
+                    cObjRes->setCollDir( vCollDir );
+                    cObjRes->respond();
+                }
+            } // end if( .. )
+        } // end if( .. ) else 
+    } // end checkCollision()
 
     // ------------------------------------------------------------------------
     bool OCCollisionDynamicBBox::checkWithObject( Vector3f& vCollDir ) const
@@ -161,7 +163,8 @@ namespace tlib
 
         // Return collision flag
         return isCollision;
-    }
+
+    } // end checkWithTile()
 
     // ------------------------------------------------------------------------
     bool OCCollisionDynamicBBox::readTile()

@@ -1,4 +1,4 @@
-#include <GL/GLee.h>
+#include "gl/glee.h"
 #include "ShaderMgr.h"
 #include "Logger.h"
 #include <cstdio>

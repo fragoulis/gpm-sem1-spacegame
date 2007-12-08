@@ -1,31 +1,37 @@
 #include "spaceshipkeyboard.h"
 #include "spaceship.h"
 
-void OCSpaceshipKeyboard::update() const
+void SpaceshipKeyboard::update()
 {
     Spaceship *ship = (Spaceship*)getOwner();
 
     if( getKey('a') ) {
+		//ship->speed(1.0f);
         ship->speedUp();
     }
     else if( getKey('s') ) {
-        ship->speedDown();
+        //ship->speed(-1.0f);
+		ship->speedDown();
     } 
     else {
         ship->resetSpeed();
     }
 
     if( getKey('f') ) {
+		//ship->move( 1.0f, 0.0f );
         ship->moveUp();
     }
     else if( getKey('r') ) {
-        ship->moveDown();
+        //ship->move( -1.0f, 0.0f );
+		ship->moveDown();
     }
 
     if( getKey('g') ) {
+		//ship->move( 0.0f, 1.0f );
         ship->moveRight();
     }
     else if( getKey('d') ) {
+		//ship->move( 0.0f, -1.0f );
         ship->moveLeft();
     } else {
         ship->resetRoll();
