@@ -57,6 +57,11 @@ void PSScorchMarks::init()
     // Initialize base class [compile's a display list for the particle]
     ParticleSystem::init( fSize );
 
+    // This line is important, although marks' particle system time
+    // is always 0[unlimited], we must explicitly start it, in order
+    // to emit particles[scorch marks]
+    m_Timer->start();
+
 } // end init()
 
 // ----------------------------------------------------------------------------

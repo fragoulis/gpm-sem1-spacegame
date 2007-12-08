@@ -34,7 +34,7 @@ namespace tlib
          * Checks the health status and takes care of the object's
          * death
          */
-        virtual bool update();
+        void update();
 
         /**
          * This is called on an object's death
@@ -45,6 +45,12 @@ namespace tlib
          * This is called on an object's revival
          */
         virtual void onRevive() = 0;
+
+        /**
+         * Accessors
+         */
+        int getHealth() const { return m_iHealth; }
+        int getMaxHealth() const { return m_iMaxHealth; }
 
         /**
          * Checks the health status

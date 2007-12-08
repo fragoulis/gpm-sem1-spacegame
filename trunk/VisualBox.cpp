@@ -51,69 +51,63 @@ namespace tlib
         {
             // front face
             glNormal3f( 0.0f, 0.0f, 1.0f );
-            texCoord( iTextures, 0.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 0.0f );
-            glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 1.0f );
-            glVertex3f(  m_vHalfDim.x(),  m_vHalfDim.y(), m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 1.0f );
-            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), m_vHalfDim.z() );
+            texCoord( iTextures, 0.0f, 0.0f ); glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), m_vHalfDim.z() );
+            glNormal3f( 0.0f, 0.0f, 1.0f );
+            texCoord( iTextures, 1.0f, 0.0f ); glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), m_vHalfDim.z() );
+            glNormal3f( 0.0f, 0.0f, 1.0f );
+            texCoord( iTextures, 1.0f, 1.0f ); glVertex3f(  m_vHalfDim.x(),  m_vHalfDim.y(), m_vHalfDim.z() );
+            glNormal3f( 0.0f, 0.0f, 1.0f );
+            texCoord( iTextures, 0.0f, 1.0f ); glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), m_vHalfDim.z() );
 
             // back face
             glNormal3f( 0.0f, 0.0f, -1.0f );
-            texCoord( iTextures, 1.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 1.0f );
-            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 1.0f );
-            glVertex3f(  m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 0.0f );
-            glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            texCoord( iTextures, 1.0f, 0.0f ); glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 0.0f, 0.0f, -1.0f );
+            texCoord( iTextures, 1.0f, 1.0f ); glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 0.0f, 0.0f, -1.0f );
+            texCoord( iTextures, 0.0f, 1.0f ); glVertex3f(  m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 0.0f, 0.0f, -1.0f );
+            texCoord( iTextures, 0.0f, 0.0f ); glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
 
             // top face
             glNormal3f( 0.0f, 1.0f, 0.0f );
-            texCoord( iTextures, 0.0f, 1.0f );
-            glVertex3f( -m_vHalfDim.x(), m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 0.0f );
-            glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 1.0f );
-            glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(), -m_vHalfDim.z() );
+            texCoord( iTextures, 0.0f, 1.0f ); glVertex3f( -m_vHalfDim.x(), m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 0.0f, 1.0f, 0.0f );
+            texCoord( iTextures, 0.0f, 0.0f ); glVertex3f( -m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
+            glNormal3f( 0.0f, 1.0f, 0.0f );
+            texCoord( iTextures, 1.0f, 0.0f ); glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(),  m_vHalfDim.z() );
+            glNormal3f( 0.0f, 1.0f, 0.0f );
+            texCoord( iTextures, 1.0f, 1.0f ); glVertex3f(  m_vHalfDim.x(), m_vHalfDim.y(), -m_vHalfDim.z() );
 
             // bottom face
             glNormal3f( 0.0f, -1.0f, 0.0f );
-            texCoord( iTextures, 1.0f, 1.0f );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 1.0f );
-            glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 0.0f );
-            glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+            texCoord( iTextures, 1.0f, 1.0f ); glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 0.0f, -1.0f, 0.0f );
+            texCoord( iTextures, 0.0f, 1.0f ); glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 0.0f, -1.0f, 0.0f );
+            texCoord( iTextures, 0.0f, 0.0f ); glVertex3f(  m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+            glNormal3f( 0.0f, -1.0f, 0.0f );
+            texCoord( iTextures, 1.0f, 0.0f ); glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
 
             // right face
             glNormal3f( 1.0f, 0.0f, 0.0f );
-            texCoord( iTextures, 1.0f, 0.0f );
-            glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 1.0f );
-            glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 1.0f );
-            glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 0.0f );
-            glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+            texCoord( iTextures, 1.0f, 0.0f ); glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 1.0f, 0.0f, 0.0f );
+            texCoord( iTextures, 1.0f, 1.0f ); glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( 1.0f, 0.0f, 0.0f );
+            texCoord( iTextures, 0.0f, 1.0f ); glVertex3f( m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
+            glNormal3f( 1.0f, 0.0f, 0.0f );
+            texCoord( iTextures, 0.0f, 0.0f ); glVertex3f( m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
 
             // left face
             glNormal3f( -1.0f, 0.0f, 0.0f );
-            texCoord( iTextures, 0.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 0.0f );
-            glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
-            texCoord( iTextures, 1.0f, 1.0f );
-            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
-            texCoord( iTextures, 0.0f, 1.0f );
-            glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
+            texCoord( iTextures, 0.0f, 0.0f ); glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(), -m_vHalfDim.z() );
+            glNormal3f( -1.0f, 0.0f, 0.0f );
+            texCoord( iTextures, 1.0f, 0.0f ); glVertex3f( -m_vHalfDim.x(), -m_vHalfDim.y(),  m_vHalfDim.z() );
+            glNormal3f( -1.0f, 0.0f, 0.0f );
+            texCoord( iTextures, 1.0f, 1.0f ); glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(),  m_vHalfDim.z() );
+            glNormal3f( -1.0f, 0.0f, 0.0f );
+            texCoord( iTextures, 0.0f, 1.0f ); glVertex3f( -m_vHalfDim.x(),  m_vHalfDim.y(), -m_vHalfDim.z() );
         }
         glEnd();
 

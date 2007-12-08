@@ -65,18 +65,33 @@ namespace tlib
                      const int nCount = 1 );
 
         /**
+         * Reads booleans
+         */
+        void getBool( const string &sKey, 
+                      bool *out, 
+                      const int nCount = 1 );
+
+
+        /**
          * Reads floats
          */
         void getFloat( const string &sKey, 
                        float *out, 
                        const int nCount = 1 );
 
-	/**
+	    /**
          * Reads doubles
          */
         void getDouble( const string &sKey, 
                         double *out, 
                         const int nCount = 1 );
+
+        /**
+         * Reads chars
+         */
+        void getChar( const string &sKey, 
+                      char *out, 
+                      const int nCount = 1 );
 
     private:
         /**

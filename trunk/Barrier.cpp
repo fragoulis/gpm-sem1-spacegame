@@ -13,6 +13,9 @@ Barrier::Barrier()
 
 Barrier::Barrier( const Vector3f& vBBox )
 {
+    // Set object's type
+    setType( BARRIER );
+
     // Initialize a bounding box for all barriers
     setComponent( new OCCollisionBBox( vBBox ) );
 }

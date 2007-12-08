@@ -7,6 +7,13 @@ const float AXIS_ZERO_N = -3.05176e-005f;
 void SpaceshipJoystick::update()
 {
     Spaceship *ship = (Spaceship*)getOwner();
+    if( !getOwner()->isActive() ) 
+    {
+        ship->resetSpeed();
+        ship->ceaseFire();
+        return;
+    }
+
 	m_Joystick.Update();
 
 	// Map  joystick controls to our spacecraft

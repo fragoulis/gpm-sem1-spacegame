@@ -55,7 +55,7 @@ namespace tlib
          * Responds to the collision
          * The parameter is the collision vector [optional]
          */
-        virtual void respond() const;
+        virtual void respond();
 
     };
 

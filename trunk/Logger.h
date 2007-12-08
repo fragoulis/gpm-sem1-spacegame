@@ -6,12 +6,11 @@
 #include <string>
 #include <stdexcept>
 #include <fstream>
-#include "Singleton.h"
 
 using namespace std;
 
 #ifdef _DEBUG
-#   define _LOG(str) {Logger::Instance().log(str);}
+#   define _LOG(str) {Logger log(str);}
 #else
 #   define _LOG(str)
 #endif
@@ -19,41 +18,15 @@ using namespace std;
 namespace tlib
 {
 
-    class Logger : public Singleton<Logger>
+    class Logger
     {
-        friend Singleton<Logger>;
-
-    private:
-        // The file stream
-        ofstream m_fsLog;
-
-    public:
-        static const char *ERROR_LOG;
-        static const char *LOADING_LOG;
-        static const char *RUNTIME_LOG;
-
-    private:
-        /**
-         * Constructors
-         */
-        Logger();
-        Logger( const char *filename );
-
-        /**
-         * Destructor
-         */
-        ~Logger() {}
-
     public:
         /**
-         * Appends an entry to the log
+         * Constructor
          */
-        void log( const string& entry );
+        Logger( const string& entry );
 
-        /**
-         * Opens the stream for logging
-         */
-        void open( const char *filename, bool clear = false );
+        static const char *LOG_FILE;
 
     }; // end of Logger class
 

@@ -50,9 +50,16 @@ private:
 // ----------------------------------------------------------------------------
 bool Recorder::start()
 {
-    m_fsOut.open( m_sFile.c_str() );
-    if( !m_fsOut.is_open() )
-        return false;
+    if( m_fsOut.is_open() ) return true;
+
+    m_fsOut.exceptions ( ofstream::eofbit | ofstream::failbit | ofstream::badbit );
+    try {
+        m_fsOut.open( m_sFile.c_str() );
+    }
+    catch( ofstream::failure e ) {
+    }
+
+    if( !m_fsOut.is_open() ) return false;
 
     return ( m_bIsOn = true );
 }

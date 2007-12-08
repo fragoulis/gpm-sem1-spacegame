@@ -1,20 +1,20 @@
 #pragma once
-#include "VitalsLives.h"
-using tlib::OCVitalsLives;
+#include "VitalsHealth.h"
+using tlib::OCVitalsHealth;
 
-class SpaceshipVitals : public OCVitalsLives
+class ReactorVitals : public OCVitalsHealth
 {
 public:
     /**
      * Constructor
      */
-    SpaceshipVitals( int iMaxLives, int iMaxHealth );
+    ReactorVitals( int iMaxHealth );
     
     /**
      * Returns the unique component ID
      */
     const string componentID() const { 
-        return string("spaceshipvitals"); 
+        return string("reactorvitals"); 
     }
 
     /**
@@ -27,10 +27,4 @@ public:
      */
     void onRevive();
 
-    /**
-     * This is called when an dying object
-     * is out of lives
-     */
-    void onEndOfLives();
-
-}; // end of SpaceshipVitals class
+}; // end of ReactorVitals class

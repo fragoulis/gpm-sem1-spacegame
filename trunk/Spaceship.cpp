@@ -166,10 +166,12 @@ void Spaceship::update()
 }
 
 // ----------------------------------------------------------------------------
-int Spaceship::getHealth()
+void Spaceship::getVitals( int &iHealthRatio, int &iLives, int &iMaxLives )
 {
-    OCVitalsHealth *cVitals = (OCVitalsHealth*)getComponent("vitals");
-    return int( 100 * cVitals->healthRatio() );
+    OCVitalsLives *cVitals = (OCVitalsLives*)getComponent("vitals");
+    iHealthRatio = int( 100 * cVitals->healthRatio() );
+    iLives = cVitals->getLives();
+    iMaxLives = cVitals->getMaxLives();
 }
 
 // ----------------------------------------------------------------------------

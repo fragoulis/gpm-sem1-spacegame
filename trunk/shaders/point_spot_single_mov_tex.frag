@@ -14,6 +14,8 @@ varying _PointLight pointLights[MAX_LIGHTS];
 
 // The surfaces texture
 uniform sampler2D colorMap;
+// Timer for the texture animation
+uniform float timer, glow_timer;
 
 // Spot light inputs
 varying vec3 spot_lightDir, halfVector;
@@ -26,7 +28,9 @@ varying vec3 normal, eyeVec;
 void main (void)
 {
     // Get texture color
-    vec4 texture = texture2D( colorMap, gl_TexCoord[0].st );
+    vec2 displace = vec2( 0, cos(timer)*sin(timer)*0.6 );
+    vec4 texture = texture2D( colorMap, gl_TexCoord[0].st + displace.st ) + 
+                   vec4( displace, displace );
 	
 	/* Combine two ambient terms, one of the spot light and one for all
 	 * other point lights.
@@ -38,11 +42,6 @@ void main (void)
 	    
 	
 	vec3 N = normalize(normal);
-	
-	if( gl_FragCoord.z > 1.0 ) 
-	{ 
-	    discard; 
-	}
 	
 	// ______________________________________________________________
 	// Calculate lamberTerm for the spotlight
@@ -107,6 +106,7 @@ void main (void)
 		                   pointLights[i].att;	
 	    }
 	}
-
-	gl_FragColor = final_color;
+                   
+    const vec4 GLOW = vec4(glow_timer,glow_timer,glow_timer,1.0);
+	gl_FragColor = final_color + GLOW;
 }

@@ -58,7 +58,8 @@ void TurretMgr::update()
 
         // Check the turret's health status
         cVitals = (IOCVitals*)obj->getComponent("vitals");
-        if( !cVitals->update() ) 
+        cVitals->update();
+        if( !cVitals->isAlive() ) 
         {
             // If turret is dead, remove it from the list
             toKill.push_back( obj );

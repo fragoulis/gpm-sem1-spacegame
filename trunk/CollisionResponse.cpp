@@ -3,7 +3,7 @@
 
 namespace tlib
 {
-    void IOCCollisionResponse::respond() const
+    void IOCCollisionResponse::respond()
     {
         m_oOwner->setPos( m_oOwner->getPos() + m_vCollDir );
     }

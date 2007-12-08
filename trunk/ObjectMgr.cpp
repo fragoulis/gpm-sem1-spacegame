@@ -66,6 +66,7 @@ namespace tlib
         m_ForcefieldMgr.update();
         m_TurretMgr.update();
         m_OutletMgr.update();
+        m_Reactor.update();
     }
 
     // ----------------------------------------------------------------------------
@@ -87,17 +88,8 @@ namespace tlib
             m_DoorMgr.render(); 
         ShaderMgr::Instance().end();
 
-        if( !isCulled( (Object*)&m_Reactor ) )
-        {
-            
-            ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_SINGLE_MOV_TEX );
-            {
-                static float fReactorTimer = 0.0f;
-                glUniform1f( ShaderMgr::Instance().getUniform("timer"), fReactorTimer );
-                ((IOCVisual*)m_Reactor.getComponent("visual"))->render();
-                fReactorTimer += Clock::Instance().getDeltaTime();
-            }
-            ShaderMgr::Instance().end();            
+        if( !isCulled( (Object*)&m_Reactor ) ) {
+            m_Reactor.render();        
         }
 
         m_ForcefieldMgr.render();

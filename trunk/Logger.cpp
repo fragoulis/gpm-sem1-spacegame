@@ -2,43 +2,16 @@
 
 namespace tlib
 {
-    const char *Logger::ERROR_LOG    = "log.errors.txt";
-    const char *Logger::LOADING_LOG  = "log.loading.txt";
-    const char *Logger::RUNTIME_LOG  = "log.runtime.txt";
+    const char *Logger::LOG_FILE = "log.errors.txt";
 
-    Logger::Logger() {}
-    Logger::Logger( const char *filename ) 
+    Logger::Logger( const string& entry ) 
     {
-#ifdef _DEBUG
-        m_fsLog.open( filename, ios_base::app );
-#endif
-    }
+        ofstream log( LOG_FILE, ios_base::app );
 
-    void Logger::log( const string& entry )
-    {
-#ifdef _DEBUG
-        if( m_fsLog.is_open() )
-            m_fsLog << entry << endl;
-        else 
-            cout << entry << endl;
-#endif
-    }
+        if( log.is_open() )
+            log << entry << endl;
 
-    /**
-     * Opens the stream for logging
-     */
-    void Logger::open( const char *filename, bool clear )
-    {
-#ifdef _DEBUG
-        if( clear )
-        {
-            m_fsLog.open( filename );
-        } else
-        {
-            m_fsLog.open( filename, ios_base::app  );
-            log( "\nStarting..." );
-        }
-#endif
+        cout << entry << endl;
     }
 
 } // end of namespace tlib

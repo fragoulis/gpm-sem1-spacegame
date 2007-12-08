@@ -6,7 +6,7 @@
 using namespace tlib;
 
 OutletAnimation::OutletAnimation():
-    OCTimerAnimation(true)
+OCTimerAnimation(true)
 {
     Config cfg("config.txt");
     cfg.loadBlock("outlet");

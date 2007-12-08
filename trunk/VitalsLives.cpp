@@ -10,9 +10,9 @@ namespace tlib
     m_iLives(iMaxLives)
     {}
 
-    bool OCVitalsLives::update()
+    void OCVitalsLives::update()
     {
-        if( isAlive() ) return true;
+        if( isAlive() || hasEnded() ) return;
         
         // If health is below zero make the object inactive
         // [aka kill it]
@@ -21,13 +21,13 @@ namespace tlib
         // If object has remaining lives revive it
         if( m_iLives > 0 ) {
             revive();
-            return true;
         }
-        else 
+        else {
             // Else deactivate it
             getOwner()->deactivate();
-
-        return false;
+            m_bHasEnded = true;
+            onEndOfLives();
+        }
     }
 
 } // end of namespace tlib

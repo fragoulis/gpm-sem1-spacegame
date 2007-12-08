@@ -4,7 +4,13 @@
 void SpaceshipKeyboard::update()
 {
     Spaceship *ship = (Spaceship*)getOwner();
-
+    if( !getOwner()->isActive() ) 
+    {
+        ship->resetSpeed();
+        ship->ceaseFire();
+        return;
+    }
+    
     if( getKey('a') ) {
 		//ship->speed(1.0f);
         ship->speedUp();

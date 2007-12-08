@@ -52,31 +52,44 @@ void MyWindow::OnCreate()
     Clock::Instance().Start( new ClockTimeSource );
 
     Config cfg("config.txt");
-    cfg.loadBlock("display");
+
+    // Map application switches
+    memset( AppControl, 0, sizeof(AppControl) );
+    cfg.loadBlock("controls");
+    cfg.getChar("fullscreen", &AppControlKey[FULLSCREEN] );
+    cfg.getChar("camera",     &AppControlKey[CAMERA] );
+    cfg.getChar("record",     &AppControlKey[RECORD] );
+    cfg.getChar("collision",  &AppControlKey[COLLISION] );
+    cfg.getChar("wireframe",  &AppControlKey[WIREFRAME] );
+    cfg.getChar("god_mode",   &AppControlKey[GOD_MODE] );
+    AppControlLabel[FULLSCREEN] = "Fullscreen";
+    AppControlLabel[CAMERA]     = "Camera";
+    AppControlLabel[RECORD]     = "Recording";
+    AppControlLabel[COLLISION]  = "Collision";
+    AppControlLabel[WIREFRAME]  = "Wireframe";
+    AppControlLabel[GOD_MODE]   = "God Mode";
 
     // Read fullscreen flag
-    int iFullScreen;
-    cfg.getInt("fullscreen", &iFullScreen);
-    if( iFullScreen )
+    cfg.loadBlock("display");
+    cfg.getBool("fullscreen", &AppControl[FULLSCREEN]);
+    if( AppControl[FULLSCREEN] )
         SetFullscreen();
 
-    // Setup misc items
-    SetFont( 30, "Times" );
-    SetCursor( CRNone );
-
     cfg.getFloat("planes", m_fPlanes, 2);
-    cfg.getFloat("fovy", &m_fFovY);
+    cfg.getFloat("fovy",   &m_fFovY);
 
+    // Setup misc items
+    int iFontSize;
+    cfg.getInt("font_size", &iFontSize);
+    SetFont( iFontSize, "Times" );
+    SetCursor( CRNone );
+    
     // Misn opengl items
     glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
     glEnable        (GL_CULL_FACE);
     glEnable        (GL_DEPTH_TEST);
     glShadeModel    (GL_SMOOTH);
     glPolygonMode   (GL_FRONT,GL_FILL);
-
-    //// ----SETUP SOME DEFAULT GLOBAL LIGHTING -------
-    //glLightModeli( GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE );
-    //glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE );
 
     // Set recording's mode destination file
     cfg.loadBlock("global");
@@ -88,9 +101,6 @@ void MyWindow::OnCreate()
     float gAmbient[4];
     cfg.getFloat("light", gAmbient, 4);
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gAmbient);
-
-    // Open log file
-    Logger::Instance().open( Logger::ERROR_LOG, true );
 
     // Initialize object's
     ShaderMgr::Instance().init();
@@ -129,6 +139,10 @@ void MyWindow::OnDisplay()
 
 void MyWindow::OnIdle() 
 {
+    if( Recorder::Instance().isOn() ) {
+        Recorder::Instance().record( Clock::Instance().getCurrentFeed() );
+    }
+
 	// Update spaceship and its shield
     ObjectMgr::Instance().update();
     LightMgr::Instance().update();
@@ -151,6 +165,7 @@ void MyWindow::OnResize(int w, int h) {
     glLoadIdentity();
     float ratio = float(w) / float(h);
     gluPerspective( m_fFovY, ratio, m_fPlanes[0], m_fPlanes[1] );
+    m_fDimRatio = ratio;
 
     // Setup modelview matrix
     glMatrixMode(GL_MODELVIEW);
@@ -166,7 +181,6 @@ void MyWindow::OnDestroy()
     PSManager::Destroy();
     Tilemap::Destroy();
     CameraMgr::Destroy();
-    Logger::Destroy();
     ShaderMgr::Destroy();
     LightMgr::Destroy();
     Clock::Destroy();
@@ -179,14 +193,24 @@ void MyWindow::OnKeyboard(int key, bool down)
 	key = tolower(key);
 	if( key == 'q' || key == 27 ) Close();
 
-    if( key == 'l' && !down ) {
-        static bool bIsLines = true;
-        if( bIsLines ) {
-            glPolygonMode(GL_FRONT,GL_LINE);
-        } else {
+    if( key == AppControlKey[WIREFRAME] && !down ) {
+        if( AppControl[WIREFRAME] ) {
             glPolygonMode(GL_FRONT,GL_FILL);
+        } else {
+            glPolygonMode(GL_FRONT,GL_LINE);
         }
-        bIsLines = !bIsLines;
+        AppControl[WIREFRAME] = !AppControl[WIREFRAME];
+    }
+
+    if( key == AppControlKey[RECORD] && !down ) {
+        if( AppControl[RECORD] ) {
+            Recorder::Instance().stop();
+        } else {
+            if( !Recorder::Instance().start() ) {
+                _LOG("Failed to open output file for recording");
+            }
+        }
+        AppControl[RECORD] = !AppControl[RECORD];
     }
 
     // Capture keyboard for spaceship
@@ -209,9 +233,10 @@ void MyWindow::drawInterface()
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    const float fWidth = float(Width()) / float(Height());
+    const float fWidth  = m_fDimRatio;
     const float fHeight = 1.0f;
-    gluOrtho2D( -(double)fWidth, (double)fWidth, -(double)fHeight, (double)fHeight );
+    gluOrtho2D( -(double)fWidth, (double)fWidth, 
+                -(double)fHeight, (double)fHeight );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
@@ -225,7 +250,7 @@ void MyWindow::drawInterface()
         { 0.0f, 1.0f, 0.0f, 1.0f }, // Spaceship
         { 0.0f, 1.0f, 1.0f, 1.0f }, // Barrier
         { 1.0f, 0.0f, 0.0f, 1.0f }, // Turret
-        { 1.0f, 1.0f, 1.0f, 1.0f }  // Reactor?
+        { 0.0f, 0.0f, 1.0f, 1.0f }  // Reactor?
     };
 
     glPointSize(5.0f);
@@ -288,6 +313,18 @@ void MyWindow::drawInterface()
                 ((IOCVisual*)ObjectMgr::Instance().getCorridors().getComponent("visual"))->render();
             }
             glPopMatrix();
+            // Render small reactor
+            glPushMatrix();
+            {
+                // Make reactor fSizeRatio times smaller
+                glColor4fv( vfColors[REACTOR] );
+                const Vector3f& vPos = ObjectMgr::Instance().getReactor().getPos() * fSizeRatio;
+                glTranslatef( vPos.x(), vPos.y(), vPos.z() );
+                glScalef( fSizeRatio*2.0f, fSizeRatio*2.0f, fSizeRatio*2.0f );
+                ((IOCVisual*)ObjectMgr::Instance().getReactor().getComponent("visual"))->render();
+            }
+            glPopMatrix();
+
             // Restore polygon display modes
             glPolygonMode(GL_FRONT,viPolygonMode[0]);
 
@@ -339,11 +376,29 @@ void MyWindow::drawInterface()
     }
     glPopMatrix();
 
-    // Draw health status
-    glColor3f( 1.0f, 1.0f, 0.0f );
-    glRasterPos3f( 1.0f, 0.0f, 0.0f );
-    Printf( "Health: %i", ObjectMgr::Instance().getShip().getHealth() );
-    
+    // Draw screen text elements
+    glColor3f( 1.0f, 1.0f, 0.0f );    
+    const float fX = -fWidth+0.01f;
+    const float fY = -fHeight+0.015f;
+    const float fStep = 0.055f;
+    char *flag;
+    int kk;
+    for( kk=0; kk<NUM_OF_CONTROLS; ++kk )
+    {
+        glRasterPos3f( fX, fY+kk*fStep, 0.0f );
+        flag = "Off";
+        if( AppControl[kk] ) flag = "On";
+        Printf( "%s[%c]: %s", AppControlLabel[kk], AppControlKey[kk], flag );
+    }
+
+    int iHealth, iLives, iMaxLives;
+    ObjectMgr::Instance().getShip().getVitals( iHealth, iLives, iMaxLives );
+    glRasterPos3f( fX, fY+(kk++)*fStep, 0.0f );
+    Printf( "Health: %i", iHealth );
+
+    glRasterPos3f( fX, fY+(kk++)*fStep, 0.0f );
+    Printf( "Lives: %i/%i", --iLives, --iMaxLives );
+
     glEnable( GL_LIGHTING );
 }
 

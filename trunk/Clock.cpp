@@ -53,7 +53,9 @@ void Clock::FrameStep()
     TimerArray::const_iterator i;
     for( i=m_vTimers.begin(); i!=m_vTimers.end(); ++i ) 
     {
-        (*i)->update( m_dDeltaTime );
+        Timer *timer = *i;
+        if( timer->isRunning() )
+            timer->update( m_dDeltaTime );
     }
 }
 

@@ -22,5 +22,5 @@ public:
      * Responds to the collision
      * The parameter is the collision vector
      */
-    void respond() const;
+    void respond();
 };
