@@ -1,6 +1,6 @@
 #include "ForcefieldAnimation.h"
 #include "Forcefield.h"
-#include "Movement.h"
+#include "Clock.h"
 #include "Collision.h"
 #include "Tilemap.h"
 using namespace tlib;
@@ -8,7 +8,7 @@ using namespace tlib;
 void ForcefieldAnimation::onUpdate()
 {
     // Decrease alpha
-    ((Forcefield*)getOwner())->fade( IOCMovement::DeltaTime() );
+    ((Forcefield*)getOwner())->fade( Clock::Instance().getDeltaTime() );
 
 } // end onUpdate()
 

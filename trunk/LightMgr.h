@@ -45,6 +45,9 @@ private:
     // we group them into a struct.
     _DistItem *m_DistItems;
 
+    // The number of frames before updating the light distances
+    int m_iUpdateFrames;
+
 public:
     /**
      * Initializes the light manager

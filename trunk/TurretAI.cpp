@@ -3,14 +3,13 @@
 #include "ParticleEmitter.h"
 #include "PSLaser.h"
 #include "QuatRotation.h"
-#include "Movement.h"
+#include "Clock.h"
 #include "Logger.h"
 #include "Config.h"
 using tlib::Vector3f;
 using tlib::Quatf;
 using tlib::OCQuatRotation;
 using tlib::Logger;
-using tlib::IOCMovement;
 using tlib::Config;
 
 TurretAI::TurretAI( Object *obj ):
@@ -53,7 +52,7 @@ void TurretAI::update( Object *oOwner )
         if( fDot < 0.999f )
         {
             // Rotate the view vector and the turrets orientation
-            const float fAngle = m_fRotFactor * IOCMovement::DeltaTime();
+            const float fAngle = m_fRotFactor * Clock::Instance().getDeltaTime();
             
             // Get the cross product of the target vector and the view vector
             Vector3f vCross = cOri->getView().cross( vTarget );

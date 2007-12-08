@@ -16,8 +16,8 @@ m_DistItems(0)
 
     // Read culling distance from config file
     Config cfg( "config.txt" );
-    cfg.loadBlock("global");
-    //cfg.getFloat("cull_distance", &m_fCullDistance);
+    cfg.loadBlock("point_light");
+    cfg.getInt("update_frames", &m_iUpdateFrames);
 }
 
 LightMgr::~LightMgr()
@@ -46,6 +46,8 @@ void LightMgr::render() const
             if( cVis ) {
                 cVis->render();
             }
+            // TODO: Move this offset to an array read from config
+            // and also fix it as needed in ADD[object mgr]
             m_vLights[i]->getPos().addY(-8.0f);
             m_vLights[i]->apply();
             m_vLights[i]->getPos().addY(8.0f);
@@ -104,10 +106,11 @@ void LightMgr::update()
 
     // ________________________________________________________________________
     // Dont update every frame
-    const static int iFrames = 75;
     static int iTimes = 0;
     if( 0 == iTimes )
     {
+        // The following loop updates the distances between the lights and 
+        // the spaceship
         GenericLight *oLight;
         int i = 0;
         LightList::const_iterator iter;
@@ -141,7 +144,6 @@ void LightMgr::update()
         for( int i=0; i<MAX_LIGHTS; ++i )
         {
             // Save this address here
-            //if( m_vLights[i] ) m_vLights[i]->turnOff();
             m_vLights[i] = m_vList[ m_DistItems[i].index ];
             // and give the light a proper id
             m_vLights[i]->setId( i+1 );
@@ -152,7 +154,7 @@ void LightMgr::update()
         }
 
         // Reset counter
-        iTimes = iFrames;
+        iTimes = m_iUpdateFrames;
 
     } else {
         // Advance counter

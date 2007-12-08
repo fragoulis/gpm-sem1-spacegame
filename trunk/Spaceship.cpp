@@ -2,7 +2,9 @@
 #include "VisualGXModel.h"
 #include "AccelMovement.h"
 #include "QuatRotation.h"
+//#include "Controller.h"
 #include "SpaceshipKeyboard.h"
+#include "SpaceshipJoystick.h"
 #include "SpaceshipCollisionResponse.h"
 #include "Texture.h"
 #include "CollisionGXModel.h"
@@ -10,6 +12,7 @@
 #include "ParticleSystemMgr.h"
 #include "PSLaser.h"
 #include "LightMgr.h"
+#include "Clock.h"
 #include "Logger.h"
 #include "Config.h"
 
@@ -42,7 +45,7 @@ void Spaceship::init()
     // ------------------------------
     m_fRoll = 0.0f;
     m_fMaxRoll = (float)M_PI_2;
-    m_fRollFactor = 2.0f*(float)M_PI;
+    m_fRollFactor = (float)M_PI;
     m_fRotFactor = (float)M_PI_2;
     m_fRotBias = 3.0f;
     // ------------------------------
@@ -71,8 +74,8 @@ void Spaceship::init()
     setComponent( cRot );
 
     // Initialize controll component
-    setComponent( new OCSpaceshipKeyboard );
-    //setComponent( new OCSpaceshipJoystick );
+    setComponent( new SpaceshipKeyboard );
+    //setComponent( new SpaceshipJoystick );
 
     // Initialize collision component
     // [Here we give our object its bounding box]
@@ -106,15 +109,16 @@ void Spaceship::init()
         vfLaserColor );
 
     // Read spotilight's cutoff
-    float fCutOff;
+    float fCutOff, fExponent;
     cfg.getFloat("light_cutoff", &fCutOff);
+    cfg.getFloat("light_exp", &fExponent);
 
     // Set light attributes
     // We are beign deterministic that light0 will always be of
     // the spotlight's
     m_Light.setId(0);
     m_Light.setCutOff( fCutOff );
-    //m_Light.setExponent( 10.0f );
+    m_Light.setExponent( fExponent );
     
 } // end setup()
 
@@ -149,18 +153,16 @@ void Spaceship::ceaseFire()
 void Spaceship::update()
 {
     // Update keyboard calls for spaceship
-    ((OCKeyboard*)getComponent("controller"))->update();
+    ((IOCController*)getComponent("controller"))->update();
 
     // Update spaceship's position
     ((IOCMovement*)getComponent("movement"))->update();
 
     // Update spaceship's rotation
-    OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
-    cRot->update();
+	((OCQuatRotation*)getComponent("orientation"))->update();
 
     // Update and check health status
-    IOCVitals *cVitals = (IOCVitals*)getComponent("vitals");
-    cVitals->update();
+	((IOCVitals*)getComponent("vitals"))->update();
 }
 
 // ----------------------------------------------------------------------------
@@ -168,6 +170,20 @@ int Spaceship::getHealth()
 {
     OCVitalsHealth *cVitals = (OCVitalsHealth*)getComponent("vitals");
     return int( 100 * cVitals->healthRatio() );
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Spaceship::speed( float fAxis )
+{
+	OCAccelMovement *cMov = (OCAccelMovement*)getComponent("movement");
+    if( cMov->getVelocity() > m_fMaxVelocity ) {
+		//cMov->setVelocity( m_fMaxVelocity );
+        cMov->setAccel( 0.0f );
+    } else {
+        cMov->setAccel( m_fVelFactor * fAxis );
+    }
+	m_bResetSpeed = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -201,20 +217,92 @@ void Spaceship::resetSpeed()
     if( !m_bResetSpeed ) return;
 
 	OCAccelMovement *cMov = (OCAccelMovement*)getComponent("movement");
-	if( cMov->getVelocity() > 1e-6 )
+	if( cMov->getVelocity() > 0.1f )
 	{
+		//std::cout << "RESET SPEED SLOW DOWN" << std::endl;
 		cMov->setAccel( -m_fVelFactor );
 	}
-	else if( cMov->getVelocity() < -1e-6 ) 
+	else if( cMov->getVelocity() < -0.1f ) 
 	{
+		//std::cout << "RESET SPEED SPEED UP" << std::endl;
 		cMov->setAccel( m_fVelFactor );
 	}
 	else {
+		//std::cout << "NO SPEED" << std::endl;
 		cMov->setVelocity( 0.0f );
         cMov->setAccel( 0.0f );
         m_bResetSpeed = false;
 	}
 }
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Spaceship::move( float fVert, float fHoriz )
+{
+	//std::cout << fVert << " ___ " << fHoriz << std::endl;
+	OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
+	OCLinearMovement *cLM = (OCLinearMovement*)getComponent("movement");
+	float fVelRatio = cLM->getVelocity() / m_fMaxVelocity;
+
+	if( fabs(fVert) < 1e-3f ) {
+		if( fHoriz > 1e-3f ) fVert = -fVelRatio;
+		else if( fHoriz < -1e-3f ) fVert = fVelRatio;
+	}
+	
+	// Add roll only if the maximum roll has not been reached
+	if( m_fRoll < -m_fMaxRoll || m_fRoll > m_fMaxRoll )
+	{
+		// Calculate the roll factor
+		const float fRollFactor = m_fRollFactor * fHoriz * fVelRatio * 
+							      Clock::Instance().getDeltaTime();
+		m_fRoll += fRollFactor;
+		// Add roll
+		cRot->addRoll( fRollFactor );
+	}
+
+	// Calculate the pitch factor
+	const float fPitchFactor = m_fRotFactor * -fVert * 
+							   Clock::Instance().getDeltaTime();
+	// Add pitch
+	cRot->addPitch( fPitchFactor );
+
+	// Update ship's orientation vectors
+	cRot->updateView( cRot->getRot() );
+	cRot->updateUp( cRot->getRot() );
+	cRot->updateRight();
+
+    // Update view vector
+    cLM->setDir( cRot->getView() );
+    //cLM->getDir().selfRotate( qTotalRot );
+} // end move()
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+void Spaceship::resetMove()
+{
+	OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
+	
+	if( fabs(m_fRoll) > 0.1f )
+	{
+		float fRollFactor;
+		if( m_fRoll > 0.1f ) {
+			// Calculate the roll factor
+			fRollFactor = -m_fRollFactor * Clock::Instance().getDeltaTime();
+		}
+		else if( m_fRoll < -0.1 ) {
+			// Calculate the roll factor
+			fRollFactor = m_fRollFactor * Clock::Instance().getDeltaTime();
+		}
+
+		m_fRoll += fRollFactor;
+		// Add roll
+		cRot->addRoll( fRollFactor );
+
+		// Update ship's orientation vectors
+		cRot->updateUp( cRot->getRot() );
+		cRot->updateRight();
+	} // end if( ... )
+} // end resetMove()
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -225,7 +313,7 @@ void Spaceship::moveUp()
         // Calculate 'half a' velocity ratio
         fVelRatio = cLM->getVelocity() / ( m_fRotBias * m_fMaxVelocity ),
         // Calculate the pitch factor
-        fPitchFactor = m_fRotFactor * IOCMovement::DeltaTime() * ( 1.0f - fVelRatio );
+        fPitchFactor = m_fRotFactor * Clock::Instance().getDeltaTime() * ( 1.0f - fVelRatio );
 
     // Rotate ship about right axis
     OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
@@ -248,7 +336,7 @@ void Spaceship::moveDown()
         // Calculate 'half a' velocity ratio
         fVelRatio = cLM->getVelocity() / ( m_fRotBias * m_fMaxVelocity ),
         // Calculate the pitch factor
-        fPitchFactor = m_fRotFactor * IOCMovement::DeltaTime() * ( 1.0f - fVelRatio );
+        fPitchFactor = m_fRotFactor * Clock::Instance().getDeltaTime() * ( 1.0f - fVelRatio );
 
     // Rotate ship about right axis
     OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
@@ -270,8 +358,8 @@ void Spaceship::moveLeft()
     OCLinearMovement *cLM = (OCLinearMovement*)getComponent("movement");
     float
         fVelRatio = cLM->getVelocity() / ( m_fRotBias * m_fMaxVelocity ),
-        fYawFactor = m_fRotFactor * IOCMovement::DeltaTime() * ( 1.0f - fVelRatio ),
-        fRollFactor = m_fRollFactor * IOCMovement::DeltaTime() * fVelRatio;
+        fYawFactor = m_fRotFactor * Clock::Instance().getDeltaTime() * ( 1.0f - fVelRatio ),
+        fRollFactor = m_fRollFactor * Clock::Instance().getDeltaTime() * fVelRatio;
 
     OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
 
@@ -303,8 +391,8 @@ void Spaceship::moveRight()
     OCLinearMovement *cLM = (OCLinearMovement*)getComponent("movement");
     float
         fVelRatio = cLM->getVelocity() / ( m_fRotBias * m_fMaxVelocity ),
-        fYawFactor = m_fRotFactor * IOCMovement::DeltaTime() * ( 1.0f - fVelRatio ),
-        fRollFactor = m_fRollFactor * IOCMovement::DeltaTime() * fVelRatio;
+        fYawFactor = m_fRotFactor * Clock::Instance().getDeltaTime() * ( 1.0f - fVelRatio ),
+        fRollFactor = m_fRollFactor * Clock::Instance().getDeltaTime() * fVelRatio;
 
     OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");
 
@@ -336,7 +424,7 @@ void Spaceship::resetRoll()
     if( !m_bResetRoll ) return;
 
     OCLinearMovement *cLM = (OCLinearMovement*)getComponent("movement");
-    float fRollFactor = m_fRollFactor * IOCMovement::DeltaTime();
+    float fRollFactor = m_fRollFactor * Clock::Instance().getDeltaTime();
 
     OCQuatRotation *cRot = (OCQuatRotation*)getComponent("orientation");    
 

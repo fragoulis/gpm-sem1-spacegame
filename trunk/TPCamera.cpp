@@ -82,7 +82,7 @@ void TPCamera::update()
         (OCQuatRotation*)m_oTarget->getComponent("orientation");
     OCQuatRotation *cCamOri = (OCQuatRotation*)getComponent("orientation");
 
-    Quatf qRot = cTarOri->getYaw() * cTarOri->getPitch();
+	Quatf qRot = cTarOri->getPitch() * cTarOri->getRoll();
     Quatf qRes;
     cCamOri->getRot().slerp( qRot, m_fRotationBias, qRes );
     cCamOri->setRot(qRes);
@@ -90,14 +90,15 @@ void TPCamera::update()
     // applied to the spaceship
     // View
     cCamOri->getView().selfRotate( qRes );
-
     // Up
     cCamOri->getUp().selfRotate( qRes );
-    
+
     // Save position
     m_vPrevPos = getPos();
 
     // Recalculate the position
+	//qRot = cTarOri->getYaw() * cTarOri->getPitch();
+    //cCamOri->getRot().slerp( qRot, m_fRotationBias, qRes );
     m_vPosOffset.selfRotate( qRes );
     getPos() += ( m_oTarget->getPos() + m_vPosOffset - getPos() ) * m_fPositionBias;
 

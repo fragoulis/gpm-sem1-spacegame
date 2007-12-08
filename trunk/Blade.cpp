@@ -1,7 +1,7 @@
 #include "Blade.h"
 #include "SimpleMaterial.h"
 #include "VisualBox.h"
-#include "Movement.h"
+#include "Clock.h"
 #include "Config.h"
 using namespace tlib;
 
@@ -41,7 +41,7 @@ void Blade::update()
 {
     // Update object's orientation
     m_qRotFactor.toRotation( 
-        m_fRotFactor * IOCMovement::DeltaTime(),
+        m_fRotFactor * Clock::Instance().getDeltaTime(),
         Vector3f::Back() 
         );
 
@@ -54,5 +54,5 @@ void Blade::slowDown() {
         return;
     }
 
-    m_fRotFactor -= 4.0f * m_fRotFactor * IOCMovement::DeltaTime();
+    m_fRotFactor -= 4.0f * m_fRotFactor * Clock::Instance().getDeltaTime();
 }

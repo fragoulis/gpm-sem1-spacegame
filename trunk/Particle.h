@@ -1,11 +1,10 @@
 #pragma once
 #include "Vector3.h"
 #include "Quaternion.h"
-#include "Movement.h"
+#include "Clock.h"
 
 using tlib::Quati;
 using tlib::Vector3f;
-using tlib::IOCMovement;
 
 /**
  * Abstract class for the particles
@@ -85,7 +84,7 @@ public:
         // Save the current position
         m_vPrevPos = m_vPos;
         // Find new position
-        m_vPos += m_vVelocity * IOCMovement::DeltaTime();
+        m_vPos += m_vVelocity * Clock::Instance().getDeltaTime();
     }
 
     /**

@@ -1,6 +1,6 @@
-
-#include "accelmovement.h"
-#include "object.h"
+#include "AccelMovement.h"
+#include "Object.h"
+#include "Clock.h"
 
 namespace tlib 
 {
@@ -20,21 +20,18 @@ namespace tlib
     {
         // Retrieve object's position
         const Vector3f& vPos = getOwner()->getPos();
-
-        // Rotate the direction vector
-        //m_vDir.selfRotate( qRot );
-
-        // Update the velocity if acceleration is greater than zero
-        m_fVelocity += m_fAccel * IOCMovement::DeltaTime();
+        const double dDeltaTime = Clock::Instance().getDeltaTime();
+        // Update the velocity
+        m_fVelocity += m_fAccel * dDeltaTime;
 
         const Vector3f 
             vVel = m_vDir * m_fVelocity,
             vAcc = m_vDir * m_fAccel;
 
         // Calculate new position
-        Vector3f vNewPos = vPos + 
-                           vVel * IOCMovement::DeltaTime() +
-                           vAcc * IOCMovement::DeltaTime() * IOCMovement::DeltaTime() * 0.5f;
+        const Vector3f vNewPos = vPos + 
+                                 vVel * dDeltaTime +
+                                 vAcc * dDeltaTime * dDeltaTime * 0.5f;
 
         // Update position
         getOwner()->setPos( vNewPos );

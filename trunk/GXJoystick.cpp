@@ -1,6 +1,6 @@
 
 #pragma once
-#include "Controller.h"
+#include "controller.h"
 #include "assert.h"
 
 namespace tlib
@@ -54,6 +54,11 @@ namespace tlib
             _ASSERT(k>=0&&k<256);
             return m_vbKeys[k]; 
         }
+
+        /**
+         * Executes after capturing user's input user input
+         */
+        virtual void update() const = 0;
 
     }; // end of OCKeyboard class
 

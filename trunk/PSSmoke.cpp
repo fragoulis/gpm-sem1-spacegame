@@ -2,6 +2,7 @@
 #include "Particle.h"
 #include "gx/image.h"
 #include "Object.h"
+#include "Timer.h"
 #include "Config.h"
 #include "Logger.h"
 using tlib::Config;
@@ -44,7 +45,7 @@ void PSSmoke::init( const Vector3f &vSysPos )
     // Read system's lifespan
     double dLifeSpan;
     cfg.getDouble("sys_lifespan", &dLifeSpan);
-    m_Timer.setDuration(dLifeSpan);
+    m_Timer->setDuration(dLifeSpan);
 
     // Read particle number
     int iNumOfParticles;
@@ -73,12 +74,10 @@ void PSSmoke::update()
     // Only create new particles if emitter is active
     if( m_Emitter.isOn() ) {
         // If time expired spawn
-        if( m_Emitter.getTimer().hasExpired() ) {
-            m_Emitter.getTimer().stop();
-
+        if( !m_Emitter.getTimer()->isRunning() ) {
             spawn();
             // Start the timer again for the new spawn
-            m_Emitter.getTimer().start();
+            m_Emitter.getTimer()->start();
         }
     }
 

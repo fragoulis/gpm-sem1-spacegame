@@ -36,7 +36,7 @@ protected:
     Object *m_oOwner;
 
     // The particle system's timer
-    Timer m_Timer;
+    Timer *m_Timer;
 
 private:
     // The particle system's type
@@ -67,8 +67,7 @@ public:
     /**
      * Timer accessor
      */
-    const Timer& getTimer() const { return m_Timer; }
-    Timer& getTimer() { return m_Timer; }
+    Timer* getTimer() { return m_Timer; }
 
     /**
      * Returns true if the particle system is of the same type 

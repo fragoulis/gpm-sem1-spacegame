@@ -1,4 +1,4 @@
-#include <GL/GLee.h>
+#include "gl/glee.h"
 #include "SpaceshipShield.h"
 #include "Spaceship.h"
 #include "SimpleMaterial.h"
@@ -6,6 +6,8 @@
 #include "CollisionDynamicBSphere.h"
 #include "SpaceshipShieldCollisionResponse.h"
 #include "SpaceshipShieldVitals.h"
+#include "Clock.h"
+#include "Timer.h"
 #include "ShaderMgr.h"
 #include "Config.h"
 using namespace tlib;
@@ -25,7 +27,7 @@ void SpaceshipShield::init( Spaceship *oShip )
     // Read animation time
     float fDuration;
     cfg.getFloat("anim_time", &fDuration);
-    m_Timer.setDuration(fDuration);
+    m_Timer->setDuration(fDuration);
 
     // Initialize material component
     OCSimpleMaterial *cMat = new OCSimpleMaterial;
@@ -63,22 +65,21 @@ void SpaceshipShield::init( Spaceship *oShip )
 
     // Initialize collision response component
     setComponent( new SpaceshipShieldCollisionResponse );
+
+    // Request a timer from the application clock
+    m_Timer = Clock::Instance().GetTimer();
 }
 
 // ----------------------------------------------------------------------------
 void SpaceshipShield::update() 
 {
     setPos( m_oShip->getPos() );
-
-    if( m_Timer.isRunning() )
-        if( m_Timer.hasExpired() ) 
-            m_Timer.stop();
 }
 
 // ----------------------------------------------------------------------------
 void SpaceshipShield::render() const
 {
-    if( !m_Timer.isRunning() ) return;
+    if( !m_Timer->isRunning() ) return;
 
     // User shield rendering program
     ShaderMgr::Instance().begin( ShaderMgr::HIT_GLOW );
@@ -89,7 +90,7 @@ void SpaceshipShield::render() const
 
         // Pass a timer value to animation the effect
         glUniform1f( ShaderMgr::Instance().getUniform("timer"), 
-                     (float)m_Timer.elapsedTime() );
+                     (float)m_Timer->getElapsedTime() );
         
         // Enable blending
         glEnable( GL_BLEND );
@@ -103,4 +104,10 @@ void SpaceshipShield::render() const
     ShaderMgr::Instance().end();
 
     //ShaderMgr::Instance().printProgramInfoLog(ShaderMgr::HIT_GLOW);
+}
+
+// ----------------------------------------------------------------------------
+void SpaceshipShield::setCollPoint( const Vector3f& vCollPoint ) {
+    m_Timer->restart();
+    m_vCollPoint = vCollPoint;
 }
