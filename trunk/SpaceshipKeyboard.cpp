@@ -12,12 +12,12 @@ void SpaceshipKeyboard::update()
     }
     
     if( getKey('a') ) {
-		//ship->speed(1.0f);
-        ship->speedUp();
+		ship->speed(1.0f);
+        //ship->speedUp();
     }
     else if( getKey('s') ) {
-        //ship->speed(-1.0f);
-		ship->speedDown();
+        ship->speed(-1.0f);
+		//ship->speedDown();
     } 
     else {
         ship->resetSpeed();

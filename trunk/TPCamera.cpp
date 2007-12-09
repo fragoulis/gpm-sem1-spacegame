@@ -83,7 +83,7 @@ void TPCamera::update()
     OCQuatRotation *cCamOri = (OCQuatRotation*)getComponent("orientation");
 
 	//Quatf qRot = cTarOri->getPitch() * cTarOri->getRoll();
-    Quatf qRot = cTarOri->getYaw() * cTarOri->getPitch();
+    Quatf qRot = cTarOri->getYaw() * cTarOri->getPitch() * cTarOri->getRoll();
     Quatf qRes;
     cCamOri->getRot().slerp( qRot, m_fRotationBias, qRes );
     cCamOri->setRot(qRes);

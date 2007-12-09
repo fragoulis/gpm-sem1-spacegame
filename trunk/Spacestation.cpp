@@ -28,7 +28,9 @@ void Spacestation::init()
     _LOG("Setting up spacestation...");
 
     // Initialize material component
-    setComponent( new OCSimpleMaterial );
+    OCSimpleMaterial *cMat = new OCSimpleMaterial;
+    cMat->setEmission( Color(0.7f,0.7f,0.7f,1.0f) );
+    setComponent( cMat );
 
     // Initialize presetation component
     setComponent( new OCSingleTexture( sTexture.c_str() ) );

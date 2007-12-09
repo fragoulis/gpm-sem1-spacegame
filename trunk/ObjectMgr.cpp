@@ -1,4 +1,3 @@
-#include "gl/glee.h"
 #include "ObjectMgr.h"
 #include "Tile3d.h"
 // Objects
@@ -42,6 +41,7 @@ namespace tlib
     // ----------------------------------------------------------------------------
     void ObjectMgr::init()
     {
+        m_Spacecube.init();
         m_Station.init();
         m_Corridors.init();
         m_Ship.init();
@@ -58,6 +58,7 @@ namespace tlib
     void ObjectMgr::update()
     {
         m_Ship.update();
+        m_Spacecube.setPos( m_Ship.getPos() );
         m_Shield.update();
 
         // Update barriers, defence guns and outlets
@@ -72,6 +73,8 @@ namespace tlib
     // ----------------------------------------------------------------------------
     void ObjectMgr::render()
     {
+        m_Spacecube.render();
+
         m_Ship.applyLight();
         ((IOCVisual*)m_Station.getComponent("visual"))->render();
         ((IOCVisual*)m_Ship.getComponent("visual"))->render();
@@ -196,22 +199,27 @@ namespace tlib
         // Allocate pointlight object
         PointLight *light= new PointLight;
 
-        float vfOffset[3];
+        float vfOffset[3], vfRoffset[3];
         Config cfg("config.txt");
         cfg.loadBlock("point_light");
         cfg.getFloat("offset", vfOffset, 3);
+        cfg.getFloat("render_offset", vfRoffset, 3);
 
         // Store new position offset
         float vfNewOffset[3] = { vfOffset[0], vfOffset[1], vfOffset[2] };
+        float vfNewRoffset[3] = { vfRoffset[0], vfRoffset[1], vfRoffset[2] };
 
         switch( oTile->getType() ) {
             case TW_Y_ALIGNED: 
                 vfNewOffset[0] = vfOffset[1];
-                vfNewOffset[1] = vfOffset[2];
+                vfNewOffset[1] = 0.0f;
+                vfNewRoffset[0] = vfRoffset[1];
+                vfNewRoffset[1] = 0.0f;
                 break;
         }
 
         // Set its position vector
+        light->setRenderOffset( vfRoffset );
         light->setPosFromIndex( oTile->ijk(), vfNewOffset );
 
         // Save it as this tile's occupant

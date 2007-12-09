@@ -48,6 +48,7 @@ MyWindow::MyWindow()
 void MyWindow::OnCreate() 
 {
     GLWindowEx::OnCreate();
+    _CLEAR_LOG
     // Start the application clock
     Clock::Instance().Start( new ClockTimeSource );
 
@@ -85,7 +86,7 @@ void MyWindow::OnCreate()
     SetCursor( CRNone );
     
     // Misn opengl items
-    glClearColor( 0.3f, 0.3f, 0.3f, 1.0f );
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glEnable        (GL_CULL_FACE);
     glEnable        (GL_DEPTH_TEST);
     glShadeModel    (GL_SMOOTH);

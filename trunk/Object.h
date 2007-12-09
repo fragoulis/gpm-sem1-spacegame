@@ -25,6 +25,7 @@ namespace tlib
             OUTLET,
             REACTOR,
             LIGHT,
+            SPACECUBE,
             NUM_OF_OBJECTS
         };
 
