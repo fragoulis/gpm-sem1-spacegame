@@ -5,7 +5,6 @@
 #include "VisualVertexArraySphere.h"
 #include "CollisionDynamicBSphere.h"
 #include "SpaceshipShieldCollisionResponse.h"
-//#include "SpaceshipShieldVitals.h"
 #include "Clock.h"
 #include "Timer.h"
 #include "ShaderMgr.h"
@@ -37,7 +36,8 @@ void SpaceshipShield::init( Spaceship *oShip )
     m_NoiseTimer->start();
 
     m_GlowTimer = Clock::Instance().GetTimer();
-    m_GlowTimer->setDuration(fGlowDuration);
+    m_GlowTimer->setDuration(1.0f);
+    m_GlowTimer->setScale( 1.0f / fGlowDuration );
 
     // Initialize material component
     OCSimpleMaterial *cMat = new OCSimpleMaterial;
@@ -93,8 +93,6 @@ void SpaceshipShield::render() const
     // User shield rendering program
     ShaderMgr::Instance().begin( ShaderMgr::HIT_GLOW );
     {   
-        ((IOCTexture*)getComponent("texture"))->apply();
-
         glUniform1f( ShaderMgr::Instance().getUniform("noise_timer"), 
                      (float)m_NoiseTimer->getElapsedTime() );
 
@@ -112,12 +110,8 @@ void SpaceshipShield::render() const
             ((IOCVisual*)getComponent("visual"))->render();
         }
         glDisable( GL_BLEND );
-
-        ((IOCTexture*)getComponent("texture"))->reset();
     }
     ShaderMgr::Instance().end();
-
-    //ShaderMgr::Instance().printProgramInfoLog(ShaderMgr::HIT_GLOW);
 }
 
 // ----------------------------------------------------------------------------

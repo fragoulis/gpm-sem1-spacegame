@@ -46,12 +46,9 @@ void LightMgr::render() const
             if( cVis ) {
                 cVis->render();
             }
-            // TODO: Move this offset to an array read from config
-            // and also fix it as needed in ADD[object mgr]
-            m_vLights[i]->getPos().addY(-8.0f);
+            m_vLights[i]->getPos() += m_vLights[i]->getRenderOffset();
             m_vLights[i]->apply();
-            m_vLights[i]->getPos().addY(8.0f);
-            //std::cout << "Applyign GL_LIGHT" << m_vLights[i]->getId() << std::endl;
+            m_vLights[i]->getPos() -= m_vLights[i]->getRenderOffset();
         }
     }
 }
@@ -149,8 +146,6 @@ void LightMgr::update()
             m_vLights[i]->setId( i+1 );
             m_vLights[i]->reset();
             m_vLights[i]->turnOn();
-            //std::cout << "Setting m_vList["<< m_DistItems[i].index << "] to m_vLights["<< i << "]" << std::endl;
-            //std::cout << "Giving m_vLights["<< i << "] id GL_LIGHT" << (i+1) << std::endl;
         }
 
         // Reset counter

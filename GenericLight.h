@@ -35,6 +35,11 @@ private:
     // otherwise is 1.
     float m_fW;
 
+    // A rendering offset, that allows us to have 
+    // the visual part in a different position than
+    // the actual lightsource
+    Vector3f m_vRenderOffset;
+
 protected:
     // Holds the constant attenuation for this light source
     float m_fConstantAttenuation;
@@ -70,6 +75,16 @@ public:
         m_iType = iType;
         if( DIRECTIONAL == iType )
             m_fW = 0.0f;
+    }
+
+    /**
+     * Offset getter/setter
+     */
+    const Vector3f& getRenderOffset() const {
+        return m_vRenderOffset;
+    }
+    void setRenderOffset( float *offset ) {
+        m_vRenderOffset.xyz( offset );
     }
 
     /**

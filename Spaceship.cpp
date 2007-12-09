@@ -179,8 +179,8 @@ void Spaceship::getVitals( int &iHealthRatio, int &iLives, int &iMaxLives )
 void Spaceship::speed( float fAxis )
 {
 	OCAccelMovement *cMov = (OCAccelMovement*)getComponent("movement");
-    if( cMov->getVelocity() > m_fMaxVelocity ) {
-		//cMov->setVelocity( m_fMaxVelocity );
+    if( cMov->getVelocity() > m_fMaxVelocity || 
+        cMov->getVelocity() < -m_fMaxVelocity ) {
         cMov->setAccel( 0.0f );
     } else {
         cMov->setAccel( m_fVelFactor * fAxis );

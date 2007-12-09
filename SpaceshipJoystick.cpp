@@ -1,5 +1,6 @@
 #include "SpaceshipJoystick.h"
 #include "Spaceship.h"
+#include "Recorder.h"
 
 const float AXIS_ZERO_P = 3.05176e-005f;
 const float AXIS_ZERO_N = -3.05176e-005f;
@@ -27,8 +28,29 @@ void SpaceshipJoystick::update()
 	//m_vfPosition[A_RIGHT_RIGHT]	= m_Joystick.Axis(3);
 	//m_vfPosition[A_RIGHT_LEFT]	= -m_Joystick.Axis(3);
 
-	for( int n=0; n<MAX_BUTTON; n++ )
-		m_vbButtons[n] = m_Joystick.Button(n);
+    // Record user inputs
+    if( Recorder::Instance().isOn() ) 
+    {
+        // Record axis movement
+        Recorder::Instance().recordAxis( A_LEFT_RIGHT,  m_vfPosition[A_LEFT_RIGHT] );
+        Recorder::Instance().recordAxis( A_LEFT_LEFT,   m_vfPosition[A_LEFT_LEFT] );
+        Recorder::Instance().recordAxis( A_LEFT_DOWN,   m_vfPosition[A_LEFT_DOWN] );
+        Recorder::Instance().recordAxis( A_LEFT_UP,     m_vfPosition[A_LEFT_UP] );
+        Recorder::Instance().recordAxis( A_RIGHT_DOWN,  m_vfPosition[A_RIGHT_DOWN] );
+        Recorder::Instance().recordAxis( A_RIGHT_UP,    m_vfPosition[A_RIGHT_UP] );
+
+        // Record button presses
+        for( int n=0; n<MAX_BUTTON; n++ ) 
+        {
+		    m_vbButtons[n] = m_Joystick.Button(n);
+            Recorder::Instance().recordButton( n, m_vbButtons[n] );
+        }
+    }
+    else 
+    {
+	    for( int n=0; n<MAX_BUTTON; n++ )
+		    m_vbButtons[n] = m_Joystick.Button(n);
+    }
 
 	//if( m_vfPosition[A_LEFT_RIGHT] )
 	//	std::cout << "LEFT AXIS -> RIGHT " << m_vfPosition[A_LEFT_RIGHT] << std::endl;

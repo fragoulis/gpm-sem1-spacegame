@@ -7,6 +7,7 @@ using std::list;
 #include "Reactor.h"
 #include "Spacestation.h"
 #include "SpacestationCorridors.h"
+#include "Spacecube.h"
 // Object managers
 #include "DoorMgr.h"
 #include "BladeMgr.h"
@@ -42,6 +43,7 @@ namespace tlib
         Reactor                 m_Reactor;
         Spacestation            m_Station;
         SpacestationCorridors   m_Corridors;
+        Spacecube               m_Spacecube;
 
         // These are managers for the barriers, the power outlets 
         // and the defence guns

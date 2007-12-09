@@ -15,7 +15,11 @@ private:
     string m_sFile;
 
     // The output stream
-    ofstream m_fsOut;
+    ofstream m_fsTimes;
+    ofstream m_fsInputs;
+
+    // The last clock time recorded
+    long m_lClockTime;
 
 public:
     /**
@@ -30,6 +34,8 @@ public:
      * Records the clock feeds into a text file
      */
     inline void record( long lClockTime );
+    inline void recordAxis( int iAxis, float fValue );
+    inline void recordButton( int iButton, bool bValue );
 
     /**
      * Starts/Stops the recording
@@ -50,16 +56,20 @@ private:
 // ----------------------------------------------------------------------------
 bool Recorder::start()
 {
-    if( m_fsOut.is_open() ) return true;
+    if( m_fsTimes.is_open() ) return true;
 
-    m_fsOut.exceptions ( ofstream::eofbit | ofstream::failbit | ofstream::badbit );
+    m_fsTimes.exceptions ( ofstream::eofbit | ofstream::failbit | ofstream::badbit );
     try {
-        m_fsOut.open( m_sFile.c_str() );
+        m_fsTimes.open( m_sFile.c_str() );
+
+        string sInputsFile = m_sFile;
+        size_t pos = m_sFile.find_last_of('.');
+        m_fsInputs.open( (m_sFile.insert(pos,"_inputs")).c_str() );
     }
     catch( ofstream::failure e ) {
     }
 
-    if( !m_fsOut.is_open() ) return false;
+    if( !m_fsTimes.is_open() || !m_fsInputs.is_open() ) return false;
 
     return ( m_bIsOn = true );
 }
@@ -67,12 +77,25 @@ bool Recorder::start()
 // ----------------------------------------------------------------------------
 void Recorder::stop()
 {
-    m_fsOut.close();
+    m_fsTimes.close();
     m_bIsOn = false;
 }
 
 // ----------------------------------------------------------------------------
 void Recorder::record( long lClockTime )
 {
-    m_fsOut << lClockTime << " ";
+    m_fsTimes << lClockTime << " ";
+    //m_lClockTime = lClockTime;
+}
+
+// ----------------------------------------------------------------------------
+void Recorder::recordAxis( int iAxis, float fValue )
+{
+    m_fsInputs << iAxis << " " << fValue << " ";
+}
+
+// ----------------------------------------------------------------------------
+void Recorder::recordButton( int iButton, bool bValue )
+{
+    m_fsInputs << iButton << " " << ((bValue)?1:0) << " ";
 }

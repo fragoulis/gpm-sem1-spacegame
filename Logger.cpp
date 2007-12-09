@@ -2,7 +2,12 @@
 
 namespace tlib
 {
-    const char *Logger::LOG_FILE = "log.errors.txt";
+    const char *Logger::LOG_FILE = "logfile.txt";
+
+    Logger::Logger() 
+    {
+        ofstream log( LOG_FILE );
+    }
 
     Logger::Logger( const string& entry ) 
     {
