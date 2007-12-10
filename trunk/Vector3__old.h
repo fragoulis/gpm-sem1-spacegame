@@ -1,15 +1,12 @@
 #pragma once
-#define _USE_MATH_DEFINES
-#define FZERO_E 1e-6
 #include <iostream>
-#include <cmath>
+#include "math.h"
 
 using std::ostream;
 using std::istream;
 
 namespace tlib 
 {
-    template<typename T> class Quaternion;
 
     template<typename T>
     class Vector3
@@ -497,7 +494,7 @@ namespace tlib
         float len = (float)sqrt( squaredLength() );
         
         // if lenth already unit then return the current values
-        if( len > 0.999f && len < 1.0001f )
+        if( fcmp( len, 1.0f ) )
         {
             vec.x( _xyz[0] );
             vec.y( _xyz[1] );

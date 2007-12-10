@@ -189,48 +189,19 @@ void Spaceship::speed( float fAxis )
 }
 
 // ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-void Spaceship::speedUp()
-{
-    OCAccelMovement *cMov = (OCAccelMovement*)getComponent("movement");
-    if( cMov->getVelocity() > m_fMaxVelocity ) {
-        cMov->setAccel( 0.0f );
-    } else {
-        cMov->setAccel( m_fVelFactor );
-    }
-    m_bResetSpeed = true;
-}
-
-// ----------------------------------------------------------------------------
-void Spaceship::speedDown()
-{
-    OCAccelMovement *cMov = (OCAccelMovement*)getComponent("movement");
-    if( cMov->getVelocity() < -m_fMaxVelocity ) {
-        cMov->setAccel( 0.0f );
-    } else {
-        cMov->setAccel( -m_fVelFactor );
-    }
-    m_bResetSpeed = true;
-}
-
-// ----------------------------------------------------------------------------
 void Spaceship::resetSpeed()
 {
     if( !m_bResetSpeed ) return;
 
 	OCAccelMovement *cMov = (OCAccelMovement*)getComponent("movement");
-	if( cMov->getVelocity() > 0.1f )
-	{
-		//std::cout << "RESET SPEED SLOW DOWN" << std::endl;
+	if( cMov->getVelocity() > 0.1f ) {
 		cMov->setAccel( -m_fVelFactor );
 	}
-	else if( cMov->getVelocity() < -0.1f ) 
-	{
-		//std::cout << "RESET SPEED SPEED UP" << std::endl;
+	else if( cMov->getVelocity() < -0.1f ) {
 		cMov->setAccel( m_fVelFactor );
 	}
-	else {
-		//std::cout << "NO SPEED" << std::endl;
+	else 
+    {
 		cMov->setVelocity( 0.0f );
         cMov->setAccel( 0.0f );
         m_bResetSpeed = false;

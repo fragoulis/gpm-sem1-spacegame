@@ -1,8 +1,7 @@
 #include "TurretVitals.h"
 #include "Turret.h"
 #include "ParticleSystemMgr.h"
-#include "PSSmallExplosion.h"
-#include "PSSmoke.h"
+#include "PSCommon.h"
 #include "Tilemap.h"
 
 TurretVitals::TurretVitals( int iMaxHealth ):
@@ -16,14 +15,8 @@ void TurretVitals::onKill()
     PSManager::Instance().remove( (ParticleSystem*)laser );
 
     // Create a particle explosion in its position
-    PSSmallExplosion *ex = 
-        PSManager::Instance().addSmallExplosion( getOwner()->getPos() );
-    ex->start();
-
-    // Create a particle smoke in the same position
-    PSSmoke *smoke = 
-        PSManager::Instance().addSmoke( getOwner()->getPos() );
-    smoke->start();
+    (PSManager::Instance().addSystem( PSManager::EXPLOSION, getOwner()->getPos() ))->start();
+    (PSManager::Instance().addSystem( PSManager::SMOKE, getOwner()->getPos() ))->start();
 
     // This object occupies a tile
     // We must set this tile's object pointer to null

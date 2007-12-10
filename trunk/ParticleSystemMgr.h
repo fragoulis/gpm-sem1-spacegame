@@ -10,8 +10,8 @@ using tlib::Object;
 class ParticleSystem;
 class PSLaser;
 class PSScorchMarks;
-class PSSmallExplosion;
-class PSSmoke;
+class PSCommon;
+class PSTemplate;
 
 typedef list<ParticleSystem*> PSList;
 
@@ -19,9 +19,19 @@ class ParticleSystemMgr : public Singleton<ParticleSystemMgr>
 {
     friend Singleton<ParticleSystemMgr>;
 
+public:
+    enum PSType {
+        EXPLOSION,
+        BIG_EXPLOSION,
+        SMOKE,
+        NUM_OF_TEMPLATES
+    };
+
 private:
     // The list of particle systems
     PSList m_vPSList;
+    // The list of availabel templates
+    PSTemplate *m_Templates[NUM_OF_TEMPLATES];
 
 public:
     /**
@@ -34,17 +44,12 @@ public:
     /**
      * 
      */
-    PSSmallExplosion* addSmallExplosion( const Vector3f &vSysPos );
-
-    /**
-     * 
-     */
-    PSSmoke* addSmoke( const Vector3f &vSysPos );
-
-    /**
-     * 
-     */
     PSScorchMarks* addScorchMark();
+
+    /**
+     * 
+     */
+    PSCommon* addSystem( PSType iType, const Vector3f &vSysPos );
 
     /**
      * 
@@ -72,11 +77,6 @@ private:
      * Destructor
      */
     ~ParticleSystemMgr();
-
-    /**
-     * 
-     */
-    ParticleSystem* checkForSameType( int iType );
 
 }; // end of ParticleSystemMgr class
 

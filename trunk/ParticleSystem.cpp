@@ -1,3 +1,5 @@
+#include <windows.h>
+#include <gl/gl.h>
 #include "ParticleSystem.h"
 #include "Particle.h"
 #include "TextureMgr.h"
@@ -7,7 +9,6 @@
 using tlib::Logger;
 
 ParticleSystem::ParticleSystem():
-m_iType(Any),
 m_Particles(0),
 m_uiListId(0),
 m_oOwner(0)

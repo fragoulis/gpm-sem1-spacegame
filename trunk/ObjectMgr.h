@@ -17,121 +17,123 @@ using std::list;
 
 // Forward declarations
 class Tile3d;
+typedef list<Object*> ObjectList;
 
-namespace tlib
+class ObjectMgr : public Singleton<ObjectMgr>
 {
+    friend Singleton<ObjectMgr>;
 
-    typedef list<Object*> ObjectList;
+private:
+    // This list holds all obejct's in the scene
+    // except of the reactor, the shield and the 
+    // spaceship which are unique
+    //ObjectList m_vObjects;
 
-    class ObjectMgr : public Singleton<ObjectMgr>
-    {
-        friend Singleton<ObjectMgr>;
+    // An imaginary radius of a sphere, used to skip
+    // object outside of it
+    float m_fCullDistance;
 
-    private:
-        // This list holds all obejct's in the scene
-        // except of the reactor, the shield and the 
-        // spaceship which are unique
-        //ObjectList m_vObjects;
+    // Unique object's of our world
+    Spaceship               m_Ship;
+    SpaceshipShield         m_Shield;
+    Reactor                 m_Reactor;
+    Spacestation            m_Station;
+    SpacestationCorridors   m_Corridors;
+    Spacecube               m_Spacecube;
 
-        // An imaginary radius of a sphere, used to skip
-        // object outside of it
-        float m_fCullDistance;
+    // These are managers for the barriers, the power outlets 
+    // and the defence guns
+    DoorMgr         m_DoorMgr;
+    BladeMgr        m_BladeMgr;
+    ForcefieldMgr   m_ForcefieldMgr;
+    OutletMgr       m_OutletMgr;
+    TurretMgr       m_TurretMgr;
 
-        // Unique object's of our world
-        Spaceship               m_Ship;
-        SpaceshipShield         m_Shield;
-        Reactor                 m_Reactor;
-        Spacestation            m_Station;
-        SpacestationCorridors   m_Corridors;
-        Spacecube               m_Spacecube;
+    // Flag for whether we should render the spaceship
+    bool m_bDrawSpaceship;
 
-        // These are managers for the barriers, the power outlets 
-        // and the defence guns
-        DoorMgr         m_DoorMgr;
-        BladeMgr        m_BladeMgr;
-        ForcefieldMgr   m_ForcefieldMgr;
-        OutletMgr       m_OutletMgr;
-        TurretMgr       m_TurretMgr;
+public:
+    /**
+     * Accessors for the unique objects
+     */
+    const Spaceship& getShip() const { return m_Ship; }
+    Spaceship& getShip() { return m_Ship; }
+    const SpaceshipShield& getShield() const { return m_Shield; }
+    const Reactor& getReactor() const { return m_Reactor; }
+    const SpacestationCorridors& getCorridors() const { return m_Corridors; }
+    
+    void showShip() { m_bDrawSpaceship = true; }
+    void hideShip() { m_bDrawSpaceship = false; }
+    bool isShipHidden() const { return !m_bDrawSpaceship; }
 
-    public:
-        /**
-         * Accessors for the unique objects
-         */
-        const Spaceship& getShip() const { return m_Ship; }
-        Spaceship& getShip() { return m_Ship; }
-        const SpaceshipShield& getShield() const { return m_Shield; }
-        const Reactor& getReactor() const { return m_Reactor; }
-        const SpacestationCorridors& getCorridors() const { return m_Corridors; }
+    /**
+     * 
+     */
+    void update();
 
-        /**
-         * 
-         */
-        void update();
+    /**
+     * 
+     */
+    void render();
+    void renderForMinimap( const float fSizeRatio ) const;
 
-        /**
-         * 
-         */
-        void render();
+    /**
+     * 
+     */
+    void checkCollision();
 
-        /**
-         * 
-         */
-        void checkCollision();
+    /**
+     * 
+     */
+    void addLight( Tile3d *oTile );
 
-        /**
-         * 
-         */
-        void addLight( Tile3d *oTile );
+    /**
+     * 
+     */
+    void addDoor( Tile3d *oTile );
+    
+    /**
+     * 
+     */
+    void addBlade( Tile3d *oTile );
 
-        /**
-         * 
-         */
-        void addDoor( Tile3d *oTile );
-        
-        /**
-         * 
-         */
-        void addBlade( Tile3d *oTile );
+    /**
+     * 
+     */
+    void addForcefield( Tile3d *oTile );
 
-        /**
-         * 
-         */
-        void addForcefield( Tile3d *oTile );
+    /**
+     * 
+     */
+    void addOutlet( Tile3d *oTile );
 
-        /**
-         * 
-         */
-        void addOutlet( Tile3d *oTile );
+    /**
+     * 
+     */
+    void addTurret( Tile3d *oTile );
 
-        /**
-         * 
-         */
-        void addTurret( Tile3d *oTile );
+    /**
+     * Checks if an object is far from the currently active
+     * camera so that it can be excused from the updates
+     * and the rendering
+     */
+    bool isCulled( Object *obj );
 
-        /**
-         * Checks if an object is far from the currently active
-         * camera so that it can be excused from the updates
-         * and the rendering
-         */
-        bool isCulled( Object *obj );
+    /** 
+     * Calls the initialization functions for the unique objects
+     */
+    void init();
 
-        /** 
-         * Calls the initialization functions for the unique objects
-         */
-        void init();
-
-    private:
-        /**
-         * Constructor
-         */
-        ObjectMgr();
+private:
+    /**
+     * Constructor
+     */
+    ObjectMgr();
 
 
-        /**
-         * Destructor
-         */
-        ~ObjectMgr();
+    /**
+     * Destructor
+     */
+    ~ObjectMgr();
 
-}; // end of ParticleSystemMgr class
-
-} // end of namespace tlib
+}; // end of ObjecMgr class

@@ -8,6 +8,8 @@ extern const double M_1_CLOCKS_PER_SEC;
 
 Clock::Clock():
 m_dCurrentTime(0.0),
+m_dPreviousTime(0.0),
+m_dDeltaTime(0.0),
 m_lStart(0),
 m_TimeSrc(0)
 {

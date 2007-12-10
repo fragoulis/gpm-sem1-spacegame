@@ -1,22 +1,16 @@
 #pragma once
-#define _USE_MATH_DEFINES
-#define FZERO_E 1e-6
 #include <iostream>
-#include <cmath>
-
+#include "math.h"
 using std::ostream;
 using std::istream;
 
 namespace tlib 
 {
-    template<typename T> class Quaternion;
-
-    template<typename T>
-    class Vector3
+    class Vector3f
     {
     private:
         // The vector's components in array format
-        T _xyz[3];
+        float _xyz[3];
 
         // The vector's length
         // This will help us simplify the normalization of the vector,
@@ -29,76 +23,50 @@ namespace tlib
          * Here we leave the compiler to create the copy constructor, 
          * the assignment operator and the destructor
          */
-        Vector3() {}
-        Vector3( const T xyz[] ) { this->xyz( xyz ); }
-        Vector3( const T x, const T y, const T z ) { xyz( x, y, z ); }
+        Vector3f() {}
+        Vector3f( const float xyz[] ) { this->xyz( xyz ); }
+        Vector3f( float x, float y, float z ) { xyz( x, y, z ); }
         
         /**
          * Sets all components to zero
          */
-        void reset() { x((T)0); y((T)0); z((T)0); }
+        void reset() { x(0.0f); y(0.0f); z(0.0f); }
 
         /**
-         * Returns the x component
+         * Component accessors
          */
-        const T x() const { return _xyz[0]; }
-
-        /**
-         * Returns the y component
-         */
-        const T y() const { return _xyz[1]; }
-
-        /**
-         * Returns the x component
-         */
-        const T z() const { return _xyz[2]; }
+        const float x() const { return _xyz[0]; }
+        const float y() const { return _xyz[1]; }
+        const float z() const { return _xyz[2]; }
 
         /**
          * Returns all components
          */
-        const T* xyz() const { return _xyz; }
+        const float* xyz() const { return _xyz; }
 
         /** 
-         * Assigns a value to x component
+         * Component mutators [single/multiple]
          */
-        void x( const T x ) { _xyz[0] = x; }
+        void x( float x ) { _xyz[0] = x; }
+        void y( float y ) { _xyz[1] = y; }
+        void z( float z ) { _xyz[2] = z; }
 
-        /** 
-         * Assigns a value to y component
-         */
-        void y( const T y ) { _xyz[1] = y; }
-
-        /** 
-         * Assigns a value to x component
-         */
-        void z( const T z ) { _xyz[2] = z; }
-
-        /**
-         *  Assigns a value to each component
-         */
-        void xyz( const T x, const T y, const T z ) { 
+        void xyz( float x, float y, float z ) { 
             this->x(x); this->y(y); this->z(z);
         }
 
-        /**
-         * Copies the values of the given array
-         */
-        void xyz( const T xyz[] ) { 
+        void xyz( const float xyz[] ) { 
             x(xyz[0]); y(xyz[1]); z(xyz[2]);
         }
         
-        /**
-         * Copies the values of the given vector
-         */
-        void xyz( const Vector3<T> &vec ) { 
+        void xyz( const Vector3f &vec ) { 
             x(vec.x()); y(vec.y()); z(vec.z());
         }
 
         /**
          * Returns the length of the vector
          */
-        float length() const
-        { 
+        float length() const { 
             // Return updated length
             return (float)sqrt( squaredLength() );
         }
@@ -113,52 +81,50 @@ namespace tlib
         /**
          * Calculates the dot product
          */
-        float dot( const Vector3<T> &vec ) const
-        {
+        float dot( const Vector3f &vec ) const {
             return ( x()*vec.x() + y()* vec.y() + z()*vec.z() );
         }
 
         /**
          * Calculates the cross product
          */
-        Vector3<T> cross( const Vector3<T> &vec2 ) const
-        {
-            return Vector3<T>( y() * vec2.z() - z() * vec2.y(),
-                               z() * vec2.x() - x() * vec2.z(),
-                               x() * vec2.y() - y() * vec2.x() );
+        Vector3f cross( const Vector3f &vec ) const {
+            return Vector3f( y() * vec.z() - z() * vec.y(),
+                               z() * vec.x() - x() * vec.z(),
+                               x() * vec.y() - y() * vec.x() );
         }
 
         /**
          * Normalizes the vector
          */
-        void normalize();
+        inline void normalize();
 
         /** 
          * Saves the normalized components to the given vector
          */
-        void normalize( Vector3<T> &vec ) const;
+        inline void normalize( Vector3f &vec ) const;
 
         /**
          * Rotates the vector by angle radians about a given axis
          * and returns the resulting rotated vector
          */
-        Vector3<T> rotate( const float fAngle, const Vector3<T> &vAxis ) const;
+        Vector3f rotate( const float fAngle, const Vector3f &vAxis ) const;
 
         /**
          * Applies a rotation in the form of quaternion
          * and returns the resulting rotated vector
          */
-        Vector3<T> rotate( const Quaternion<T> &qRotation ) const;
+        Vector3f rotate( const Quatf &qRotation ) const;
 
         /**
          * Rotates the vector by angle radians about a given axis
          */
-        void selfRotate( const float fAngle, const Vector3<T> &vAxis );
+        void selfRotate( const float fAngle, const Vector3f &vAxis );
 
         /**
          * Applies a rotation in the form of quaternion
          */
-        void selfRotate( const Quaternion<T> &qRotation );
+        void selfRotate( const Quatf &qRotation );
 
         /**
          * Echos the vector in an output stream
@@ -173,119 +139,119 @@ namespace tlib
         /**
          * Adds a value to x component
          */
-        void addX( T x ) { _xyz[0] += x; }
+        void addX( float x ) { _xyz[0] += x; }
 
         /**
          * Adds a value to y component
          */
-        void addY( T y ) { _xyz[1] += y; }
+        void addY( float y ) { _xyz[1] += y; }
 
         /**
          * Adds a value to z component
          */
-        void addZ( T z ) { _xyz[2] += z; }
+        void addZ( float z ) { _xyz[2] += z; }
         
         /**
          * Adds a value to all components
          */
-        void add( T amount ) 
+        void add( float amount ) 
         { 
             _xyz[0] += amount; 
             _xyz[1] += amount; 
             _xyz[2] += amount; 
         }
 
-        void add( T x, T y, T z ) 
+        void add( float x, float y, float z ) 
         {
             _xyz[0] += x; 
             _xyz[1] += y; 
             _xyz[2] += z; 
         }
 
-        void add( T xyz[] ) 
+        void add( float xyz[] ) 
         { 
             _xyz[0] += xyz[0]; 
             _xyz[1] += xyz[1]; 
             _xyz[2] += xyz[2]; 
         }
 
-        void add( const Vector3<T> &vec ) 
+        void add( const Vector3f &vec ) 
         { 
             _xyz[0] += vec.x(); 
             _xyz[1] += vec.y(); 
             _xyz[2] += vec.z(); 
         }
 
-        const Vector3<T> operator+( const Vector3<T> &vec ) const
+        const Vector3f operator+( const Vector3f &vec ) const
         { 
-            return Vector3<T>( _xyz[0] + vec.x(), _xyz[1] + vec.y(), _xyz[2] + vec.z() );
+            return Vector3f( _xyz[0] + vec.x(), _xyz[1] + vec.y(), _xyz[2] + vec.z() );
         }
 
-        const Vector3<T> operator+( T val ) const
+        const Vector3f operator+( float val ) const
         { 
-            return Vector3<T>( _xyz[0] + val, _xyz[1] + val, _xyz[2] + val ); 
+            return Vector3f( _xyz[0] + val, _xyz[1] + val, _xyz[2] + val ); 
         }
 
-        Vector3<T>& operator+=( const Vector3<T> &vec ) 
+        Vector3f& operator+=( const Vector3f &vec ) 
         { 
             add( vec ); 
             return *this;
         }
 
-        Vector3<T>& operator+=( T val ) 
+        Vector3f& operator+=( float val ) 
         { 
             add( val );
             return *this; 
         }
 
         // -- Subtraction
-        void subX( T x ) { _xyz[0] -= x; }
-        void subY( T y ) { _xyz[1] -= y; }
-        void subZ( T z ) { _xyz[2] -= z; }
+        void subX( float x ) { _xyz[0] -= x; }
+        void subY( float y ) { _xyz[1] -= y; }
+        void subZ( float z ) { _xyz[2] -= z; }
         
-        void sub( T amount ) 
+        void sub( float amount ) 
         { 
             _xyz[0] -= amount; 
             _xyz[1] -= amount; 
             _xyz[2] -= amount; 
         }
 
-        void sub( T x, T y, T z ) 
+        void sub( float x, float y, float z ) 
         {
             _xyz[0] -= x; 
             _xyz[1] -= y; 
             _xyz[2] -= z; 
         }
 
-        void sub( T xyz[] ) 
+        void sub( float xyz[] ) 
         { 
             _xyz[0] -= xyz[0]; 
             _xyz[1] -= xyz[1]; 
             _xyz[2] -= xyz[2]; 
         }
 
-        void sub( const Vector3<T> &vec ) 
+        void sub( const Vector3f &vec ) 
         { 
             _xyz[0] -= vec.x(); 
             _xyz[1] -= vec.y(); 
             _xyz[2] -= vec.z(); 
         }
 
-        const Vector3<T> operator-( const Vector3<T> &vec ) const
+        const Vector3f operator-( const Vector3f &vec ) const
         { 
-            return Vector3<T>( _xyz[0] - vec.x(), 
+            return Vector3f( _xyz[0] - vec.x(), 
                                _xyz[1] - vec.y(), 
                                _xyz[2] - vec.z() ); 
         }
 
-        const Vector3<T> operator-( T val ) const
+        const Vector3f operator-( float val ) const
         { 
-            return Vector3<T>( _xyz[0] - val, 
+            return Vector3f( _xyz[0] - val, 
                                _xyz[1] - val, 
                                _xyz[2] - val ); 
         }
 
-        Vector3<T>& operator-=( const Vector3<T> &vec ) 
+        Vector3f& operator-=( const Vector3f &vec ) 
         { 
             _xyz[0] -= vec.x(); 
             _xyz[1] -= vec.y(); 
@@ -294,7 +260,7 @@ namespace tlib
             return *this; 
         }
 
-        Vector3<T>& operator-=( T val ) 
+        Vector3f& operator-=( float val ) 
         { 
             _xyz[0] -= val; 
             _xyz[1] -= val; 
@@ -304,53 +270,53 @@ namespace tlib
         }
 
         // -- Multiplication
-        void mulX( T x ) { _xyz[0] *= x; }
-        void mulY( T y ) { _xyz[1] *= y; }
-        void mulZ( T z ) { _xyz[2] *= z; }
+        void mulX( float x ) { _xyz[0] *= x; }
+        void mulY( float y ) { _xyz[1] *= y; }
+        void mulZ( float z ) { _xyz[2] *= z; }
         
-        void mul( T amount ) 
+        void mul( float amount ) 
         { 
             _xyz[0] *= amount; 
             _xyz[1] *= amount; 
             _xyz[2] *= amount; 
         }
 
-        void mul( T x, T y, T z ) 
+        void mul( float x, float y, float z ) 
         {
             _xyz[0] *= x; 
             _xyz[1] *= y; 
             _xyz[2] *= z; 
         }
 
-        void mul( T xyz[] ) 
+        void mul( float xyz[] ) 
         { 
             _xyz[0] *= xyz[0]; 
             _xyz[1] *= xyz[1]; 
             _xyz[2] *= xyz[2]; 
         }
 
-        void mul( const Vector3<T> &vec ) 
+        void mul( const Vector3f &vec ) 
         { 
             _xyz[0] *= vec.x(); 
             _xyz[1] *= vec.y(); 
             _xyz[2] *= vec.z(); 
         }
 
-        const Vector3<T> operator*( const Vector3<T> &vec ) const
+        const Vector3f operator*( const Vector3f &vec ) const
         { 
-            return Vector3<T>( _xyz[0] * vec.x(), 
+            return Vector3f( _xyz[0] * vec.x(), 
                                _xyz[1] * vec.y(), 
                                _xyz[2] * vec.z() ); 
         }
 
-        const Vector3<T> operator*( T val ) const
+        const Vector3f operator*( float val ) const
         { 
-            return Vector3<T>( _xyz[0] * val, 
+            return Vector3f( _xyz[0] * val, 
                                _xyz[1] * val, 
                                _xyz[2] * val ); 
         }
 
-        Vector3<T>& operator*=( const Vector3<T> &vec ) 
+        Vector3f& operator*=( const Vector3f &vec ) 
         { 
             _xyz[0] *= vec.x(); 
             _xyz[1] *= vec.y(); 
@@ -359,7 +325,7 @@ namespace tlib
             return *this; 
         }
 
-        Vector3<T>& operator*=( T val ) 
+        Vector3f& operator*=( float val ) 
         { 
             _xyz[0] *= val; 
             _xyz[1] *= val; 
@@ -369,54 +335,54 @@ namespace tlib
         }
 
         // -- Division
-        void divX( T x ) { _xyz[0] /= x; }
-        void divY( T y ) { _xyz[1] /= y; }
-        void divZ( T z ) { _xyz[2] /= z; }
+        void divX( float x ) { _xyz[0] /= x; }
+        void divY( float y ) { _xyz[1] /= y; }
+        void divZ( float z ) { _xyz[2] /= z; }
         
-        void div( T amount ) 
+        void div( float amount ) 
         { 
             _xyz[0] /= amount; 
             _xyz[1] /= amount; 
             _xyz[2] /= amount; 
         }
 
-        void div( T x, T y, T z ) 
+        void div( float x, float y, float z ) 
         {
             _xyz[0] /= x; 
             _xyz[1] /= y; 
             _xyz[2] /= z; 
         }
 
-        void div( T xyz[] ) 
+        void div( float xyz[] ) 
         { 
             _xyz[0] /= xyz[0]; 
             _xyz[1] /= xyz[1]; 
             _xyz[2] /= xyz[2]; 
         }
 
-        void div( const Vector3<T> &vec ) 
+        void div( const Vector3f &vec ) 
         { 
             _xyz[0] /= vec.x(); 
             _xyz[1] /= vec.y(); 
             _xyz[2] /= vec.z(); 
         }
 
-        const Vector3<T> operator/( const Vector3<T> &vec ) const
+        const Vector3f operator/( const Vector3f &vec ) const
         { 
-            return Vector3<T>( _xyz[0] / vec.x(), 
+            return Vector3f( _xyz[0] / vec.x(), 
                                _xyz[1] / vec.y(), 
                                _xyz[2] / vec.z() ); 
         }
 
-        const Vector3<T> operator/( const T val ) const
+        const Vector3f operator/( const float val ) const
         { 
             float temp = 1.0f / (float)val;
-            return Vector3<T>( _xyz[0] * temp, 
+            return Vector3f( _xyz[0] * temp, 
                                _xyz[1] * temp, 
                                _xyz[2] * temp ); 
         }
 
-        Vector3<T>& operator/=( const Vector3<T> &vec ) 
+        Vector3f& operator/=( const Vector3f &vec ) 
         { 
             _xyz[0] /= vec.x(); 
             _xyz[1] /= vec.y(); 
@@ -425,7 +391,7 @@ namespace tlib
             return *this; 
         }
 
-        Vector3<T>& operator/=( const T val ) 
+        Vector3f& operator/=( const float val ) 
         { 
             float temp = 1.0f / (float)val;
             _xyz[0] *= temp; 
@@ -438,33 +404,32 @@ namespace tlib
         /**
          * Predifed common vectors
          */
-        static Vector3<T> Down() { 
-            return Vector3<T>( Ô(0), T(-1), Ô(0) ); 
+        static Vector3f Down() { 
+            return Vector3f( 0.0f, -1.0f, 0.0f ); 
         }
-        static Vector3<T> Up() { 
-            return Vector3<T>( T(0), T(1), T(0) ); 
+        static Vector3f Up() { 
+            return Vector3f( 0.0f, 1.0f, 0.0f ); 
         }
-        static Vector3<T> Left() { 
-            return Vector3<T>( T(-1), T(0), T(0) ); 
+        static Vector3f Left() { 
+            return Vector3f( -1.0f, 0.0f, 0.0f ); 
         }
-        static Vector3<T> Right() { 
-            return Vector3<T>( T(1), T(0), T(0) ); 
+        static Vector3f Right() { 
+            return Vector3f( 1.0f, 0.0f, 0.0f ); 
         }
-        static Vector3<T> Front() { 
-            return Vector3<T>( T(0), T(0), T(-1) ); 
+        static Vector3f Front() { 
+            return Vector3f( 0.0f, 0.0f, -1.0f ); 
         }
-        static Vector3<T> Back() { 
-            return Vector3<T>( T(0), T(0), T(1) ); 
+        static Vector3f Back() { 
+            return Vector3f( 0.0f, 0.0f, 1.0f ); 
         }
-        static Vector3<T> Null() { 
-            return Vector3<T>( T(0), T(0), T(0) ); 
+        static Vector3f Null() { 
+            return Vector3f( 0.0f, 0.0f, 0.0f ); 
         }
 
-    }; // end Vector3<T> class
+    }; // end Vector3f class
 
     /** Members functions **/
-    template<typename T>
-    void Vector3<T>::normalize()
+    void Vector3f::normalize()
     {
         // get vector length
         float len = length();
@@ -475,9 +440,9 @@ namespace tlib
         // if length is zero, then the components are all zero
         if( len < 1e-6 )
         {
-            _xyz[0] = (T)0;
-            _xyz[1] = (T)0;
-            _xyz[2] = (T)0;
+            _xyz[0] = 0.0f;
+            _xyz[1] = 0.0f;
+            _xyz[2] = 0.0f;
             return;
         }
         
@@ -490,14 +455,13 @@ namespace tlib
 
     } // end normalize()
 
-    template<typename T>
-    void Vector3<T>::normalize( Vector3<T> &vec ) const
+    void Vector3f::normalize( Vector3f &vec ) const
     {
         // get vector length
         float len = (float)sqrt( squaredLength() );
         
         // if lenth already unit then return the current values
-        if( len > 0.999f && len < 1.0001f )
+        if( fcmp( len, 1.0f ) )
         {
             vec.x( _xyz[0] );
             vec.y( _xyz[1] );
@@ -508,9 +472,9 @@ namespace tlib
         // if length is zero, then the components are all zero
         if( len < FZERO_E )
         {
-            vec.x((T)0);
-            vec.y((T)0);
-            vec.z((T)0);
+            vec.x(0.0f);
+            vec.y(0.0f);
+            vec.z(0.0f);
             return;
         }
 
@@ -526,66 +490,60 @@ namespace tlib
     /**
      * Rotates the vector by angle radians about a given axis
      */
-    template<typename T>
-    Vector3<T> Vector3<T>::rotate( const float fAngle, const Vector3<T> &vAxis ) const
+    Vector3f Vector3f::rotate( const float fAngle, const Vector3f &vAxis ) const
     {   
         // Create rotation quaternion
-        Quaternion<T> qRotation( fAngle, vAxis );
+        Quatf qRotation( fAngle, vAxis );
         qRotation.toRotation();
 
         return rotate( qRotation );
 
     } // end rotate()
 
-    template<typename T>
-    Vector3<T> Vector3<T>::rotate( const Quaternion<T> &qRotation ) const
+    Vector3f Vector3f::rotate( const Quatf &qRotation ) const
     {   
         // Create quaternion after the vector data
-        Quaternion<T> qVec( 0.0f, _xyz );
+        Quatf qVec( 0.0f, _xyz );
 
         // Apply rotation
-        Quaternion<T> qResult = qRotation * qVec * (~qRotation);
+        Quatf qResult = qRotation * qVec * (~qRotation);
 
         // Return rotated vector components
         return qResult.xyz();
 
     } // end rotate()
 
-    template<typename T>
-    void Vector3<T>::selfRotate( const float fAngle, const Vector3<T> &vAxis )
+    void Vector3f::selfRotate( const float fAngle, const Vector3f &vAxis )
     {   
         // Create rotation quaternion
-        Quaternion<T> qRotation( fAngle, vAxis );
+        Quatf qRotation( fAngle, vAxis );
         qRotation.toRotation();
 
         selfRotate( qRotation );
 
     } // end selfRotate()
 
-    template<typename T>
-    void Vector3<T>::selfRotate( const Quaternion<T> &qRotation )
+    void Vector3f::selfRotate( const Quatf &qRotation )
     {   
         // Create quaternion after the vector data
-        Quaternion<T> qVec( 0.0f, _xyz );
+        Quatf qVec( 0.0f, _xyz );
 
         // Apply rotation
-        Quaternion<T> qResult = qRotation * qVec * (~qRotation);
+        Quatf qResult = qRotation * qVec * (~qRotation);
 
         // Replace rotated vector with self
         xyz( qResult.xyz() );
 
     } // end selfRotate()
 
-    template<typename T>
-    void Vector3<T>::write( ostream &cout ) const
+    void Vector3f::write( ostream &cout ) const
     {
         cout << "( " << _xyz[0] << ", "
                      << _xyz[1] << ", "
                      << _xyz[2] << " )";
     }
 
-    template<typename T>
-    void Vector3<T>::read( istream &cin )
+    void Vector3f::read( istream &cin )
     {
         char ch[10];
         cin >> ch >> _xyz[0]
@@ -597,16 +555,14 @@ namespace tlib
     /**
      * Multiplies a vector with a value and returns the result vector
      */
-    template<typename T>
-    inline Vector3<T> operator*( const Vector3<T> &vec1, T val )
+    inline Vector3f operator*( const Vector3f &vec1, float val )
     { 
-        return Vector3<T>( vec1.x() * val, 
+        return Vector3f( vec1.x() * val, 
                            vec1.y() * val,
                            vec1.z() * val );
     }
 
-    template<typename T>
-    inline Vector3<T> operator*( T val, const Vector3<T> &vec1 )
+    inline Vector3f operator*( float val, const Vector3f &vec1 )
     { 
         return ( vec1 * val );
     }
@@ -614,11 +570,10 @@ namespace tlib
     /**
      * Subtracts two vectors and returns the result vector
      */
-    template<typename T>
-    inline Vector3<T> operator-( const Vector3<T> &vec1, 
-                                 const Vector3<T> &vec2 ) 
+    inline Vector3f operator-( const Vector3f &vec1, 
+                                 const Vector3f &vec2 ) 
     { 
-        return Vector3<T>( vec1.x() - vec2.x(), 
+        return Vector3f( vec1.x() - vec2.x(), 
                            vec1.y() - vec2.y(),
                            vec1.z() - vec2.z() );
     }
@@ -627,8 +582,7 @@ namespace tlib
      * Echos the vector in an output stream returning the stream
      * to support chainability
      */
-    template<typename T>
-    ostream& operator<<( ostream &cout, const Vector3<T> &vec )
+    ostream& operator<<( ostream &cout, const Vector3f &vec )
     {
         vec.write( cout );
         return cout;
@@ -638,15 +592,10 @@ namespace tlib
      * Reads a vector from an input stream returning the stream
      * to support chainability
      */
-    template<typename T>
-    istream& operator>>( istream &cin, Vector3<T> &vec )
+    istream& operator>>( istream &cin, Vector3f &vec )
     {
         vec.read( cin );
         return cin;
     }
-
-    //typedef Vector3<int>        Vector3i;
-    typedef Vector3<float>      Vector3f;
-    //typedef Vector3<double>     Vector3d;
 
 } // end of tlib namespace

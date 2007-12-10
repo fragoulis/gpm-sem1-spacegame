@@ -53,8 +53,6 @@ public:
      * Control the spaceship's speed
      */
 	void speed( float fAxis );
-    void speedUp();
-    void speedDown();
     void resetSpeed();
 
     /**

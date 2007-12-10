@@ -1,8 +1,9 @@
 #pragma once
 #pragma comment( lib, "glee" )
 #include "GX/GXBase.h"
-
 using namespace gxbase;
+
+#include "Minimap.h"
 
 // this is a simple example: it creates one window,
 // and draws a rotating sphere with hidden surface removal
@@ -23,6 +24,7 @@ private:
     bool AppControl[NUM_OF_CONTROLS];
 
     float m_fFovY, m_fPlanes[2], m_fDimRatio;
+    Minimap m_Minimap;
 
 public:
 	MyWindow();
@@ -33,5 +35,4 @@ public:
     void OnDestroy();
 	void OnKeyboard(int key, bool down);
     void drawInterface();
-    GLuint makeGrid( int , float );
 };
