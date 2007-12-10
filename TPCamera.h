@@ -26,11 +26,6 @@ public:
     TPCamera();
 
     /**
-     * Destructor
-     */
-    virtual ~TPCamera() {}
-
-    /**
      * 
      */
     void init( Object *oTarget );
@@ -38,7 +33,7 @@ public:
     /**
      * Updates the position of the camera
      */
-    virtual void update();
+    void update();
 
     /**
      * Sets the target object
@@ -53,5 +48,7 @@ public:
 	void setPosOffset( const Vector3f& vOff ) {
 		m_vPosOffset = vOff;
 	}
+
+    void onActive();
 
 }; // end of TPCamera class

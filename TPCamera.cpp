@@ -7,9 +7,11 @@
 
 using namespace tlib;
 
-TPCamera::TPCamera()
+TPCamera::TPCamera():
+m_oTarget(0)
 {}
 
+// ----------------------------------------------------------------------------
 void TPCamera::init( Object *oTarget )
 {
     m_oTarget = oTarget;
@@ -31,11 +33,11 @@ void TPCamera::init( Object *oTarget )
 
     // Position the camera
     setPos( m_oTarget->getPos() + m_vPosOffset );
-    //std::cout << m_vPos << std::endl;
+
     // Calculate the view point by adding to the target's position
     // the offset
     Vector3f vViewPoint = m_oTarget->getPos() + vViewOffset;
-    //std::cout << vViewPoint << std::endl;
+
     // Setup view vector
     Vector3f vView = vViewPoint - getPos();
     vView.normalize();
@@ -71,12 +73,10 @@ void TPCamera::init( Object *oTarget )
     setComponent( new IOCCollisionResponse );
 }
 
-/**
- * Updates the position of the camera
- */
+// ----------------------------------------------------------------------------
 void TPCamera::update()
 {
-    if( !m_oTarget ) return;
+    _ASSERT(m_oTarget!=0);
 
     OCQuatRotation *cTarOri = 
         (OCQuatRotation*)m_oTarget->getComponent("orientation");
@@ -102,7 +102,7 @@ void TPCamera::update()
     //cCamOri->getRot().slerp( qRot, m_fRotationBias, qRes );
     m_vPosOffset.selfRotate( qRes );
     getPos() += ( m_oTarget->getPos() + m_vPosOffset - getPos() ) * m_fPositionBias;
-
+    //std::cout << "Cam: " << getPos() << " Ship: " << m_oTarget->getPos() << std::endl;
     // Reset the rotations of the orientation component
     cTarOri->resetAngles();
 }

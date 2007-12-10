@@ -1,8 +1,8 @@
- 
 #pragma once
-
+#define _USE_MATH_DEFINES
+#define FZERO_E 1e-6
 #include <iostream>
-#include "math.h"
+#include <cmath>
 
 using std::ostream;
 using std::istream;

@@ -34,6 +34,9 @@ private:
     int m_iLife;
     int m_iStartLife;
 
+    // Particle's color
+    float m_vfColor[4];
+
 public:
     /**
      * Getter/Setter for the position
@@ -118,6 +121,30 @@ public:
     }
     const Quati& getRot() const { return m_qRot; }
 
+    /**
+     * Color getter/setter
+     */
+    void setColor( float color[] ) { 
+        m_vfColor[0] = color[0];
+        m_vfColor[1] = color[1];
+        m_vfColor[2] = color[2];
+        m_vfColor[3] = color[3];
+    }
+    const float* getColor() const { return m_vfColor; }
+    
+    void updateColor( float vfStart[], float vfFactor[] ) 
+    {
+        const float rationInv = 1.0f - getLifeRatio();
+        m_vfColor[0] = vfStart[0] + vfFactor[0] * rationInv;
+        m_vfColor[1] = vfStart[1] + vfFactor[1] * rationInv;
+        m_vfColor[2] = vfStart[2] + vfFactor[2] * rationInv;
+        m_vfColor[3] = vfStart[3] + vfFactor[3] * rationInv;
+    }
+
+    /**
+     * Gives a new direction for the particle based on the collision
+     * vector
+     */
     void bounce( const Vector3f &vColDir, float speed );
 
 };

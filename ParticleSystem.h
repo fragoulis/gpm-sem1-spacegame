@@ -7,13 +7,6 @@ using tlib::Object;
 
 class ParticleSystem
 {
-public:
-    enum PSType {
-        Any = 0,
-        SmallExplosion,
-        Smoke
-    };
-
 protected:
     // The particle system's position
     Vector3f m_vPos;
@@ -37,11 +30,6 @@ protected:
 
     // The particle system's timer
     Timer *m_Timer;
-
-private:
-    // The particle system's type
-    // Default: 0[Any]
-    PSType m_iType;
 
 public:
     /**
@@ -70,23 +58,10 @@ public:
     Timer* getTimer() { return m_Timer; }
 
     /**
-     * Returns true if the particle system is of the same type 
-     * as the given parameter
-     */
-    bool isType( int iType ) const { return (m_iType==iType); }
-
-    /**
      * Setter for the position
      */
     void setPos( const Vector3f &vPos ) {
         m_vPos = vPos;
-    }
-
-    /**
-     * Sets the particle system's type
-     */
-    void setType( PSType iType ) {
-        m_iType = iType;
     }
 
     /**

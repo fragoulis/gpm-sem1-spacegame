@@ -1,7 +1,6 @@
-
 #include <windows.h>
 #include <gl/glu.h>
-#include "camera.h"
+#include "Camera.h"
 #include "QuatRotation.h"
 
 using namespace tlib;
@@ -22,6 +21,9 @@ Camera::Camera()
     cOrientation->setRight( Vector3f(1.0f,0.0f,0.0f) );
     setComponent( cOrientation );
 }
+
+Camera::~Camera()
+{}
 
 // ----------------------------------------------------------------------------
 void Camera::apply()
@@ -46,3 +48,7 @@ void Camera::write( std::ostream &cout )
     cout << "View" << cOri->getView() << std::endl;
     cout << "Up"   << cOri->getUp()   << std::endl;
 }
+
+// ----------------------------------------------------------------------------
+void Camera::update()
+{}

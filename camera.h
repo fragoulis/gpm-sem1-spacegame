@@ -18,7 +18,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~Camera() {}
+    virtual ~Camera();
 
     /**
      * Previous position getter
@@ -35,5 +35,11 @@ public:
      * Writes the camera's significant points and vectors to a stream
      */
     void write( std::ostream &cout );
+
+    /**
+     * A virtual update method for the derived instances that
+     * require an constant update
+     */
+    virtual void update();
 
 }; // end of Camera class

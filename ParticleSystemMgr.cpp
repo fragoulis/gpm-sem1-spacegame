@@ -1,20 +1,15 @@
 #include "ParticleSystemMgr.h"
 #include "PSLaser.h"
 #include "PSScorchMarks.h"
-#include "PSSmallExplosion.h"
-#include "PSSmoke.h"
+#include "PSCommon.h"
+#include "PSTemplate.h"
 #include "Timer.h"
 
 ParticleSystemMgr::ParticleSystemMgr()
 {
-    // Preallocate 3 explosion particle systems
-    const Vector3f vPos;
-    addSmallExplosion( vPos );
-    addSmallExplosion( vPos );
-    addSmallExplosion( vPos );
-    addSmoke( vPos );
-    addSmoke( vPos );
-    addSmoke( vPos );
+    m_Templates[EXPLOSION]      = new PSTemplate("explosion");
+    m_Templates[BIG_EXPLOSION]  = new PSTemplate("big_explosion");
+    m_Templates[SMOKE]          = new PSTemplate("smoke");
 }
 
 ParticleSystemMgr::~ParticleSystemMgr()
@@ -28,25 +23,6 @@ ParticleSystemMgr::~ParticleSystemMgr()
         delete *iter;
         *iter = 0;
     }
-}
-
-// ----------------------------------------------------------------------------
-ParticleSystem* ParticleSystemMgr::checkForSameType( int iType )
-{
-    // Search for an unused/expired system
-    ParticleSystem *list;
-    PSList::iterator iter;
-    for( iter = m_vPSList.begin(); 
-         iter != m_vPSList.end(); 
-         ++iter )
-    {
-        list = *iter;
-        if( !list->getTimer()->isRunning() )
-            if( list->isType( iType ) )
-                return list;
-    }
-
-    return 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -65,55 +41,23 @@ PSLaser* ParticleSystemMgr::addLaser( Object *oOwner,
 }
 
 // ----------------------------------------------------------------------------
-PSSmallExplosion* ParticleSystemMgr::addSmallExplosion( const Vector3f &vSysPos )
-{
-    PSSmallExplosion *ps;
-
-    // Before allcating a new system
-    // Search for an unused/expired system
-    if( !(ps = (PSSmallExplosion*)checkForSameType( ParticleSystem::SmallExplosion )) )
-    {
-        // Create the explosion particle system
-        ps = new PSSmallExplosion;
-        ps->init( vSysPos );
-
-        // Push it pack to the list
-        m_vPSList.push_back( (ParticleSystem*)ps );
-    } else {
-        ps->setPos( vSysPos );
-    }
-    
-    return ps;
-}
-
-// ----------------------------------------------------------------------------
-PSSmoke* ParticleSystemMgr::addSmoke( const Vector3f &vSysPos )
-{
-    PSSmoke *ps;
-
-    // Before allcating a new system
-    // Search for an unused/expired system
-    if( !(ps = (PSSmoke*)checkForSameType( ParticleSystem::Smoke )) )
-    {
-        // Create the explosion particle system
-        ps = new PSSmoke;
-        ps->init( vSysPos );
-
-        // Push it pack to the list
-        m_vPSList.push_back( (ParticleSystem*)ps );
-    } else {
-        ps->setPos( vSysPos );
-    }
-    
-    return ps;
-}
-
-// ----------------------------------------------------------------------------
 PSScorchMarks* ParticleSystemMgr::addScorchMark()
 {
     // Create the scortch mark particle system
     PSScorchMarks *ps = new PSScorchMarks;
     ps->init();
+
+    // Push it pack to the list
+    m_vPSList.push_back( (ParticleSystem*)ps );
+
+    return ps;
+}
+
+// ----------------------------------------------------------------------------
+PSCommon* ParticleSystemMgr::addSystem( PSType iType, const Vector3f &vSysPos )
+{
+    PSCommon *ps = new PSCommon;
+    ps->init( *(m_Templates[iType]), vSysPos );
 
     // Push it pack to the list
     m_vPSList.push_back( (ParticleSystem*)ps );
@@ -150,12 +94,20 @@ void ParticleSystemMgr::update()
             if( ps->getEmitter().getPAlive().size() ) {
                 // Turn of its emitter
                 ps->getEmitter().stop();
+                toKill.push_back(ps);
             } 
             else 
                 continue;
         }
 
         ps->update();
+    }
+
+    for( iter = toKill.begin();
+         iter != toKill.end();
+         ++iter )
+    {
+        remove( *iter );
     }
 
 } // end update()
@@ -167,6 +119,9 @@ void ParticleSystemMgr::render()
     for( iter = m_vPSList.begin(); iter != m_vPSList.end(); ++iter )
     {
         _ASSERT((*iter)!=0);
-        (*iter)->render();
+        ParticleSystem *ps = *iter;
+        if( ps->getEmitter().getPAlive().size() ) {
+            ps->render();
+        }
     }
 }
