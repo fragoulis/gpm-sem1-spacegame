@@ -3,6 +3,8 @@
 #  define NDEBUG
 #endif
 #include <cassert>
+#include "Logger.h"
+using tlib::Logger;
 #include "Recorder.h"
 extern const double M_1_CLOCKS_PER_SEC;
 
@@ -21,18 +23,20 @@ m_TimeSrc(0)
 
 Clock::~Clock()
 {
+    _LOG("Deleting clock");
+
     // Detele time source
     delete m_TimeSrc;
     m_TimeSrc = 0;
     
     // Clear timer array
-    TimerArray::iterator i;
-    for( i=m_vTimers.begin(); i!=m_vTimers.end(); ++i ) 
+    TimerArray::iterator iter;
+    for( iter=m_vTimers.begin(); iter!=m_vTimers.end(); ++iter ) 
     {
-        if( *i ) 
+        if( *iter ) 
         {
-            delete *i;
-            *i=0;
+            delete *iter;
+            *iter=0;
         }
     }
 }
@@ -43,6 +47,8 @@ void Clock::FrameStep()
     assert(m_TimeSrc!=0);
 
     m_lNow = m_TimeSrc->get();
+
+	if( !m_lNow ) return;
 
     // Update current time
     m_dPreviousTime = m_dCurrentTime;

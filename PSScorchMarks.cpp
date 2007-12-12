@@ -45,10 +45,6 @@ void PSScorchMarks::init()
         m_Emitter.getPDead().push_back( &m_Particles[i] );
     }
 
-    // Read colors
-    cfg.getFloat("ambient", m_vfAmbient, 4);
-    cfg.getFloat("diffuse", m_vfDiffuse, 4);
-
     // Read texture
     string sTexture;
     cfg.getString("texture", sTexture);
@@ -68,12 +64,11 @@ void PSScorchMarks::init()
 void PSScorchMarks::update()
 {
     // Here we save the particles to be killed after the next update
-    ParticleList toKill;
     Particle *obj;
-    ParticleList::const_iterator iter;
+    ParticleList::iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
-         ++iter )
+         )
     {
         obj = *iter;
 
@@ -83,14 +78,13 @@ void PSScorchMarks::update()
         // Check if the particle has expired
         if( obj->getLife() < 0 )
         {
-            toKill.push_back( obj );
+            iter = m_Emitter.getPAlive().erase(iter);
+			m_Emitter.getPDead().push_back( obj );
             continue;
         }
 
+        ++iter;
     } // end for( ... )
-    
-    // Kill the temporary list
-    kill( toKill );
 
 } // end update()
 

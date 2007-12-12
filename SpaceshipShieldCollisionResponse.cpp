@@ -8,8 +8,6 @@ using tlib::OCVitalsHealth;
 
 void SpaceshipShieldCollisionResponse::respond()
 {
-    //std::cout << "Center: " << getOwner()->getPos() << std::endl;
-    //std::cout << "Collision point: " << getCollPoint() << std::endl;
     ((SpaceshipShield*)getOwner())->setCollPoint( getCollPoint() );
 
     // Hit the spaceship [even though this is the shields response 

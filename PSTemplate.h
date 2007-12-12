@@ -9,7 +9,8 @@ private:
         m_fSize[2], 
         m_fVelocity[2],
         m_vfColor[4], 
-        m_vfColorFactor[4];
+        m_vfColorFactor[4],
+        m_vfDirection[3][2];
     double 
         m_dReleaseTime,
         m_dSysDuration;

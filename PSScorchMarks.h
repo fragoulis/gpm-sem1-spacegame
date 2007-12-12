@@ -11,9 +11,6 @@ using tlib::Object;
 class PSScorchMarks : public ParticleSystem
 {
 private:
-    // Standard color values
-    float m_vfAmbient[4], m_vfDiffuse[4];
-
     // The direction in which the emitter will spawn new particles
     Vector3f m_vDir;
 

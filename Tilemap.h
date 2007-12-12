@@ -29,7 +29,7 @@ private:
     // a wanted tile.
     // The key is the index of the tile in an imaginary 3d cube
     // [key: i + j*tiles + k*tiles*tiles]
-    TileAssocArray m_TileMap;
+    mutable TileAssocArray m_TileMap;
 
 public:
     /**
@@ -55,7 +55,7 @@ public:
     /**
      * Returns a pointer to a tile directly from the tile array
      */
-    Tile3d* getTileByIndex( int tileIndex ) {
+    Tile3d* getTileByIndex( int tileIndex ) const {
         return &m_TileArray[ tileIndex ];
     }
 
@@ -68,7 +68,7 @@ public:
      * Returns a pointer to a tile from the tile map
      * by passing a single index
      */
-    Tile3d* getTile( int index ) {
+    Tile3d* getTile( int index ) const {
         return m_TileMap[index];
     }
 
@@ -76,7 +76,7 @@ public:
      * Returns a pointer to a tile from the tile map
      * by passing a 3d index
      */
-    Tile3d* getTile( int i, int j, int k )
+    Tile3d* getTile( int i, int j, int k ) const
     { 
         int index = i + 
                     j * m_iNumOfTiles + 
@@ -90,8 +90,21 @@ public:
      * by passing a position vector and checking if that position is 
      * in fact within a tile
      */
-    Tile3d* getTile( const Vector3f& vIn );
+    Tile3d* getTile( const Vector3f& vIn ) const;
 
+    /**
+     * The tile that holds the final exit door
+     */
+    const Tile3d* getExitDoorTile() const {
+        return getTile(21,24,20);
+    }
+
+    /**
+     * Returns the position[center] of a tile
+     */
+    Vector3f getTilePos( const Tile3d* oTile ) const;
+
+    
     /**
      * Allocates memory for the tiles' array
      */

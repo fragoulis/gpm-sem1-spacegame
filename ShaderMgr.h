@@ -104,7 +104,7 @@ namespace tlib
          * Creates a vertex shader, compiles it and attaches it
          * to a program
          */
-        unsigned addShader( unsigned shaderType, const char *file );
+        int addShader( unsigned shaderType, const char *file );
 
         /**
          * Loads the source of a shader from file

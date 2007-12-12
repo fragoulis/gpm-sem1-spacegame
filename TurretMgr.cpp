@@ -7,6 +7,7 @@
 #include "QuatRotation.h"
 #include "Vitals.h"
 #include "ObjectMgr.h"
+#include "Tile3d.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
@@ -150,4 +151,19 @@ void TurretMgr::remove( Turret *value )
     // Delete object system from memory
     delete value;
     value = 0;
+}
+
+// ----------------------------------------------------------------------------
+Turret* TurretMgr::add( Tile3d *oTile )
+{
+    // Allocate object
+    Turret *obj = new Turret;
+
+    // Save it as this tile's occupant
+    oTile->setOccupant( (Object*)obj );
+
+    // Push it to the list
+    m_vTurrets.push_back( obj );
+
+    return obj;
 }

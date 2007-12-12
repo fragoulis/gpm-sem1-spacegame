@@ -9,12 +9,11 @@
 #include "Logger.h"
 #include "TPCamera.h"
 #include "FPCamera.h"
-//#include "PointLight.h"
 #include "ClockTimeSource.h"
 #include "FileTimeSource.h"
 // Components
 #include "SpaceshipKeyboard.h"
-//#include "Visual.h"
+#include "QuatRotation.h"
 // Singletons
 #include "CameraMgr.h"
 #include "ObjectMgr.h"
@@ -25,11 +24,14 @@
 #include "LightMgr.h"
 #include "Clock.h"
 #include "Recorder.h"
+#include "EventMgr.h"
 
 using namespace std;
 using namespace tlib;
-#include "PSBigExplosion.h"
-PSBigExplosion *BigEx;
+
+extern bool g_bIsReplay		= false;
+extern bool g_bSwitchCam	= false;
+extern bool g_bToggleRecord = false;
 
 MyWindow::MyWindow() 
 {   
@@ -41,20 +43,55 @@ MyWindow::MyWindow()
     SetSize( iDim[0], iDim[1] );
 
     SetPosition(100,100);
+
+    m_isAppCreated = false;
 }
 
 // ----------------------------------------------------------------------------
 void MyWindow::OnCreate() 
 {
+    // Safety flag, OnCreate() may be called more than once
+    if( m_isAppCreated ) return;
+    m_isAppCreated = true;
+
     GLWindowEx::OnCreate();
     _CLEAR_LOG
-    // Start the application clock
-    Clock::Instance().Start( new ClockTimeSource );
 
     Config cfg("config.txt");
+    cfg.loadBlock("global");
+    // Read whether this is a replay game
+    cfg.getBool("replay", &g_bIsReplay);
 
-    // Map application switches
+    // Read the file to output the recording to
+    string sOutputFile;
+    cfg.getString("record_output", sOutputFile);
+
+    Recorder::Instance().setFiles( sOutputFile.c_str() );
+
+    // Start the application clock.
+    // If this is a replay game, use times from a file
+    if( g_bIsReplay ) {
+        if( !Recorder::Instance().openInputsForReplay() ) {
+            _LOG("Failed to open replay files. Exiting!");
+            Close();
+        }
+        Clock::Instance().Start( new FileTimeSource( sOutputFile.c_str() ) );
+    } else {
+        Clock::Instance().Start( new ClockTimeSource );
+        
+    }
+
+    // Setup default ambient lighting
+    float gAmbient[4];
+    cfg.getFloat("light", gAmbient, 4);
+    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gAmbient);
+
+    // Zero application bool control values
     memset( AppControl, 0, sizeof(AppControl) );
+    // Read default collision checking state
+    cfg.getBool("collision", &AppControl[COLLISION]);
+
+    // Read application's control buttons
     cfg.loadBlock("controls");
     cfg.getChar("fullscreen", &AppControlKey[FULLSCREEN] );
     cfg.getChar("camera",     &AppControlKey[CAMERA] );
@@ -75,13 +112,14 @@ void MyWindow::OnCreate()
     if( AppControl[FULLSCREEN] )
         SetFullscreen();
 
+    // Read projection parametres
     cfg.getFloat("planes", m_fPlanes, 2);
     cfg.getFloat("fovy",   &m_fFovY);
 
     // Setup misc items
     int iFontSize;
     cfg.getInt("font_size", &iFontSize);
-    SetFont( iFontSize, "Times" );
+    SetFont( iFontSize, "Arial Bold" );
     SetCursor( CRNone );
     
     // Misn opengl items
@@ -91,33 +129,29 @@ void MyWindow::OnCreate()
     glShadeModel    (GL_SMOOTH);
     glPolygonMode   (GL_FRONT,GL_FILL);
 
-    // Set recording's mode destination file
-    cfg.loadBlock("global");
-
-    cfg.getBool("collision", &AppControl[COLLISION]);
-
-    string sOutputFile;
-    cfg.getString("record_output", sOutputFile);
-    Recorder::Instance().setFile( sOutputFile.c_str() );
-
-    // Setup ambient lighting
-    float gAmbient[4];
-    cfg.getFloat("light", gAmbient, 4);
-    glLightModelfv( GL_LIGHT_MODEL_AMBIENT, gAmbient);
-
     // Initialize object's
     m_Minimap.init();
     ShaderMgr::Instance().init();
     ObjectMgr::Instance().init();
     LightMgr::Instance().init();
 
-    // Setup the two cameras
+    // Setup the cameras
     // Third person
     TPCamera *camStalker = CameraMgr::Instance().add<TPCamera>("stalker");
     camStalker->init( (Object*)&ObjectMgr::Instance().getShip() );
     // First person
     FPCamera *camFP = CameraMgr::Instance().add<FPCamera>("first-person");
     camFP->init( (Object*)&ObjectMgr::Instance().getShip() );
+    
+    // Panoramic for final scene
+    float vfCamPos[3];
+    cfg.loadBlock("pan_cam");
+    cfg.getFloat("position", vfCamPos, 3);
+
+    Camera *camPan = CameraMgr::Instance().add<Camera>("end-scene");
+    camPan->setPos( Vector3f( vfCamPos ) );
+    OCQuatRotation *cCamRot = (OCQuatRotation*)camPan->getComponent("orientation");
+    cCamRot->lookAt( Vector3f(0.0f,0.0f,0.0f) );
     
     CameraMgr::Instance().activate("first-person");
 }
@@ -146,6 +180,16 @@ void MyWindow::OnDisplay()
 // ----------------------------------------------------------------------------
 void MyWindow::OnIdle() 
 {
+	EventMgr::Instance().update();
+	AppControl[CAMERA] = g_bSwitchCam;
+    AppControl[RECORD] = g_bToggleRecord;
+
+	// At the end of replay exit gracefully
+	if( g_bIsReplay && !Clock::Instance().getCurrentFeed() ) {
+		Close();
+	}
+
+	// If recording is on, save the time values
     if( Recorder::Instance().isOn() ) {
         Recorder::Instance().record( Clock::Instance().getCurrentFeed() );
     }
@@ -153,8 +197,7 @@ void MyWindow::OnIdle()
 	// Update spaceship and its shield
     ObjectMgr::Instance().update();
     LightMgr::Instance().update();
-    // Update third-person camera
-    //CameraMgr::Instance().getActive()->update();
+	// Update the cameras
     CameraMgr::Instance().get("stalker")->update();
     CameraMgr::Instance().get("first-person")->update();
 
@@ -197,6 +240,7 @@ void MyWindow::OnDestroy()
     LightMgr::Destroy();
     Clock::Destroy();
     Recorder::Destroy();
+    EventMgr::Destroy();
 }
 
 // ----------------------------------------------------------------------------
@@ -215,16 +259,14 @@ void MyWindow::OnKeyboard(int key, bool down)
         AppControl[WIREFRAME] = !AppControl[WIREFRAME];
     }
 
-    // Record switch
-    if( key == AppControlKey[RECORD] && !down ) {
-        if( AppControl[RECORD] ) {
-            Recorder::Instance().stop();
+    // Fullscreen switch
+    if( key == AppControlKey[FULLSCREEN] && !down ) {
+        if( AppControl[FULLSCREEN] ) {
+            SetFullscreen(false);
         } else {
-            if( !Recorder::Instance().start() ) {
-                _LOG("Failed to open output file for recording");
-            }
+            SetFullscreen(true);
         }
-        AppControl[RECORD] = !AppControl[RECORD];
+        AppControl[FULLSCREEN] = !AppControl[FULLSCREEN];
     }
 
     // Collision switch
@@ -232,22 +274,11 @@ void MyWindow::OnKeyboard(int key, bool down)
         AppControl[COLLISION] = !AppControl[COLLISION];
     }
 
-    // Camera switch
-    if( key == AppControlKey[CAMERA] && !down ) {
-        if( AppControl[CAMERA] ) {
-            CameraMgr::Instance().activate("first-person");
-            ObjectMgr::Instance().hideShip();
-        } else {
-            CameraMgr::Instance().activate("stalker");
-            ObjectMgr::Instance().showShip();
-        }
-        AppControl[CAMERA] = !AppControl[CAMERA];
-    }
-
     // Capture keyboard for spaceship
     OCKeyboard *cShipCont = 
         (OCKeyboard*)ObjectMgr::Instance().getShip().getComponent("controller");
-    cShipCont->capture( key, down );
+	if( cShipCont )
+		cShipCont->capture( key, down );
 
     Redraw();
 }	
@@ -314,7 +345,7 @@ void MyWindow::drawInterface()
     glPopMatrix();
 
     // Draw screen text elements
-    glColor3f( 1.0f, 1.0f, 0.0f );    
+    glColor3f( 1.0f, 1.0f, 1.0f );
     const float fX = -fWidth+0.01f;
     const float fY = -fHeight+0.015f;
     const float fStep = 0.055f;
@@ -328,6 +359,7 @@ void MyWindow::drawInterface()
         Printf( "%s[%c]: %s", AppControlLabel[kk], AppControlKey[kk], flag );
     }
 
+	glColor3f( 0.0f, 1.0f, 0.0f );
     int iHealth, iLives, iMaxLives;
     ObjectMgr::Instance().getShip().getVitals( iHealth, iLives, iMaxLives );
     glRasterPos3f( fX, fY+(kk++)*fStep, 0.0f );

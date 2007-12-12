@@ -159,7 +159,7 @@ namespace tlib
     }
 
     // ------------------------------------------------------------------------
-    GLuint ShaderMgr::addShader( GLenum shaderType, const char *file )
+    int ShaderMgr::addShader( GLenum shaderType, const char *file )
     {
         // Load shader's source from
         const char *source = loadSource( file );

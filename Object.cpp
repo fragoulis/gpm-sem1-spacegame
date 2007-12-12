@@ -19,10 +19,11 @@ namespace tlib
         component_array::iterator iter;
         for( iter = m_vComponents.begin(); 
              iter != m_vComponents.end(); 
-             iter++ )
+             ++iter )
         {
-            delete iter->second;
-            iter->second = 0;
+			IComponent *comp = iter->second;
+            delete comp;
+            comp = 0;
         }
     }
 

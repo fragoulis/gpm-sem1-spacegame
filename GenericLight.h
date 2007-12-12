@@ -21,7 +21,7 @@ public:
 private:
     // The light's Id.
     // This is a number between 0 and 7
-    short int m_iLightId;
+    int m_iLightId;
 
     // The light's type
     LightType m_iType;
@@ -64,7 +64,7 @@ public:
     /**
      * Getter/Setter for the light id
      */
-    short int getId() const { return m_iLightId; }
+    int getId() const { return m_iLightId; }
     void setId( int iLightId ) { m_iLightId = iLightId; }
 
     /**

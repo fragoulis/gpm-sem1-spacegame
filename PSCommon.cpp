@@ -8,9 +8,7 @@
 #include "Config.h"
 #include "Logger.h"
 #include "Random.h"
-using tlib::Config;
-using tlib::Logger;
-using tlib::Object;
+using namespace tlib;
 
 // ----------------------------------------------------------------------------
 void PSCommon::init( const PSTemplate &Template, const Vector3f &vSysPos )
@@ -50,13 +48,11 @@ void PSCommon::update()
         }
     }
 
-    // Here we save the particles to be killed after the next update
-    ParticleList toKill;
     Particle *obj;
-    ParticleList::const_iterator iter;
+    ParticleList::iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
-         ++iter )
+         )
     {
         obj = *iter;
 
@@ -66,7 +62,8 @@ void PSCommon::update()
         // Check if the particle has expired
         if( obj->getLife() < 0 )
         {
-            toKill.push_back( obj );
+			iter = m_Emitter.getPAlive().erase(iter);
+			m_Emitter.getPDead().push_back( obj );
             continue;
         }
 
@@ -74,10 +71,8 @@ void PSCommon::update()
         obj->update();
         obj->updateColor( m_vfColor, m_vfColorFactor );
 
+        ++iter;
     } // end for( ... )
-    
-    // Kill the temporary list
-    kill( toKill );
 
 } // end update()
 
@@ -150,15 +145,15 @@ void PSCommon::render() const
 void PSCommon::onSpawn( Particle *particle ) 
 {
     particle->setColor( m_vfColor );
-    particle->setSize( tlib::randFloat( m_fSize[0], m_fSize[1] ) );
-    particle->setStartLife( tlib::randInt( m_iLifeSpan[0], m_iLifeSpan[1] ) );
+    particle->setSize( randFloat( m_fSize[0], m_fSize[1] ) );
+    particle->setStartLife( randInt( m_iLifeSpan[0], m_iLifeSpan[1] ) );
     particle->setPos( m_vPos );
-        
-    Vector3f vDir( tlib::randFloat( -1.0f, 1.0f ), 
-                   tlib::randFloat( -1.0f, 1.0f ), 
-                   tlib::randFloat( -1.0f, 1.0f ) );
+
+    Vector3f vDir( randFloat( m_vfDirection[0][0], m_vfDirection[0][1] ), 
+                   randFloat( m_vfDirection[1][0], m_vfDirection[1][1] ), 
+                   randFloat( m_vfDirection[2][0], m_vfDirection[2][1] ) );
     vDir.normalize();
 
-    float fVel = tlib::randFloat( m_fVelocity[0], m_fVelocity[1] );
+    float fVel = randFloat( m_fVelocity[0], m_fVelocity[1] );
     particle->setVelocity( vDir * fVel );
 }

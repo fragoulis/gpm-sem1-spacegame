@@ -4,9 +4,12 @@
 #include "PSCommon.h"
 #include "PSTemplate.h"
 #include "Timer.h"
+#include "Logger.h"
+using tlib::Logger;
 
 ParticleSystemMgr::ParticleSystemMgr()
 {
+    memset( m_Templates, 0, sizeof(m_Templates) );
     m_Templates[EXPLOSION]      = new PSTemplate("explosion");
     m_Templates[BIG_EXPLOSION]  = new PSTemplate("big_explosion");
     m_Templates[SMOKE]          = new PSTemplate("smoke");
@@ -14,6 +17,7 @@ ParticleSystemMgr::ParticleSystemMgr()
 
 ParticleSystemMgr::~ParticleSystemMgr()
 {
+    _LOG("Deleting particle system manager");
     // Clear particle system list
     PSList::iterator iter;
     for( iter = m_vPSList.begin(); 
@@ -23,6 +27,14 @@ ParticleSystemMgr::~ParticleSystemMgr()
         delete *iter;
         *iter = 0;
     }
+
+    for( int i=0; i<NUM_OF_TEMPLATES; ++i ) {
+        if( m_Templates ) {
+            delete m_Templates[i];
+            m_Templates[i] = 0;
+        }
+    }
+
 }
 
 // ----------------------------------------------------------------------------
@@ -81,9 +93,8 @@ void ParticleSystemMgr::remove( ParticleSystem *value )
 // ----------------------------------------------------------------------------
 void ParticleSystemMgr::update()
 {
-    PSList toKill;
     PSList::iterator iter;
-    for( iter = m_vPSList.begin(); iter != m_vPSList.end(); ++iter )
+    for( iter = m_vPSList.begin(); iter != m_vPSList.end(); )
     {
         _ASSERT((*iter)!=0);
         ParticleSystem *ps = *iter;
@@ -94,20 +105,18 @@ void ParticleSystemMgr::update()
             if( ps->getEmitter().getPAlive().size() ) {
                 // Turn of its emitter
                 ps->getEmitter().stop();
-                toKill.push_back(ps);
             } 
-            else 
+            else {
+                iter = m_vPSList.erase(iter);
+                delete ps;
+                ps = 0;
                 continue;
+            }
         }
 
         ps->update();
-    }
 
-    for( iter = toKill.begin();
-         iter != toKill.end();
-         ++iter )
-    {
-        remove( *iter );
+        ++iter;
     }
 
 } // end update()

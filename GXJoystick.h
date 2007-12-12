@@ -1,8 +1,6 @@
-
 #pragma once
 #include "Controller.h"
 #include "Logger.h"
-//#include "assert.h"
 #include "GX/Joystick.h"
 using gxbase::Joystick;
 
@@ -20,11 +18,9 @@ namespace tlib
 			A_LEFT_RIGHT,
 			A_LEFT_UP,
 			A_LEFT_DOWN,
-
-			A_RIGHT_LEFT,
-			A_RIGHT_RIGHT,
 			A_RIGHT_UP,
-			A_RIGHT_DOWN
+			A_RIGHT_DOWN,
+			NUM_AXIS
 		};
 
 		// Joystick's buttons mapped to enumeration
@@ -36,28 +32,19 @@ namespace tlib
 		Joystick m_Joystick;
 
 		// Joystick's interface attributes
-        float m_vfPosition[4];
+        float m_vfPosition[NUM_AXIS];
 		bool  m_vbButtons[MAX_BUTTON];
 
     public:
         /**
          * Constructor
          */
-        OCGXJoystick()
-        {
-			m_vfPosition[0] = m_vfPosition[1] = 0.0f;
-            memset( m_vbButtons, 0, sizeof(m_vbButtons) );
-            if (!m_Joystick.Open()) {
-				_LOG("This sample needs a joystick!");
-            }
-        }
+        OCGXJoystick();
 
         /**
          * Destructor
          */
-        virtual ~OCGXJoystick() {
-			m_Joystick.Close();
-		}
+        virtual ~OCGXJoystick();
 
         /**
          * Returns the unique component ID
@@ -66,14 +53,6 @@ namespace tlib
             return string("gxjoystick"); 
         }
 
-        //int getKey() const { return m_iKey; }
-        //bool isDown() const { return m_bDown; }
-        //int getKey( int k ) const 
-        //{ 
-        //    _ASSERT(k>=0&&k<256);
-        //    return m_vbKeys[k]; 
-        //}
-
-    }; // end of OCKeyboard class
+    }; // end of OCGXJoystick class
 
 } // end of namespace tlib

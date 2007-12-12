@@ -1,11 +1,9 @@
-
 #pragma once
-
 #include <string>
 #include <fstream>
 #include <map>
 #include <sstream>
-
+#include <iostream>
 using namespace std;
 
 namespace tlib
@@ -110,20 +108,20 @@ namespace tlib
 
     // ------------------------------------------------------------------------
     template<typename T>
-    void Config::_get( const string &sKey, 
-                       T *out, 
-                       const int nCount )
+    void Config::_get( const string &sKey, T *out, const int nCount )
     {
         // Create a string stream to easily read the values
         // from out data string
         istringstream instream;
         instream.clear();
         instream.str( m_Items[sKey] );
-        
+
         // dummy character to read delimiter
         char d;
-        for( int i=0; i<nCount; ++i )
-            instream >> *(out+i) >> d;
+        for( int i=0; i<nCount; ++i ) {
+            instream >> out[i] >> d;
+        }
+        
     } // end of _get
 
 } // end of namespace tlib

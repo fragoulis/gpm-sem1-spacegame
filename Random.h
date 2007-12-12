@@ -9,7 +9,7 @@ namespace tlib
     // ------------------------------------------------------------------------
     inline int randInt( const int min, const int max )
     {
-        //if( min == max ) return min;
+        if( min == max ) return min;
         //if( min > max ) return 0;
         //if( min < -INT_MAX ) min = -INT_MAX;
         //if( max > INT_MAX ) max = INT_MAX;

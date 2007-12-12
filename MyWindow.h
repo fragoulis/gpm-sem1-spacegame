@@ -26,6 +26,8 @@ private:
     float m_fFovY, m_fPlanes[2], m_fDimRatio;
     Minimap m_Minimap;
 
+    bool m_isAppCreated;
+
 public:
 	MyWindow();
 	void OnCreate();

@@ -60,7 +60,7 @@ void ForcefieldMgr::init()
     // Initialize visual component
     OCVisualBox *cVBox = new OCVisualBox;
     setComponent( cVBox );
-    cVBox->init( Vector3f( vfBBox ) * 0.5f );
+    cVBox->init( Vector3f( vfBBox ) );
 
     // Initialize shader object
     setComponent( new OCShader( ShaderMgr::FORCEFIELD_DOUBLE_TEX ) );
@@ -72,35 +72,31 @@ void ForcefieldMgr::update()
     IOCAnimation* cAnim;
 
     Forcefield *obj;
-    ForcefieldList toKill;
-    ForcefieldList::const_iterator iter;
+    ForcefieldList::iterator iter;
     for( iter = m_vForcefields.begin();
          iter != m_vForcefields.end();
-         iter++ )
+         )
     {
         obj = *iter;
 
         if( ObjectMgr::Instance().isCulled( obj ) ) {
             // If object is not active dont bother updating it
             // since it is culled
+            ++iter;
             continue;
         }
 
         cAnim = (IOCAnimation*)obj->getComponent("animation");
         // If object has finished its animation kill it
         if( cAnim->isDone() ) {
-            toKill.push_back( obj );
+            iter = m_vForcefields.erase(iter);
+            delete obj;
+            obj=0;
             continue;
         }
 
         cAnim->update();
-    }
-
-    for( iter = toKill.begin(); 
-         iter != toKill.end(); 
-         ++iter )
-    {
-         remove( *iter );
+        ++iter;
     }
 
 } // end update()
@@ -174,32 +170,19 @@ void ForcefieldMgr::render()
 } // end render()
 
 // ----------------------------------------------------------------------------
-void ForcefieldMgr::remove( Forcefield *value )
-{
-    _ASSERT(value!=0);
-
-    // Remove it from the object list
-    m_vForcefields.remove( value );
-
-    // Delete object system from memory
-    delete value;
-    value = 0;
-}
-
-// ----------------------------------------------------------------------------
 Forcefield* ForcefieldMgr::add( Tile3d *oTile )
 {
     // Allocate object
-    Forcefield *field = new Forcefield;
+    Forcefield *obj = new Forcefield;
 
     // Set its position
-    field->setPosFromIndex( oTile->ijk() );
+    obj->setPosFromIndex( oTile->ijk() );
 
     // Save it as this tile's occupant
-    oTile->setOccupant( (Object*)field );
+    oTile->setOccupant( (Object*)obj );
 
     // Push it to the list
-    m_vForcefields.push_back( field );
+    m_vForcefields.push_back( obj );
 
-    return field;
+    return obj;
 }

@@ -75,11 +75,6 @@ public:
     void spawn();
 
     /**
-     * Puts a particle array to the dead list
-     */
-    void kill( ParticleList &toKill );
-
-    /**
      * Initializes the particle system
      */
     void init( float fParticleSize );

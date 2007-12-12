@@ -4,6 +4,10 @@ using tlib::OCVitalsHealth;
 
 class ReactorVitals : public OCVitalsHealth
 {
+private:
+	// Seconds to fire the big explosion after its been destroyed
+	double m_dSecsToFire;
+
 public:
     /**
      * Constructor
