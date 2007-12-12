@@ -3,6 +3,7 @@
 #include "Object.h"
 using namespace std;
 
+class Tile3d;
 class RotatingBlade;
 typedef list<RotatingBlade*> RotatingBladeList;
 
@@ -22,7 +23,7 @@ public:
     /**
      * Renders all blades in the game
      */
-    void render();
+    void render() const;
 
     /**
      * Updates the animations for all blades
@@ -31,17 +32,6 @@ public:
      */
     void update();
 
-    /**
-     * Pushes a blade to the list
-     */
-    static void add( RotatingBlade *obj ) {
-        m_vBlades.push_back( obj );
-    }
-
-private:
-    /**
-     * 
-     */
-    void remove( RotatingBlade *value );
+    static RotatingBlade* add( Tile3d *oTile );
 
 }; // end of BladeMgr class

@@ -4,6 +4,7 @@
 using namespace std;
 using tlib::Object;
 
+class Tile3d;
 class Door;
 typedef list<Door*> DoorList;
 
@@ -36,17 +37,6 @@ public:
      */
     void update();
 
-    /**
-     * Pushes a door to the list
-     */
-    static void add( Door *door ) {
-        m_vDoors.push_back( door );
-    }
-
-private:
-    /**
-     * 
-     */
-    void remove( Door *value );
+    static Door* add( Tile3d *oTile );
 
 }; // end of DoorMgr class

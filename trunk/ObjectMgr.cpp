@@ -85,15 +85,19 @@ void ObjectMgr::render()
         ((IOCVisual*)m_Ship.getComponent("visual"))->render();
 
     ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_NO_TEX );
-        m_OutletMgr.render();
+    {
         m_BladeMgr.render();
         m_TurretMgr.render();
+    }
     ShaderMgr::Instance().end();
 
     //((IOCVisual*)m_Corridors.getComponent("visual"))->render();
     ShaderMgr::Instance().begin( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX );
+    {
         ((IOCVisual*)m_Corridors.getComponent("visual"))->render();
+        m_OutletMgr.render();    
         m_DoorMgr.render(); 
+    }
     ShaderMgr::Instance().end();
 
     if( !isCulled( (Object*)&m_Reactor ) ) {
@@ -297,7 +301,7 @@ void ObjectMgr::checkCollision()
 } // end checkCollision()
 
 // ----------------------------------------------------------------------------
-void ObjectMgr::addLight( Tile3d *oTile )
+void ObjectMgr::addLight( Tile3d *oTile ) const 
 {
     _LOG("Adding light at [" + toStr<int>(oTile->i()) + " "
                              + toStr<int>(oTile->j()) + " "
@@ -335,20 +339,17 @@ void ObjectMgr::addLight( Tile3d *oTile )
     // Push the light to the manager
     LightMgr::Instance().add( (GenericLight*)light );
 
-} // end addDoor()
+} // end addLight()
 
 // ----------------------------------------------------------------------------
-void ObjectMgr::addDoor( Tile3d *oTile )
+void ObjectMgr::addDoor( Tile3d *oTile ) const 
 {
     _LOG("Adding door at [" + toStr<int>(oTile->i()) + " "
                             + toStr<int>(oTile->j()) + " "
                             + toStr<int>(oTile->k()) + "]" );
 
     // Allocate door object
-    Door *door = new Door;
-    
-    // Set its position vector
-    door->setPosFromIndex( oTile->ijk() );
+    Door *door = DoorMgr::add( oTile );
     
     // By default every door is aligned to the z-axis
     // Correct the door's orientation according to what tile its 
@@ -371,26 +372,18 @@ void ObjectMgr::addDoor( Tile3d *oTile )
             break;
     }
     door->setDir( qCorrectRotation );
-
-    // Push the door to the manager
-    DoorMgr::add(door);
-    // Save it as this tile's occupant
-    oTile->setOccupant( (Object*)door );
-
+    
 } // end addDoor()
 
 // ----------------------------------------------------------------------------
-void ObjectMgr::addBlade( Tile3d *oTile )
+void ObjectMgr::addBlade( Tile3d *oTile ) const 
 {
     _LOG("Adding blade at [" + toStr<int>(oTile->i()) + " "
                              + toStr<int>(oTile->j()) + " "
                              + toStr<int>(oTile->k()) + "]" );
 
     // Allocate blade object
-    RotatingBlade *blade = new RotatingBlade;
-    
-    // Set its position vector
-    blade->setPosFromIndex( oTile->ijk() );
+    RotatingBlade *blade = BladeMgr::add( oTile );
     
     // By default every blade is aligned to the z-axis
     // Correct the blade's orientation according to what tile its 
@@ -417,16 +410,11 @@ void ObjectMgr::addBlade( Tile3d *oTile )
             break;
     }
     blade->setDir( qCorrectRotation );
-    
-    // Push the blade to the manager
-    BladeMgr::add(blade);
-    // Save it as this tile's occupant
-    oTile->setOccupant( (Object*)blade );
 
 } // end addBlade()
 
 // ----------------------------------------------------------------------------
-void ObjectMgr::addForcefield( Tile3d *oTile )
+void ObjectMgr::addForcefield( Tile3d *oTile ) const 
 {
     _LOG("Adding forcefield at [" + toStr<int>(oTile->i()) + " "
                                   + toStr<int>(oTile->j()) + " "
@@ -456,17 +444,18 @@ void ObjectMgr::addForcefield( Tile3d *oTile )
             break;
     }
     field->setDir( qCorrectRotation );
-}
+
+} // end addForcefield()
 
 // ----------------------------------------------------------------------------
-void ObjectMgr::addOutlet( Tile3d *oTile )
+void ObjectMgr::addOutlet( Tile3d *oTile ) const 
 {
     _LOG("Adding outlet at [" + toStr<int>(oTile->i()) + " "
                               + toStr<int>(oTile->j()) + " "
                               + toStr<int>(oTile->k()) + "]" );
     
     // Allocate outlet object
-    Outlet *ol = new Outlet;
+    Outlet *ol = OutletMgr::add( oTile );
     
     // Get the power outlet's position offset from the centre of the tile
     float vfOffset[3];
@@ -498,25 +487,19 @@ void ObjectMgr::addOutlet( Tile3d *oTile )
             break;
     }
     ol->setDir( qCorrectRotation );
-
-    // Set its position vector
     ol->setPosFromIndex( oTile->ijk(), vfNewOffset );
 
-    // Push the outlet to the manager
-    OutletMgr::add(ol);
-    // Save it as this tile's occupant
-    oTile->setOccupant( (Object*)ol );
-}
+} // end addOutlet()
 
 // ----------------------------------------------------------------------------
-void ObjectMgr::addTurret( Tile3d *oTile )
+void ObjectMgr::addTurret( Tile3d *oTile ) const 
 {
     _LOG("Adding turret at [" + toStr<int>(oTile->i()) + " "
                               + toStr<int>(oTile->j()) + " "
                               + toStr<int>(oTile->k()) + "]" );
 
     // Allocate object
-    Turret *tr = new Turret;
+    Turret *tr = TurretMgr::add( oTile );
     
     // Get the power outlet's position offset from the centre of the tile
     float vfOffset[3];
@@ -535,14 +518,10 @@ void ObjectMgr::addTurret( Tile3d *oTile )
     tr->setPosFromIndex( oTile->ijk(), vfNewOffset );
     tr->init();
 
-    // Push the outlet to the manager
-    TurretMgr::add(tr);
-    // Save it as this tile's occupant
-    oTile->setOccupant( (Object*)tr );
-}
+} // end addTurret()
 
 // ----------------------------------------------------------------------------
-bool ObjectMgr::isCulled( Object *obj )
+bool ObjectMgr::isCulled( Object *obj ) const
 {
     // Shorthand the active camera object
     Camera *activeCam = CameraMgr::Instance().getActive();

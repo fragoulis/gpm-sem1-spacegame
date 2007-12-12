@@ -2,12 +2,13 @@
 #include <iostream>
 FileTimeSource::FileTimeSource( const char *sFile )
 {
-    m_fsIn.open( sFile );
+    if( !m_fsIn.is_open() )
+        m_fsIn.open( sFile );
 }
 
 feed_t FileTimeSource::get()
 {
-    if( !m_fsIn.is_open() || m_fsIn.eof() )
+    if( !m_fsIn.is_open() || !m_fsIn.good() )
     {
         m_fsIn.close();
         return 0L;

@@ -110,13 +110,11 @@ void PSLaser::update()
         }
     }
 
-    // Here we save the particles to be killed after the next update
-    ParticleList toKill;
     Particle *obj;
-    ParticleList::const_iterator iter;
+    ParticleList::iterator iter;
     for( iter = m_Emitter.getPAlive().begin();
          iter != m_Emitter.getPAlive().end();
-         ++iter )
+         )
     {
         obj = *iter;
 
@@ -126,8 +124,8 @@ void PSLaser::update()
         // Check if the particle has expired
         if( obj->getLife() < 0 )
         {
-            // Particle has expired
-            toKill.push_back( obj );
+            iter = m_Emitter.getPAlive().erase(iter);
+			m_Emitter.getPDead().push_back( obj );
             continue;
         }
 
@@ -137,10 +135,8 @@ void PSLaser::update()
         // Check for collisions
         checkCollision( obj );
 
+        ++iter;
     } // end for( ... )
-    
-    // Kill the temporary list
-    kill( toKill );
 
 } // end update()
 

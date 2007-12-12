@@ -1,7 +1,6 @@
 #include "SpacestationCorridors.h"
 #include "SpacestationCorridorsDisplayList.h"
 #include "SingleTexture.h"
-#include "MultiTexture.h"
 #include "SimpleMaterial.h"
 #include "Shader.h"
 #include "Logger.h"
@@ -43,12 +42,6 @@ void SpacestationCorridors::init()
     OCSingleTexture *cTex = new OCSingleTexture( sTexture.c_str() );
     cTex->setName("colorMap");
     setComponent( cTex );
-    //OCMultiTexture *cTex = new OCMultiTexture(2);
-    //cTex->set(0, sTexture.c_str());
-    //cTex->setName(0, "colorMap");
-    //cTex->set(1, "textures/padded_normal.jpg");
-    //cTex->setName(1, "normalMap");
-    //setComponent( cTex );
 
     // Initialize shader object
     setComponent( new OCShader( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX ) );

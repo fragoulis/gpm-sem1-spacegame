@@ -85,39 +85,19 @@ public:
     /**
      * 
      */
-    void addLight( Tile3d *oTile );
-
-    /**
-     * 
-     */
-    void addDoor( Tile3d *oTile );
-    
-    /**
-     * 
-     */
-    void addBlade( Tile3d *oTile );
-
-    /**
-     * 
-     */
-    void addForcefield( Tile3d *oTile );
-
-    /**
-     * 
-     */
-    void addOutlet( Tile3d *oTile );
-
-    /**
-     * 
-     */
-    void addTurret( Tile3d *oTile );
+    void addLight( Tile3d *oTile ) const;
+    void addDoor( Tile3d *oTile ) const;
+    void addBlade( Tile3d *oTile ) const;
+    void addForcefield( Tile3d *oTile ) const;
+    void addOutlet( Tile3d *oTile ) const;
+    void addTurret( Tile3d *oTile ) const;
 
     /**
      * Checks if an object is far from the currently active
      * camera so that it can be excused from the updates
      * and the rendering
      */
-    bool isCulled( Object *obj );
+    bool isCulled( Object *obj ) const;
 
     /** 
      * Calls the initialization functions for the unique objects

@@ -12,11 +12,13 @@ private:
     bool m_bIsOn;
 
     // File to record to
-    string m_sFile;
+    string m_sTimes;
+    string m_sInputs;
 
     // The output stream
-    ofstream m_fsTimes;
-    ofstream m_fsInputs;
+    ofstream m_ofsTimes;
+    ofstream m_ofsInputs;
+    ifstream m_ifsInputs;
 
     // The last clock time recorded
     long m_lClockTime;
@@ -26,22 +28,26 @@ public:
      * Accesors/Mutators
      */
     bool isOn() const { return m_bIsOn; }
-    void setFile( const string &sFile ) {
-        m_sFile = sFile;
-    }
+    void setFiles( const string &sFile );
+	bool isOpen() const { return m_ifsInputs.is_open(); }
 
     /**
      * Records the clock feeds into a text file
      */
     inline void record( long lClockTime );
-    inline void recordAxis( int iAxis, float fValue );
-    inline void recordButton( int iButton, bool bValue );
+    inline void recordAxis( float fValues[], int iCount );
+    inline void recordButton( bool bValues[], int iCount );
+    inline void flush();
+    inline void replayAxis( float fValues[], int iCount );
+    inline void replayButton( bool bValues[], int iCount );
+	inline void replayEnd();
 
     /**
      * Starts/Stops the recording
      */
     inline bool start();
     inline void stop();
+    bool openInputsForReplay();
 
 private:
     /**
@@ -56,20 +62,18 @@ private:
 // ----------------------------------------------------------------------------
 bool Recorder::start()
 {
-    if( m_fsTimes.is_open() ) return true;
+    if( m_ofsTimes.is_open() ) return true;
 
-    m_fsTimes.exceptions ( ofstream::eofbit | ofstream::failbit | ofstream::badbit );
+    m_ofsTimes.exceptions ( ofstream::eofbit | ofstream::failbit | ofstream::badbit );
+    m_ofsInputs.exceptions ( ofstream::eofbit | ofstream::failbit | ofstream::badbit );
     try {
-        m_fsTimes.open( m_sFile.c_str() );
-
-        string sInputsFile = m_sFile;
-        size_t pos = m_sFile.find_last_of('.');
-        m_fsInputs.open( (m_sFile.insert(pos,"_inputs")).c_str() );
+        m_ofsTimes.open( m_sTimes.c_str() );
+        m_ofsInputs.open( m_sInputs.c_str() );
     }
     catch( ofstream::failure e ) {
     }
 
-    if( !m_fsTimes.is_open() || !m_fsInputs.is_open() ) return false;
+    if( !m_ofsTimes.is_open() || !m_ofsInputs.is_open() ) return false;
 
     return ( m_bIsOn = true );
 }
@@ -77,25 +81,56 @@ bool Recorder::start()
 // ----------------------------------------------------------------------------
 void Recorder::stop()
 {
-    m_fsTimes.close();
+    m_ofsTimes.close();
+    m_ofsInputs.close();
     m_bIsOn = false;
 }
 
 // ----------------------------------------------------------------------------
 void Recorder::record( long lClockTime )
 {
-    m_fsTimes << lClockTime << " ";
-    //m_lClockTime = lClockTime;
+    m_ofsTimes << lClockTime << " ";
 }
 
 // ----------------------------------------------------------------------------
-void Recorder::recordAxis( int iAxis, float fValue )
+void Recorder::flush()
 {
-    m_fsInputs << iAxis << " " << fValue << " ";
+    m_ofsInputs << endl;
+    m_ofsInputs.flush();
 }
 
 // ----------------------------------------------------------------------------
-void Recorder::recordButton( int iButton, bool bValue )
+void Recorder::recordAxis( float fValues[], int iCount )
 {
-    m_fsInputs << iButton << " " << ((bValue)?1:0) << " ";
+	for( int i=0; i<iCount; ++i )
+        m_ofsInputs << fValues[i] << " ";
+}
+
+// ----------------------------------------------------------------------------
+void Recorder::recordButton( bool bValues[], int iCount )
+{
+	for( int i=0; i<iCount; ++i )
+        m_ofsInputs << ((bValues[i])?1:0) << " ";
+}
+
+// ----------------------------------------------------------------------------
+void Recorder::replayAxis( float fValues[], int iCount )
+{
+    for( int i=0; i<iCount; ++i )
+        m_ifsInputs >> fValues[i];
+}
+
+// ----------------------------------------------------------------------------
+void Recorder::replayButton( bool bValues[], int iCount )
+{
+    for( int i=0; i<iCount; ++i )
+        m_ifsInputs >> bValues[i];
+}
+
+// ----------------------------------------------------------------------------
+void Recorder::replayEnd()
+{
+	if( !m_ifsInputs.good() ) {
+		m_ifsInputs.close();
+	}
 }

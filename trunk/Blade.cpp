@@ -33,7 +33,7 @@ void Blade::init()
     setComponent( cMat );
 
     // Initialize visual component
-    setComponent( new OCVisualBox( Vector3f( vfDim ) * 0.5f ) );
+    setComponent( new OCVisualBox( Vector3f( vfDim ) ) );
 
 } // end init()
 

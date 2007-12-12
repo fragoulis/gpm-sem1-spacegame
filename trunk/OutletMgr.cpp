@@ -6,9 +6,9 @@
 #include "Material.h"
 #include "Animation.h"
 #include "ObjectMgr.h"
-//#include "MultiTexture.h"
-//#include "SingleTexture.h"
+#include "SingleTexture.h"
 #include "Shader.h"
+#include "Tile3d.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
@@ -24,23 +24,20 @@ void OutletMgr::init()
     Config cfg("config.txt");
     cfg.loadBlock("outlet");
 
-    //OCMultiTexture *cMTex = new OCMultiTexture( 2 );
-    //cMTex->set( 0, "textures/metal-texture02.jpg" );
-    //cMTex->set( 1, "textures/particle01.gif" );
-    //setComponent( cMTex );
-
-    //setComponent( new OCSingleTexture( "textures/metal-texture02.jpg" ) );
+    string sTexture;
+    cfg.getString("texture", sTexture);
+    setComponent( new OCSingleTexture( sTexture.c_str() ) );
 
     // Get the outlet's bounding box which incidentaly is the same
     // as its [half] dimensions
-    float fvDim[3];
-    cfg.getFloat("bbox", fvDim, 3);
+    float vfDim[3];
+    cfg.getFloat("bbox", vfDim, 3);
     
     // Initialize visual component
     // We will use this single component to draw all power outlets
     OCVisualBox *cVBox = new OCVisualBox;
     setComponent( cVBox );
-    cVBox->init( Vector3f( fvDim ) );
+    cVBox->init( Vector3f( vfDim ) );
 
     // Initialize shader object
     setComponent( new OCShader( ShaderMgr::POINT_AND_SPOT_LIGHT_SINGLE_TEX ) );
@@ -100,3 +97,18 @@ void OutletMgr::update()
         cAnim->update();
     }
 } // end update()
+
+// ----------------------------------------------------------------------------
+Outlet* OutletMgr::add( Tile3d *oTile )
+{
+    // Allocate object
+    Outlet *obj = new Outlet;
+
+    // Save it as this tile's occupant
+    oTile->setOccupant( (Object*)obj );
+
+    // Push it to the list
+    m_vOutlets.push_back( obj );
+
+    return obj;
+}

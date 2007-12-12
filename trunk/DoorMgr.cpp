@@ -8,6 +8,7 @@
 #include "Animation.h"
 #include "Shader.h"
 #include "ObjectMgr.h"
+#include "Tile3d.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
@@ -28,11 +29,15 @@ void DoorMgr::init()
     string sTexture;
     cfg.getString("texture", sTexture );
 
+    // Read material
+    float vfSpec[4], fShine;
+    cfg.getFloat("specular", vfSpec, 4);
+    cfg.getFloat("shininess", &fShine);
+
     // Initialize material component
     OCSimpleMaterial *cMat = new OCSimpleMaterial;
-    cMat->setDiffuse( Color::white() );
-    cMat->setSpecular( Color( 0.5f, 0.5f, 0.5f, 1.0f ) );
-    cMat->setShininess( 80.0f );
+    cMat->setSpecular( Color( vfSpec ) );
+    cMat->setShininess( fShine );
     setComponent( cMat );
     
     // Initialize texture component
@@ -57,17 +62,17 @@ void DoorMgr::update()
     IOCAnimation* cAnim;
 
     Door *obj;
-    DoorList toKill;
-    DoorList::const_iterator iter;
+    DoorList::iterator iter;
     for( iter = m_vDoors.begin();
          iter != m_vDoors.end();
-         ++iter )
+         )
     {
         obj = *iter;
 
         if( ObjectMgr::Instance().isCulled( obj ) ) {
             // If object is not active dont bother updating it
             // since it is culled
+            ++iter;
             continue;
         }
 
@@ -75,19 +80,15 @@ void DoorMgr::update()
         // If object has finished its animation kill it
         if( cAnim->isDone() )
         {
-            toKill.push_back( obj );
+            iter = m_vDoors.erase(iter);
+            delete obj;
+            obj = 0;
             continue;
         }
 
-        
         cAnim->update();
-    }
 
-    for( iter = toKill.begin(); 
-         iter != toKill.end(); 
-         ++iter )
-    {
-         remove( *iter );
+        ++iter;
     }
 
 } // end update()
@@ -144,14 +145,19 @@ void DoorMgr::render()
 } // end render()
 
 // ----------------------------------------------------------------------------
-void DoorMgr::remove( Door *value )
+Door* DoorMgr::add( Tile3d *oTile )
 {
-    _ASSERT(value!=0);
+    // Allocate object
+    Door *obj = new Door;
 
-    // Remove it from the object list
-    m_vDoors.remove( value );
+    // Set its position
+    obj->setPosFromIndex( oTile->ijk() );
 
-    // Delete object system from memory
-    delete value;
-    value = 0;
+    // Save it as this tile's occupant
+    oTile->setOccupant( (Object*)obj );
+
+    // Push it to the list
+    m_vDoors.push_back( obj );
+
+    return obj;
 }

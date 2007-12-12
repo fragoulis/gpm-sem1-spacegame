@@ -4,6 +4,7 @@
 #include "RotatingBlade.h"
 #include "Animation.h"
 #include "ObjectMgr.h"
+#include "Tile3d.h"
 #include "Config.h"
 #include "Logger.h"
 using namespace tlib;
@@ -15,17 +16,17 @@ void BladeMgr::update()
     IOCAnimation* cAnim;
 
     RotatingBlade *obj;
-    RotatingBladeList toKill;
-    RotatingBladeList::const_iterator iter;
+    RotatingBladeList::iterator iter;
     for( iter = m_vBlades.begin();
          iter != m_vBlades.end();
-         iter++ )
+         )
     {
         obj = *iter;
 
         if( ObjectMgr::Instance().isCulled( obj ) ) {
             // If object is not active dont bother updating it
             // since it is culled
+            ++iter;
             continue;
         }
 
@@ -33,7 +34,9 @@ void BladeMgr::update()
         // If object has finished its animation kill it
         if( cAnim->isDone() )
         {
-            toKill.push_back( obj );
+            iter = m_vBlades.erase(iter);
+            delete obj;
+            obj=0;
             continue;
         }
 
@@ -42,19 +45,14 @@ void BladeMgr::update()
         } else {
             cAnim->update();
         }
-    }
 
-    for( iter = toKill.begin(); 
-         iter != toKill.end(); 
-         ++iter )
-    {
-         remove( *iter );
+        ++iter;
     }
 
 } // end update()
 
 // ----------------------------------------------------------------------------
-void BladeMgr::render()
+void BladeMgr::render() const
 {
     // Draw all blade systems
     RotatingBlade *obj;
@@ -74,14 +72,19 @@ void BladeMgr::render()
 } // end render()
 
 // ----------------------------------------------------------------------------
-void BladeMgr::remove( RotatingBlade *value )
+RotatingBlade* BladeMgr::add( Tile3d *oTile )
 {
-    _ASSERT(value!=0);
+    // Allocate object
+    RotatingBlade *obj = new RotatingBlade;
 
-    // Remove it from the object list
-    m_vBlades.remove( value );
+    // Set its position
+    obj->setPosFromIndex( oTile->ijk() );
 
-    // Delete object system from memory
-    delete value;
-    value = 0;
+    // Save it as this tile's occupant
+    oTile->setOccupant( (Object*)obj );
+
+    // Push it to the list
+    m_vBlades.push_back( obj );
+
+    return obj;
 }

@@ -4,9 +4,10 @@
 #include "Visual.h"
 #include "ObjectMgr.h"
 #include "Config.h"
+#include "Logger.h"
+using tlib::Logger;
 using tlib::Config;
 using tlib::IOCVisual;
-//using tlib::ObjectMgr;
 
 LightMgr::LightMgr():
 m_DistItems(0)
@@ -22,6 +23,16 @@ m_DistItems(0)
 
 LightMgr::~LightMgr()
 {
+    _LOG("Deleting light manager");
+    //LightList::iterator iter;
+    //for( iter = m_vList.begin(); 
+    //     iter != m_vList.end(); 
+    //     ++iter )
+    //{
+    //    delete *iter;
+    //    *iter = 0;
+    //}
+
     delete [] m_DistItems;
     m_DistItems = 0;
 }
@@ -37,7 +48,6 @@ void LightMgr::init()
 // ----------------------------------------------------------------------------
 void LightMgr::render() const 
 {
-    LightList::const_iterator iter;
     for( int i=0; i<MAX_LIGHTS; ++i )
     {
         if( m_vLights[i] ) //&& m_vLights[i]->isOn() )

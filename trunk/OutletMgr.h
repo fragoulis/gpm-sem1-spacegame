@@ -4,6 +4,7 @@
 using namespace std;
 using tlib::Object;
 
+class Tile3d;
 class Outlet;
 typedef list<Outlet*> OutletList;
 
@@ -36,11 +37,6 @@ public:
      */
     void update();
 
-    /**
-     * Pushes an outlet to the list
-     */
-    static void add( Outlet *ol ) {
-        m_vOutlets.push_back( ol );
-    }
+    static Outlet* add( Tile3d *oTile );
 
 }; // end of OutletMgr class

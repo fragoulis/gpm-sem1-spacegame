@@ -92,24 +92,3 @@ void ParticleSystem::spawn()
     }
 
 } // end spawn()
-
-// ----------------------------------------------------------------------------
-void ParticleSystem::kill( ParticleList &toKill )
-{
-    Particle *obj;
-    ParticleList::const_iterator iter;
-    for( iter = toKill.begin();
-         iter != toKill.end();
-         ++iter )
-    {
-        obj = *iter;
-        // Remove it from the alive list
-        m_Emitter.getPAlive().remove( obj );
-
-        // Push it to the dead list
-        m_Emitter.getPDead().push_back( obj );
-    }
-
-    // Empty kill list
-    toKill.clear();
-}

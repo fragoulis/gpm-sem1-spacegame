@@ -17,7 +17,8 @@ GLuint TextureMgr::getTexture( const char *filename )
 
     // Check is the requested texture is already loaded
     // and if it is return its handle.
-    if( ( uiTexId = m_vTextures[ sTexture ] ) ) {
+    uiTexId = m_vTextures[ sTexture ];
+    if( uiTexId ) {
         _LOG("Texture already loaded "+ string(filename) +"["+ toStr<GLuint>(uiTexId) +"]");
         // Make sude the format is set to default;
         m_iFormat = Image::RGB;

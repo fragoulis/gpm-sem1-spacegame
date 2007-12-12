@@ -46,10 +46,4 @@ public:
      */
     static Forcefield* add( Tile3d *oTile );
 
-private:
-    /**
-     * 
-     */
-    void remove( Forcefield *value );
-
 }; // end of ForcefieldMgr class

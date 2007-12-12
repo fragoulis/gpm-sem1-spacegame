@@ -31,15 +31,15 @@ namespace tlib
                 oObj->getPos(), 
                 ((OCCollisionBSphere*)cObjCol)->getRadius(),
                 vCollDir );
-        } else {
-            return checkSphereWithSphere( 
-                oObj->getPos(), 
-                ((OCCollisionBSphere*)cObjCol)->getRadius(),
-                vCollDir );
-        }
+        } 
+        //else
+        return checkSphereWithSphere( 
+            oObj->getPos(), 
+            ((OCCollisionBSphere*)cObjCol)->getRadius(),
+            vCollDir );
 
         // Programme will never go here
-        return false;
+        //return false;
     }
 
     // ------------------------------------------------------------------------
@@ -64,14 +64,14 @@ namespace tlib
             return checkBoxWithSphere( 
                 oObj->getPos(), 
                 ((OCCollisionBSphere*)cObjCol)->getRadius() );
-        } else {
-            return checkSphereWithSphere( 
-                oObj->getPos(), 
-                ((OCCollisionBSphere*)cObjCol)->getRadius() );
         }
+        //else
+        return checkSphereWithSphere( 
+            oObj->getPos(), 
+            ((OCCollisionBSphere*)cObjCol)->getRadius() );
 
         // Programme will never go here
-        return false;
+        //return false;
     }
 
     // ------------------------------------------------------------------------

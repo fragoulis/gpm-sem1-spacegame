@@ -40,6 +40,11 @@ PSTemplate::PSTemplate( const char *block )
     // Read particle number
     cfg.getInt("max_particles", &m_iNumOfParticles);
 
+    // Read particle direction cone
+    cfg.getFloat("dir_x", m_vfDirection[0], 2);
+    cfg.getFloat("dir_y", m_vfDirection[1], 2);
+    cfg.getFloat("dir_z", m_vfDirection[2], 2);
+
     // Read texture
     string sTexture;
     cfg.getString("texture", sTexture);
@@ -68,6 +73,13 @@ void PSTemplate::copyTo( PSCommon &ps ) const
     ps.m_vfColorFactor[1] = m_vfColorFactor[1];
     ps.m_vfColorFactor[2] = m_vfColorFactor[2];
     ps.m_vfColorFactor[3] = m_vfColorFactor[3];
+
+    ps.m_vfDirection[0][0] = m_vfDirection[0][0];
+    ps.m_vfDirection[0][1] = m_vfDirection[0][1];
+    ps.m_vfDirection[1][0] = m_vfDirection[1][0];
+    ps.m_vfDirection[1][1] = m_vfDirection[1][1];
+    ps.m_vfDirection[2][0] = m_vfDirection[2][0];
+    ps.m_vfDirection[2][1] = m_vfDirection[2][1];
 
     ps.m_iReleaseCount = m_iReleaseCount;
 

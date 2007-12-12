@@ -1,5 +1,7 @@
 #include "Tilemap.h"
 #include "Config.h"
+#include "Logger.h"
+using tlib::Logger;
 using tlib::Config;
 
 Tilemap::Tilemap():
@@ -15,9 +17,11 @@ m_TileArray(0)
 
 Tilemap::~Tilemap()
 {
-    if( m_TileArray )
+    if( m_TileArray ) {
         delete [] m_TileArray;
-    m_TileArray = 0;
+        m_TileArray = 0;
+        _LOG("Deleted tilemap array");
+    }
     m_TileMap.clear();
 }
 
@@ -33,20 +37,29 @@ void Tilemap::create( int iNumOfTiles ) {
 }
 
 // ----------------------------------------------------------------------------
-Tile3d* Tilemap::getTile( const Vector3f& vIn )
+Vector3f Tilemap::getTilePos( const Tile3d* oTile ) const
+{
+    const float fHalfTiles = (float)m_iNumOfTiles * 0.5f;
+
+    Vector3f vIndex( 
+        oTile->i() - fHalfTiles,
+        oTile->j() - fHalfTiles,
+        oTile->k() + fHalfTiles
+        );
+    
+    return Vector3f(vIndex * (float)m_iTileSize);
+}
+
+// ----------------------------------------------------------------------------
+Tile3d* Tilemap::getTile( const Vector3f& vIn ) const
 { 
-    float fHalfTiles = (float)m_iNumOfTiles * 0.5f;
+    const float fHalfTiles = (float)m_iNumOfTiles * 0.5f;
 
     // Convert position vector to 'tile' coordinates
     Vector3f vIndex = vIn / (float)m_iTileSize;
     vIndex.x( vIndex.x() + fHalfTiles );
     vIndex.y( vIndex.y() + fHalfTiles );
     vIndex.z( vIndex.z() - fHalfTiles );
-
-    //vIndex += Vector3f( fHalfTiles, fHalfTiles, -fHalfTiles );
-    //vIndex.addX( fHalfTiles );
-    //vIndex.addY( fHalfTiles );
-    //vIndex.subZ( fHalfTiles );
     
     return getTile( (int)floor((float)vIndex.x()), 
                     (int)floor((float)vIndex.y()),

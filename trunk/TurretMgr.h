@@ -4,6 +4,7 @@
 using namespace std;
 using tlib::Object;
 
+class Tile3d;
 class Turret;
 typedef list<Turret*> TurretList;
 
@@ -39,12 +40,7 @@ public:
      */
     void update();
 
-    /**
-     * Pushes a turret to the list
-     */
-    static void add( Turret *tr ) {
-        m_vTurrets.push_back( tr );
-    }
+    static Turret* add( Tile3d *oTile );
 
 private:
     /**

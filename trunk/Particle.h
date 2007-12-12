@@ -13,14 +13,14 @@ class Particle
 {
 private:
     // Pointers to the previous and the next particle
-    //Particle *m_pPrev, *m_pNext;
+    Particle *m_pNext;
 
     // The particle's position
     Vector3f m_vPos;
     Vector3f m_vPrevPos;
 
     // Particle's velocity
-    float m_fVelocity;
+    float m_fScalarVelocity;
     Vector3f m_vVelocity;
 
     // The particle's rotation
@@ -38,6 +38,16 @@ private:
     float m_vfColor[4];
 
 public:
+    /**
+     * Next particle pointer getter/setter
+     */
+    void setNext( Particle *next ) {
+        m_pNext = next;
+    }
+    Particle* getNext() const {
+        return m_pNext;
+    }
+
     /**
      * Getter/Setter for the position
      */
@@ -57,14 +67,14 @@ public:
      * Changes the direction for the particle
      */
     void setDir( const Vector3f &vDir ) {
-        m_vVelocity = vDir * m_fVelocity;
+        m_vVelocity = vDir * m_fScalarVelocity;
     }
 
     /**
      * Sets the scalar velocity of the particle
      */
     void setVelocity( float fVelocity ) {
-        m_fVelocity = fVelocity;
+        m_fScalarVelocity = fVelocity;
     }
 
     /**

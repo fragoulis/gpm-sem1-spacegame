@@ -31,7 +31,7 @@ Outlet::Outlet(): m_pBarrier(0)
 
     // Read specular component
     float vfSpecular[4], fShininess;
-    cfg.getFloat("spcular",   vfSpecular, 4);
+    cfg.getFloat("specular",   vfSpecular, 4);
     cfg.getFloat("shininess", &fShininess );
 
     // Initialize material component
