@@ -86,7 +86,8 @@ void TPCamera::update()
     //Quatf qRot = cTarOri->getYaw() * cTarOri->getPitch() * cTarOri->getRoll();
     //Quatf qRes;
     //cCamOri->getRot().slerp( qRot, m_fRotationBias, qRes );
-	Quatf qRes = cTarOri->getYaw() * cTarOri->getPitch() * cTarOri->getRoll();
+	//Quatf qRes = cTarOri->getYaw() * cTarOri->getPitch() * cTarOri->getRoll();
+    Quatf qRes = cTarOri->getPrevRot();
     cCamOri->setRot(qRes);
     // Apply to the vectors the same rotations that were 
     // applied to the spaceship
@@ -103,7 +104,4 @@ void TPCamera::update()
     //cCamOri->getRot().slerp( qRot, m_fRotationBias, qRes );
     m_vPosOffset.selfRotate( qRes );
     getPos() += ( m_oTarget->getPos() + m_vPosOffset - getPos() ) * m_fPositionBias;
-    
-    // Reset the rotations of the orientation component
-    cTarOri->resetAngles();
 }

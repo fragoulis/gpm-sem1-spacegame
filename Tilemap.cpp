@@ -41,13 +41,11 @@ Vector3f Tilemap::getTilePos( const Tile3d* oTile ) const
 {
     const float fHalfTiles = (float)m_iNumOfTiles * 0.5f;
 
-    Vector3f vIndex( 
-        oTile->i() - fHalfTiles,
-        oTile->j() - fHalfTiles,
-        oTile->k() + fHalfTiles
+    return Vector3f( 
+        ( ( oTile->i() - fHalfTiles ) + 0.5f ) * (float)m_iTileSize,
+        ( ( oTile->j() - fHalfTiles ) + 0.5f ) * (float)m_iTileSize,
+        ( ( fHalfTiles - oTile->k() ) - 0.5f ) * (float)m_iTileSize
         );
-    
-    return Vector3f(vIndex * (float)m_iTileSize);
 }
 
 // ----------------------------------------------------------------------------

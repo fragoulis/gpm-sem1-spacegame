@@ -8,8 +8,8 @@ class Recorder  : public Singleton<Recorder>
 {
     friend Singleton<Recorder>;
 private:
-    // Tells whether we are reconding
-    bool m_bIsOn;
+    // Tells whether we are reconding/replaying
+    bool m_bIsRecord, m_bIsReplay;
 
     // File to record to
     string m_sTimes;
@@ -27,7 +27,8 @@ public:
     /**
      * Accesors/Mutators
      */
-    bool isOn() const { return m_bIsOn; }
+    bool isRecordOn() const { return m_bIsRecord; }
+    bool isReplayOn() const { return m_bIsReplay; }
     void setFiles( const string &sFile );
 	bool isOpen() const { return m_ifsInputs.is_open(); }
 
@@ -40,10 +41,10 @@ public:
     inline void flush();
     inline void replayAxis( float fValues[], int iCount );
     inline void replayButton( bool bValues[], int iCount );
-	inline void replayEnd();
+	inline void endReplay();
 
     /**
-     * Starts/Stops the recording
+     * Starts/Stops the recording/replay
      */
     inline bool start();
     inline void stop();
@@ -75,7 +76,7 @@ bool Recorder::start()
 
     if( !m_ofsTimes.is_open() || !m_ofsInputs.is_open() ) return false;
 
-    return ( m_bIsOn = true );
+    return ( m_bIsRecord = true );
 }
 
 // ----------------------------------------------------------------------------
@@ -83,7 +84,7 @@ void Recorder::stop()
 {
     m_ofsTimes.close();
     m_ofsInputs.close();
-    m_bIsOn = false;
+    m_bIsRecord = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -125,12 +126,15 @@ void Recorder::replayButton( bool bValues[], int iCount )
 {
     for( int i=0; i<iCount; ++i )
         m_ifsInputs >> bValues[i];
+
+    if( !m_ifsInputs.good() ) {
+		endReplay();
+	}
 }
 
 // ----------------------------------------------------------------------------
-void Recorder::replayEnd()
+void Recorder::endReplay()
 {
-	if( !m_ifsInputs.good() ) {
-		m_ifsInputs.close();
-	}
+    m_ifsInputs.close();
+    m_bIsReplay = false;
 }

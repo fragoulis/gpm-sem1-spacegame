@@ -60,7 +60,6 @@ void ObjectMgr::init()
 void ObjectMgr::update()
 {
     m_Ship.update();
-    m_Spacecube.setPos( m_Ship.getPos() );
     m_Shield.update();
 
     // Update barriers, defence guns and outlets

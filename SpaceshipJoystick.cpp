@@ -3,12 +3,12 @@
 #include "Recorder.h"
 #include "CameraMgr.h"
 #include "ObjectMgr.h"
+#include "Autopilot.h"
 
 const float AXIS_ZERO_P = 3.05176e-005f;
 const float AXIS_ZERO_N = -3.05176e-005f;
 
 // Control variables
-extern bool g_bIsReplay;
 extern bool g_bSwitchCam;
 extern bool g_bToggleRecord;
 
@@ -21,12 +21,34 @@ void SpaceshipJoystick::update()
     Spaceship *ship = (Spaceship*)getOwner();
     if( !ship->isActive() ) 
     {
-        ship->resetSpeed();
+        // Check if autopilot is on, otherwise the ship is just dead
+        if( Autopilot::Instance().isActive() )
+        {
+            // Stop replay if we are in replay mode
+            if( Recorder::Instance().isReplayOn() )
+                Recorder::Instance().endReplay();
+            else
+                // Stop recording if we are recording
+                if( Recorder::Instance().isRecordOn() )
+                    Recorder::Instance().stop();
+            
+            // We could force a third-person view
+            //CameraMgr::Instance().activate("stalker");
+            ////ObjectMgr::Instance().showShip();
+            //CameraMgr::Instance().activate("first-person");
+            //ObjectMgr::Instance().hideShip();
+        } 
+        else 
+        {
+            // Ship is dead
+            ship->resetSpeed();
+        }
+    
         ship->ceaseFire();
         return;
     }
 
-    if( g_bIsReplay )
+    if( Recorder::Instance().isReplayOn() )
     {
         // Read joystick inputs from file
 		if( !Recorder::Instance().isOpen() ) {
@@ -35,27 +57,26 @@ void SpaceshipJoystick::update()
 
 		Recorder::Instance().replayAxis( m_vfPosition, NUM_AXIS );
         Recorder::Instance().replayButton( m_vbButtons, MAX_BUTTON );
-		//Recorder::Instance().replayEnd();
     } 
     else 
     {
-	    m_Joystick.Update();
+        m_Joystick.Update();
 
-	    // Map  joystick controls to our spacecraft
-	    m_vfPosition[A_LEFT_RIGHT]	=  m_Joystick.Axis(0);
-	    m_vfPosition[A_LEFT_LEFT]	= -m_Joystick.Axis(0);
-	    m_vfPosition[A_LEFT_DOWN]	=  m_Joystick.Axis(1);
-	    m_vfPosition[A_LEFT_UP]		= -m_Joystick.Axis(1);
+        // Map  joystick controls to our spacecraft
+        m_vfPosition[A_LEFT_RIGHT]	=  m_Joystick.Axis(0);
+        m_vfPosition[A_LEFT_LEFT]	= -m_Joystick.Axis(0);
+        m_vfPosition[A_LEFT_DOWN]	=  m_Joystick.Axis(1);
+        m_vfPosition[A_LEFT_UP]		= -m_Joystick.Axis(1);
 
-	    m_vfPosition[A_RIGHT_UP]	= -m_Joystick.Axis(2);
-		m_vfPosition[A_RIGHT_DOWN]	=  m_Joystick.Axis(2);
+        m_vfPosition[A_RIGHT_UP]	= -m_Joystick.Axis(2);
+	    m_vfPosition[A_RIGHT_DOWN]	=  m_Joystick.Axis(2);
 
-		for( int n=0; n<MAX_BUTTON; ++n ) {
-		    m_vbButtons[n] = m_Joystick.Button(n);
-		}
+	    for( int n=0; n<MAX_BUTTON; ++n ) {
+	        m_vbButtons[n] = m_Joystick.Button(n);
+	    }
 
         // Record user inputs
-        if( Recorder::Instance().isOn() )
+        if( Recorder::Instance().isRecordOn() )
         {
             // Record axis movement
 			Recorder::Instance().recordAxis( m_vfPosition, NUM_AXIS );
@@ -64,8 +85,9 @@ void SpaceshipJoystick::update()
 
             Recorder::Instance().flush();
         }
-    } // end if( g_bIsReplay ) ...
+    } // end if( g_bIsReplay ) ... else 
 
+    // Control speed
 	if( m_vfPosition[A_RIGHT_UP] > AXIS_ZERO_P ) {
 		ship->speed( m_vfPosition[A_RIGHT_UP] );
 	}
@@ -76,6 +98,7 @@ void SpaceshipJoystick::update()
 		ship->resetSpeed();
 	}
 	
+    // Control rotations
 	if( ( m_vfPosition[A_LEFT_UP]   > AXIS_ZERO_P ||
 		  m_vfPosition[A_LEFT_DOWN] > AXIS_ZERO_P ) ||
 		( m_vfPosition[A_LEFT_RIGHT]> AXIS_ZERO_P ||
@@ -88,7 +111,8 @@ void SpaceshipJoystick::update()
     if( m_vbButtons[B_BOTTOM] ) ship->fire();
     else ship->ceaseFire();
 
-	if( m_vbButtons[B_TOP] && g_iSingleInterval<0 && !g_bIsReplay ) 
+	if( m_vbButtons[B_TOP] && g_iSingleInterval<0 && 
+        !Recorder::Instance().isReplayOn() ) 
 	{
 		if( g_bToggleRecord ) {
             Recorder::Instance().stop();
@@ -117,4 +141,4 @@ void SpaceshipJoystick::update()
 	}
 	--g_iSingleInterval;
 
-}
+} // end update()

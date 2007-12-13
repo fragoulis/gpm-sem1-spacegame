@@ -1,7 +1,8 @@
 #include "Recorder.h"
 
 Recorder::Recorder():
-m_bIsOn(false)
+m_bIsRecord(false),
+m_bIsReplay(false)
 {}
 
 Recorder::~Recorder()
@@ -27,5 +28,6 @@ bool Recorder::openInputsForReplay()
 
     if( !m_ifsInputs.is_open() ) return false;
 
+    m_bIsReplay = true;
     return true;
 }

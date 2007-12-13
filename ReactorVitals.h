@@ -6,7 +6,8 @@ class ReactorVitals : public OCVitalsHealth
 {
 private:
 	// Seconds to fire the big explosion after its been destroyed
-	double m_dSecsToFire;
+	double m_dSecToFire;
+    double m_dSecToPanCam;
 
 public:
     /**

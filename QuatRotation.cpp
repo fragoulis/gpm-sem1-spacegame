@@ -41,6 +41,8 @@ namespace tlib
     // ----------------------------------------------------------------------------
     void OCQuatRotation::resetAngles()
     {
+        m_qPrevRot = m_qRot;
+        m_qRot.wxyz(1,0,0,0);
         m_qPitch.wxyz(1,0,0,0);
         m_qYaw.wxyz(1,0,0,0);
         m_qRoll.wxyz(1,0,0,0);
@@ -103,8 +105,7 @@ namespace tlib
         // Update the object's direction quaternion
         getOwner()->setDir( qNewDir );
 
-        m_qPrevRot = m_qRot;
-        m_qRot.wxyz(1,0,0,0);
+        resetAngles();
     }
 
 } // end of namespace tlib
