@@ -64,7 +64,7 @@ namespace tlib
         /**
          * Returns the imaginary part of the quaternion in vector format
          */
-        Vector3<T> xyz() { return Vector3<T>( &_wxyz[1] ); }
+        Vector3<T> xyz() const { return Vector3<T>( &_wxyz[1] ); }
 
         /**
          * Assigns a value to the   component
@@ -250,7 +250,7 @@ namespace tlib
     void Quaternion<T>::toRotation( float w, const Vector3<T> &xyz )
     {
         w *= 0.5f; // angle / 2
-        const T mysin = sin(w);
+        const float mysin = sin(w);
 
         // Setup rotation quaternion
         this->w( cos(w) );

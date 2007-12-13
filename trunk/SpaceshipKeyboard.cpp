@@ -1,16 +1,28 @@
-#include "spaceshipkeyboard.h"
-#include "spaceship.h"
+#include "SpaceshipKeyboard.h"
+#include "Spaceship.h"
+#include "Autopilot.h"
+#include "CameraMgr.h"
+#include "ObjectMgr.h"
 
 void SpaceshipKeyboard::update()
 {
     Spaceship *ship = (Spaceship*)getOwner();
     if( !ship->isActive() ) 
     {
-        ship->resetSpeed();
+        if( Autopilot::Instance().isActive() )
+        {
+            //CameraMgr::Instance().activate("stalker");
+            //ObjectMgr::Instance().showShip();
+            //CameraMgr::Instance().activate("first-person");
+            //ObjectMgr::Instance().hideShip();
+        }
+        else {
+            ship->resetSpeed();
+        }
         ship->ceaseFire();
         return;
     }
-    
+
     if( getKey('a') ) {
 		ship->speed(1.0f);
         //ship->speedUp();

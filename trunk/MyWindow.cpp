@@ -25,11 +25,11 @@
 #include "Clock.h"
 #include "Recorder.h"
 #include "EventMgr.h"
+#include "Autopilot.h"
 
 using namespace std;
 using namespace tlib;
 
-extern bool g_bIsReplay		= false;
 extern bool g_bSwitchCam	= false;
 extern bool g_bToggleRecord = false;
 
@@ -60,7 +60,8 @@ void MyWindow::OnCreate()
     Config cfg("config.txt");
     cfg.loadBlock("global");
     // Read whether this is a replay game
-    cfg.getBool("replay", &g_bIsReplay);
+    bool bIsReplay;
+    cfg.getBool("replay", &bIsReplay);
 
     // Read the file to output the recording to
     string sOutputFile;
@@ -70,7 +71,7 @@ void MyWindow::OnCreate()
 
     // Start the application clock.
     // If this is a replay game, use times from a file
-    if( g_bIsReplay ) {
+    if( bIsReplay ) {
         if( !Recorder::Instance().openInputsForReplay() ) {
             _LOG("Failed to open replay files. Exiting!");
             Close();
@@ -148,7 +149,7 @@ void MyWindow::OnCreate()
     cfg.loadBlock("pan_cam");
     cfg.getFloat("position", vfCamPos, 3);
 
-    Camera *camPan = CameraMgr::Instance().add<Camera>("end-scene");
+    Camera *camPan = CameraMgr::Instance().add<Camera>("pan-cam");
     camPan->setPos( Vector3f( vfCamPos ) );
     OCQuatRotation *cCamRot = (OCQuatRotation*)camPan->getComponent("orientation");
     cCamRot->lookAt( Vector3f(0.0f,0.0f,0.0f) );
@@ -185,12 +186,17 @@ void MyWindow::OnIdle()
     AppControl[RECORD] = g_bToggleRecord;
 
 	// At the end of replay exit gracefully
-	if( g_bIsReplay && !Clock::Instance().getCurrentFeed() ) {
+	if( Recorder::Instance().isReplayOn() && 
+        !Clock::Instance().getCurrentFeed() ) {
 		Close();
 	}
-
+    
+    if( Autopilot::Instance().isActive() ) {
+        Autopilot::Instance().update();
+    }
+    else // Autopilot and recording cannot be active at the same time
 	// If recording is on, save the time values
-    if( Recorder::Instance().isOn() ) {
+    if( Recorder::Instance().isRecordOn() ) {
         Recorder::Instance().record( Clock::Instance().getCurrentFeed() );
     }
     
@@ -241,6 +247,7 @@ void MyWindow::OnDestroy()
     Clock::Destroy();
     Recorder::Destroy();
     EventMgr::Destroy();
+    Autopilot::Destroy();
 }
 
 // ----------------------------------------------------------------------------

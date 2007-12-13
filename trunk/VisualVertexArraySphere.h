@@ -31,6 +31,11 @@ namespace tlib
         }
 
         /**
+         * Accessors
+         */
+        float getRadius() const { return m_fRadius; }
+
+        /**
          * Renders the sphere
          */
         void render() const;

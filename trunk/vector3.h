@@ -18,11 +18,6 @@ namespace tlib
         // The vector's components in array format
         T _xyz[3];
 
-        // The vector's length
-        // This will help us simplify the normalization of the vector,
-        // basically avoid normalization if length is already a unit
-        float m_fLength;
-
     public:
         /**
          * Constructors

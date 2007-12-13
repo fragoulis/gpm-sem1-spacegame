@@ -128,12 +128,12 @@ namespace tlib
                 m_vView.selfRotate( -alpha, normal );
                 m_vUp = m_vUp.rotate( -alpha, normal );
         }
-        m_vView = vNewView;
+        m_vView = vNewView; /// <-???????? what is this????
 
         // If the dot product is near to -1, it means we look the wrong way.
         // To correct this, we just rotate pi radians (a half circle).
         if( dotProd < -0.999f )
-            rotate( (float)M_PI, Vector3f::Up() );
+            m_vView.selfRotate( (float)M_PI, m_vUp );
 
     } // end _updateUpVector()
 
